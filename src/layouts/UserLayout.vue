@@ -10,7 +10,7 @@
           <div class="header">
             <a href="/">
               <img src="~@/assets/logo.png" class="logo" alt="logo">
-              <span class="title">AbsAdmin</span>
+              <span class="title">RMQX Admin</span>
             </a>
           </div>
           <div class="desc">
@@ -115,6 +115,7 @@ export default {
 
           .logo {
             height: 44px;
+            object-fit: contain;
             vertical-align: top;
             margin-right: 16px;
             border-style: none;
