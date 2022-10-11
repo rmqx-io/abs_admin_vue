@@ -28,6 +28,7 @@ const api = {
   user: '/admin/user',
   role: '/admin/role',
   service: '/service',
+  device: '/admin/device',
   permission: '/permission',
   permissionNoPager: '/permission/no-pager',
   orgTree: '/org/tree'
@@ -56,6 +57,14 @@ export function getServiceList (parameter) {
     url: api.service,
     method: 'get',
     params: parameter
+  })
+}
+
+export function getDeviceList (arg) {
+  return request({
+    url: api.device,
+    method: 'post',
+    data: arg
   })
 }
 

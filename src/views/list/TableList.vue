@@ -5,7 +5,7 @@
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item label="规则编号">
+              <a-form-item label="编号">
                 <a-input v-model="queryParam.id" placeholder=""/>
               </a-form-item>
             </a-col>
@@ -79,7 +79,7 @@
       <s-table
         ref="table"
         size="default"
-        rowKey="key"
+        rowKey="(record) => record.data.id"
         :columns="columns"
         :data="loadData"
         :alert="true"
@@ -121,48 +121,61 @@
 <script>
 import moment from 'moment'
 import { STable, Ellipsis } from '@/components'
-import { getRoleList, getServiceList } from '@/api/manage'
+import { getDeviceList, getRoleList } from '@/api/manage'
 
 import StepByStepModal from './modules/StepByStepModal'
 import CreateForm from './modules/CreateForm'
 
 const columns = [
+  // {
+  //   title: '#',
+  //   scopedSlots: { customRender: 'serial' }
+  // },
   {
-    title: '#',
-    scopedSlots: { customRender: 'serial' }
+    title: '编号',
+    dataIndex: 'id'
   },
   {
-    title: '规则编号',
-    dataIndex: 'no'
+    title: '创建时间',
+    dataIndex: 'create_time'
   },
   {
-    title: '描述',
-    dataIndex: 'description',
-    scopedSlots: { customRender: 'description' }
+    title: '第一次 GPS 定位时间',
+    dataIndex: 'first_gps_location_time'
   },
   {
-    title: '服务调用次数',
-    dataIndex: 'callNo',
-    sorter: true,
-    needTotal: true,
-    customRender: (text) => text + ' 次'
-  },
-  {
-    title: '状态',
-    dataIndex: 'status',
-    scopedSlots: { customRender: 'status' }
-  },
-  {
-    title: '更新时间',
-    dataIndex: 'updatedAt',
-    sorter: true
-  },
-  {
-    title: '操作',
-    dataIndex: 'action',
-    width: '150px',
-    scopedSlots: { customRender: 'action' }
+    title: '第一次基站定位时间',
+    dataIndex: 'first_cell_location_time'
   }
+  // ,
+  // {
+  //   title: '描述',
+  //   dataIndex: 'description',
+  //   scopedSlots: { customRender: 'description' }
+  // },
+  // {
+  //   title: '服务调用次数',
+  //   dataIndex: 'callNo',
+  //   sorter: true,
+  //   needTotal: true,
+  //   customRender: (text) => text + ' 次'
+  // },
+  // {
+  //   title: '状态',
+  //   dataIndex: 'status',
+  //   scopedSlots: { customRender: 'status' }
+  // },
+  // {
+  //   title: '更新时间',
+  //   dataIndex: 'updatedAt',
+  //   sorter: true
+  // },
+  // {
+  //   title: '操作',
+  //   dataIndex: 'action',
+  //   width: '150px',
+  //   scopedSlots: { customRender: 'action' }
+  // }
 ]
 
 const statusMap = {
@@ -203,13 +216,31 @@ export default {
       advanced: false,
       // 查询参数
       queryParam: {},
+      queryData: {
+        id: null,
+        account: null,
+        name: null,
+        page_no: 1,
+        page_size: 5
+      },
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        const requestParameters = Object.assign({}, parameter, this.queryParam)
-        console.log('loadData request parameters:', requestParameters)
-        return getServiceList(requestParameters)
+        let arg = Object.assign(parameter, this.queryData)
+        arg.page_no = arg.pageNo
+        arg.page_size = arg.pageSize
+        delete arg.pageNo
+        delete arg.pageSize
+        console.log('loadData request arg:', arg)
+        return getDeviceList(arg)
           .then(res => {
-            return res.result
+            // console.log(res)
+            return {
+              pageSize: res.data.page_size,
+              pageNo: res.data.page_no,
+              totalCount: res.data.total,
+              totalPage: res.data.pages,
+              data: res.data.records
+            }
           })
       },
       selectedRowKeys: [],

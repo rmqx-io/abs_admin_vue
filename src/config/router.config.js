@@ -40,50 +40,11 @@ export const asyncRouterMap = [
         meta: { title: 'menu.device', icon: 'table', permission: ['table'] },
         children: [
           {
-            path: '/list/table-list/:pageNo([1-9]\\d*)?',
+            path: '/list/table-list/:page_no([1-9]\\d*)?',
             name: 'TableListWrapper',
             hideChildrenInMenu: true, // 强制显示 MenuItem 而不是 SubMenu
             component: () => import('@/views/list/TableList'),
-            meta: { title: 'menu.list.table-list', keepAlive: true, permission: ['table'] }
-          },
-          {
-            path: '/list/basic-list',
-            name: 'BasicList',
-            component: () => import('@/views/list/BasicList'),
-            meta: { title: 'menu.list.basic-list', keepAlive: true, permission: ['table'] }
-          },
-          {
-            path: '/list/card',
-            name: 'CardList',
-            component: () => import('@/views/list/CardList'),
-            meta: { title: 'menu.list.card-list', keepAlive: true, permission: ['table'] }
-          },
-          {
-            path: '/list/search',
-            name: 'SearchList',
-            component: () => import('@/views/list/search/SearchLayout'),
-            redirect: '/list/search/article',
-            meta: { title: 'menu.list.search-list', keepAlive: true, permission: ['table'] },
-            children: [
-              {
-                path: '/list/search/article',
-                name: 'SearchArticles',
-                component: () => import('../views/list/search/Article'),
-                meta: { title: 'menu.list.search-list.articles', permission: ['table'] }
-              },
-              {
-                path: '/list/search/project',
-                name: 'SearchProjects',
-                component: () => import('../views/list/search/Projects'),
-                meta: { title: 'menu.list.search-list.projects', permission: ['table'] }
-              },
-              {
-                path: '/list/search/application',
-                name: 'SearchApplications',
-                component: () => import('../views/list/search/Applications'),
-                meta: { title: 'menu.list.search-list.applications', permission: ['table'] }
-              }
-            ]
+            meta: { title: 'menu.device', keepAlive: true, permission: ['table'] }
           }
         ]
       },
