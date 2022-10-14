@@ -63,7 +63,7 @@
       </div>
 
       <div class="table-operator">
-        <a-button type="primary" icon="plus" @click="handleAdd">新建</a-button>
+        <a-button type="primary" icon="plus" @click="handleAdd">添加</a-button>
         <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
           <a-menu slot="overlay">
             <a-menu-item key="1"><a-icon type="delete" />删除</a-menu-item>
@@ -96,11 +96,47 @@
           <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
         </span>
 
+        <span slot="device_info" slot-scope="text, record">
+          <template>
+            编号: <span>{{ record.code }}</span>
+            <br />
+            别名: <span>{{ record.alias }}</span>
+            <br />
+            ICCID: <span>{{ record.iccid }}</span>
+          </template>
+        </span>
+
+        <span slot="organization_info" slot-scope="text, record">
+          <template>
+            组织: <span>{{ record.organization_name }}</span>
+            <br />
+            仓库: <span>{{ record.storehouse_name }}</span>
+          </template>
+        </span>
+
+        <span slot="model_info" slot-scope="text, record">
+          <template>
+            电池型号: <span>{{ record.battery_name }}</span>
+            <br />
+            设备型号: <span>{{ record.model_name }}</span>
+            <br />
+            BT码: <span>{{ record.bms_bt }}</span>
+          </template>
+        </span>
+
+        <span slot="version_info" slot-scope="text, record">
+          <template>
+            软件: <span>{{ record.s_ver }}</span>
+            <br />
+            硬件: <span>{{ record.h_ver }}</span>
+          </template>
+        </span>
+
         <span slot="action" slot-scope="text, record">
           <template>
             <a @click="handleEdit(record)">配置</a>
             <a-divider type="vertical" />
-            <a @click="handleSub(record)">订阅报警</a>
+<!--            <a @click="handleSub(record)">订阅报警</a>-->
           </template>
         </span>
       </s-table>
@@ -121,7 +157,7 @@
 <script>
 import moment from 'moment'
 import { STable, Ellipsis } from '@/components'
-import { getDeviceList, getRoleList } from '@/api/manage'
+import { addDevice, getDeviceList, getRoleList } from '@/api/manage'
 
 import StepByStepModal from './modules/StepByStepModal'
 import CreateForm from './modules/CreateForm'
@@ -133,7 +169,27 @@ const columns = [
   // },
   {
     title: '编号',
-    dataIndex: 'id'
+    dataIndex: 'code',
+    scopedSlots: { customRender: 'device_info' }
+  },
+  {
+    title: '组织信息',
+    dataIndex: 'organization_name',
+    scopedSlots: { customRender: 'organization_info' }
+  },
+  {
+    title: '设备型号',
+    dataIndex: 'model_name',
+    scopedSlots: { customRender: 'model_info' }
+  },
+  {
+    title: '版本信息',
+    dataIndex: 'version',
+    scopedSlots: { customRender: 'version_info' }
+  },
+  {
+    title: '上线时间',
+    dataIndex: 'register_time',
   },
   {
     title: '创建时间',
@@ -170,12 +226,13 @@ const columns = [
   //   dataIndex: 'updatedAt',
   //   sorter: true
   // },
-  // {
-  //   title: '操作',
-  //   dataIndex: 'action',
-  //   width: '150px',
-  //   scopedSlots: { customRender: 'action' }
-  // }
+  ,
+  {
+    title: '操作',
+    dataIndex: 'action23',
+    width: '150px',
+    scopedSlots: { customRender: 'action' }
+  }
 ]
 
 const statusMap = {
@@ -256,7 +313,7 @@ export default {
     }
   },
   created () {
-    getRoleList({ t: new Date() })
+    // getRoleList({ t: new Date() })
   },
   computed: {
     rowSelection () {
@@ -268,6 +325,7 @@ export default {
   },
   methods: {
     handleAdd () {
+      console.log('handle add')
       this.mdl = null
       this.visible = true
     },
@@ -298,11 +356,18 @@ export default {
               this.$message.info('修改成功')
             })
           } else {
+            delete values.id
             // 新增
             new Promise((resolve, reject) => {
-              setTimeout(() => {
-                resolve()
-              }, 1000)
+              addDevice(values)
+                .then(res => {
+                  console.log(res)
+                  resolve()
+                }).catch(err => {
+                  console.log('add device', err)
+                  this.$message.error(err)
+                  reject(err)
+              })
             }).then(res => {
               this.visible = false
               this.confirmLoading = false
@@ -320,6 +385,7 @@ export default {
       })
     },
     handleCancel () {
+      console.log('handle cancel')
       this.visible = false
 
       const form = this.$refs.createModal.form

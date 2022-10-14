@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    title="新建规则"
+    title="添加设备"
     :width="640"
     :visible="visible"
     :confirmLoading="loading"
@@ -13,9 +13,39 @@
         <a-form-item v-show="model && model.id > 0" label="主键ID">
           <a-input v-decorator="['id', { initialValue: 0 }]" disabled />
         </a-form-item>
-        <a-form-item label="描述">
-          <a-input v-decorator="['description', {rules: [{required: true, min: 5, message: '请输入至少五个字符的规则描述！'}]}]" />
+        <a-form-item label="设备编号">
+          <a-input v-decorator="['device_id', { initialValue: '', rules: [ {required: true, min: 5, message: '至少5位'} ]}]" />
         </a-form-item>
+        <a-form-item label="运营单位">
+          <a-tree-select
+            :treeData="orgList"
+            v-decorator="['organization_id', { rules: [ {required: true} ]}]"
+          ></a-tree-select>
+        </a-form-item>
+        <a-form-item label="设备类型">
+          <a-select
+            v-decorator="['model_id', { rules: [ {required: true} ]}]"
+          >
+            <a-select-option
+              :value=1
+              >类型1</a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="电池类型">
+          <a-select
+            v-decorator="['battery_id', { rules: [ {required: false} ]}]"
+          >
+            <a-select-option
+              :value=1
+            >类型1</a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label='电话卡'>
+          <a-input v-decorator="['iccid']"/>
+        </a-form-item>
+<!--        <a-form-item label="描述">-->
+<!--          <a-input v-decorator="['description', {rules: [{required: true, min: 5, message: '请输入至少五个字符的规则描述！'}]}]" />-->
+<!--        </a-form-item>-->
       </a-form>
     </a-spin>
   </a-modal>
@@ -23,11 +53,13 @@
 
 <script>
 import pick from 'lodash.pick'
+import TagSelectOption from '@/components/TagSelect/TagSelectOption'
 
 // 表单字段
 const fields = ['description', 'id']
 
 export default {
+  components: { TagSelectOption },
   props: {
     visible: {
       type: Boolean,
@@ -54,7 +86,8 @@ export default {
       }
     }
     return {
-      form: this.$form.createForm(this)
+      form: this.$form.createForm(this),
+      orgList: []
     }
   },
   created () {
