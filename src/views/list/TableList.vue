@@ -365,6 +365,7 @@ export default {
                   resolve()
                 }).catch(err => {
                   console.log('add device', err)
+                  this.confirmLoading = false
                   this.$message.error(err)
                   reject(err)
               })

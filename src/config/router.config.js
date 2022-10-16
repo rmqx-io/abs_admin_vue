@@ -49,6 +49,47 @@ export const asyncRouterMap = [
         ]
       },
 
+      {
+        path: '/org',
+        name: 'org',
+        component: RouteView,
+        redirect: '/org/org',
+        meta: { title: 'menu.org', icon: 'table', permission: ['table'] },
+        children: [
+          {
+            path: '/org/org/:page_no([1-9]\\d*)?',
+            name: 'OrgList',
+            hideChildrenInMenu: true,
+            component: () => import('@/views/org/OrgList'),
+            meta: { title: 'menu.org', keepAlive: true, permission: ['table'] }
+          }
+        ]
+      },
+
+      {
+        path: '/model',
+        name: 'model',
+        component: RouteView,
+        redirect: '/model/device-model',
+        meta: { title: 'menu.model', icon: 'table', permission: ['table'] },
+        children: [
+          {
+            path: '/model/device-model/:page_no([1-9]\\d*)?',
+            name: 'DeviceList',
+            hideChildrenInMenu: true,
+            component: () => import('@/views/model/DeviceList'),
+            meta: { title: 'menu.device-model', keepAlive: true, permission: ['table'] }
+          },
+          {
+            path: '/model/battery-model/:page_no([1-9]\\d*)?',
+            name: 'BatteryList',
+            hideChildrenInMenu: true,
+            component: () => import('@/views/model/BatteryList'),
+            meta: { title: 'menu.battery-model', keepAlive: true, permission: ['table'] }
+          }
+        ]
+      },
+
       // forms
       {
         path: '/form',

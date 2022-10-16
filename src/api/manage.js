@@ -30,6 +30,11 @@ const api = {
   service: '/service',
   device: '/admin/device',
   add_device: '/admin/device/add',
+
+  org: '/admin/org',
+  add_org: '/admin/org/add',
+  org_tree: '/admin/organization/tree',
+
   permission: '/permission',
   permissionNoPager: '/permission/no-pager',
   orgTree: '/org/tree'
@@ -80,6 +85,30 @@ export function addDevice (arg) {
 export function getPermissions (parameter) {
   return request({
     url: api.permissionNoPager,
+    method: 'get',
+    params: parameter
+  })
+}
+
+export function getOrgList (arg) {
+  return request({
+    url: api.org,
+    method: 'post',
+    data: arg
+  })
+}
+
+export function addOrg (arg) {
+  return request({
+    url: api.add_org,
+    method: 'post',
+    data: arg
+  })
+}
+
+export function getAdminOrgTree (parameter) {
+  return request({
+    url: api.org_tree,
     method: 'get',
     params: parameter
   })
