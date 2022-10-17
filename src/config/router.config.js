@@ -37,7 +37,7 @@ export const asyncRouterMap = [
         name: 'list',
         component: RouteView,
         redirect: '/list/table-list',
-        meta: { title: 'menu.device', icon: 'table', permission: ['table'] },
+        meta: { title: 'menu.device', icon: 'bars', permission: ['table'] },
         children: [
           {
             path: '/list/table-list/:page_no([1-9]\\d*)?',
@@ -54,7 +54,7 @@ export const asyncRouterMap = [
         name: 'org',
         component: RouteView,
         redirect: '/org/org',
-        meta: { title: 'menu.org', icon: 'table', permission: ['table'] },
+        meta: { title: 'menu.org', icon: 'team', permission: ['table'] },
         children: [
           {
             path: '/org/org/:page_no([1-9]\\d*)?',
@@ -71,7 +71,7 @@ export const asyncRouterMap = [
         name: 'model',
         component: RouteView,
         redirect: '/model/device-model',
-        meta: { title: 'menu.model', icon: 'table', permission: ['table'] },
+        meta: { title: 'menu.model', icon: 'profile', permission: ['table'] },
         children: [
           {
             path: '/model/device-model/:page_no([1-9]\\d*)?',
