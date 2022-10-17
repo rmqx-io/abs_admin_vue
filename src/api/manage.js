@@ -35,6 +35,9 @@ const api = {
   add_org: '/admin/org/add',
   org_tree: '/admin/organization/tree',
 
+  device_model: '/admin/device/model/page',
+  battery_model: '/admin/battery/model/page',
+
   permission: '/permission',
   permissionNoPager: '/permission/no-pager',
   orgTree: '/org/tree'
@@ -111,6 +114,22 @@ export function getAdminOrgTree (parameter) {
     url: api.org_tree,
     method: 'get',
     params: parameter
+  })
+}
+
+export function getDeviceModelList (arg) {
+  return request({
+    url: api.device_model,
+    method: 'post',
+    data: arg
+  })
+}
+
+export function getBatteryModelList (arg) {
+  return request({
+    url: api.battery_model,
+    method: 'post',
+    data: arg
   })
 }
 
