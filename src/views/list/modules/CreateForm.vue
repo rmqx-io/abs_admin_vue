@@ -27,20 +27,16 @@
         </a-form-item>
         <a-form-item label="设备类型">
           <a-select
-            v-decorator="['model_name', { rules: [ {required: true} ]}]"
+            :options="options"
+            v-decorator="['model_id', { rules: [ {required: true} ]}]"
           >
-            <a-select-option
-              :value=1
-              >类型1</a-select-option>
           </a-select>
         </a-form-item>
         <a-form-item label="电池类型">
           <a-select
-            v-decorator="['battery_name', { rules: [ {required: false} ]}]"
+            :options="batteryModelOptions"
+            v-decorator="['battery_id', { rules: [ {required: false} ]}]"
           >
-            <a-select-option
-              :value=1
-            >类型1</a-select-option>
           </a-select>
         </a-form-item>
         <a-form-item label='电话卡'>
@@ -57,10 +53,10 @@
 <script>
 import pick from 'lodash.pick'
 import TagSelectOption from '@/components/TagSelect/TagSelectOption'
-import { getAdminOrgTree } from '@/api/manage'
+import { getAdminOrgTree, getBatteryModelList, getDeviceModelList } from '@/api/manage'
 
 // 表单字段
-const fields = ['id', 'code', 'organization_id', 'storehouse_name', 'battery_name', 'model_name', 'bms_bt', 'h_ver', 's_ver', 'iccid']
+const fields = ['id', 'code', 'organization_id', 'storehouse_name', 'battery_id', 'model_id', 'bms_bt', 'h_ver', 's_ver', 'iccid']
 
 export default {
   components: { TagSelectOption },
@@ -92,19 +88,23 @@ export default {
     return {
       form: this.$form.createForm(this),
       orgList: [],
-      org: undefined
+      options: [],
+      batteryModelOptions: []
     }
   },
   created () {
     console.log('custom modal created')
 
     this.getAdminOrgList()
+    this.getDeviceModelListOptions()
+    this.getBatteryModelOptions()
 
     // 防止表单未注册
     fields.forEach(v => this.form.getFieldDecorator(v))
 
     // 当 model 发生改变时，为表单设置值
     this.$watch('model', () => {
+      console.log('set fields value', this.model)
       this.model && this.form.setFieldsValue(pick(this.model, fields))
     })
   },
@@ -120,6 +120,33 @@ export default {
           console.log('org list', res)
           this.orgList = []
           this.orgList.push(res.data)
+        })
+    },
+    getDeviceModelListOptions () {
+      let parameter = {}
+      let arg = Object.assign(parameter, this.queryData)
+      arg.page_no = arg.pageNo
+      arg.page_size = arg.pageSize
+      delete arg.pageNo
+      delete arg.pageSize
+
+      return getDeviceModelList(arg)
+        .then(res => {
+          console.log('device model list', res.data.records)
+          res.data.records.forEach((model) => {
+            this.options.push({ value: model.id, label: model.name })
+          })
+          console.log('device model', this.options)
+        })
+    },
+    getBatteryModelOptions () {
+      return getBatteryModelList({})
+        .then(res => {
+          console.log('battery model list', res.data.records)
+          res.data.records.forEach((model) => {
+            this.batteryModelOptions.push({ value: model.id, label: model.name })
+          })
+          console.log('battery model', this.batteryModelOptions)
         })
     }
   }

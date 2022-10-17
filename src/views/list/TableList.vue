@@ -157,7 +157,7 @@
 <script>
 import moment from 'moment'
 import { STable, Ellipsis } from '@/components'
-import { addDevice, getDeviceList, getRoleList } from '@/api/manage'
+import { addDevice, getDeviceList, getRoleList, updateDevice } from '@/api/manage'
 
 import StepByStepModal from './modules/StepByStepModal'
 import CreateForm from './modules/CreateForm'
@@ -290,7 +290,7 @@ export default {
         console.log('loadData request arg:', arg)
         return getDeviceList(arg)
           .then(res => {
-            // console.log(res)
+            console.log('device list', res)
             return {
               pageSize: res.data.page_size,
               pageNo: res.data.page_no,
@@ -339,13 +339,20 @@ export default {
       this.confirmLoading = true
       form.validateFields((errors, values) => {
         if (!errors) {
-          console.log('values', values)
+          console.log('update device', values)
           if (values.id > 0) {
             // 修改 e.g.
             new Promise((resolve, reject) => {
-              setTimeout(() => {
-                resolve()
-              }, 1000)
+              updateDevice(values)
+                .then(res => {
+                  console.log(res)
+                  resolve()
+                }).catch(err => {
+                  console.log('update device', err)
+                  this.confirmLoading = false
+                  this.$message.error(err)
+                  reject(err)
+              })
             }).then(res => {
               this.visible = false
               this.confirmLoading = false
@@ -360,6 +367,7 @@ export default {
             delete values.id
             // 新增
             new Promise((resolve, reject) => {
+              console.log('add device', values)
               addDevice(values)
                 .then(res => {
                   console.log(res)

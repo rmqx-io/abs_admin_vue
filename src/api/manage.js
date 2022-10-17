@@ -30,6 +30,7 @@ const api = {
   service: '/service',
   device: '/admin/device',
   add_device: '/admin/device/add',
+  update_device: '/admin/device/update',
 
   org: '/admin/org',
   add_org: '/admin/org/add',
@@ -80,6 +81,14 @@ export function getDeviceList (arg) {
 export function addDevice (arg) {
   return request({
     url: api.add_device,
+    method: 'post',
+    data: arg
+  })
+}
+
+export function updateDevice (arg) {
+  return request({
+    url: api.update_device,
     method: 'post',
     data: arg
   })
