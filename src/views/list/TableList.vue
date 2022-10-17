@@ -134,7 +134,7 @@
 
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleEdit(record)">配置</a>
+            <a @click="handleEdit(record)">修改</a>
             <a-divider type="vertical" />
 <!--            <a @click="handleSub(record)">订阅报警</a>-->
           </template>
@@ -330,6 +330,7 @@ export default {
       this.visible = true
     },
     handleEdit (record) {
+      console.log('handleEdit', record)
       this.visible = true
       this.mdl = { ...record }
     },

@@ -14,17 +14,20 @@
           <a-input v-decorator="['id', { initialValue: 0 }]" disabled />
         </a-form-item>
         <a-form-item label="设备编号">
-          <a-input v-decorator="['device_id', { initialValue: '', rules: [ {required: true, min: 5, message: '至少5位'} ]}]" />
+          <a-input v-decorator="['code', { initialValue: '', rules: [ {required: true, min: 5, message: '至少5位'} ]}]" />
         </a-form-item>
         <a-form-item label="运营单位">
           <a-tree-select
+            show-search
+            tree-default-expand-all
+            :filterTreeNode="filterTreeNode"
             :treeData="orgList"
             v-decorator="['organization_id', { rules: [ {required: true} ]}]"
           ></a-tree-select>
         </a-form-item>
         <a-form-item label="设备类型">
           <a-select
-            v-decorator="['model_id', { rules: [ {required: true} ]}]"
+            v-decorator="['model_name', { rules: [ {required: true} ]}]"
           >
             <a-select-option
               :value=1
@@ -33,7 +36,7 @@
         </a-form-item>
         <a-form-item label="电池类型">
           <a-select
-            v-decorator="['battery_id', { rules: [ {required: false} ]}]"
+            v-decorator="['battery_name', { rules: [ {required: false} ]}]"
           >
             <a-select-option
               :value=1
@@ -54,9 +57,10 @@
 <script>
 import pick from 'lodash.pick'
 import TagSelectOption from '@/components/TagSelect/TagSelectOption'
+import { getAdminOrgTree } from '@/api/manage'
 
 // 表单字段
-const fields = ['description', 'id']
+const fields = ['id', 'code', 'organization_id', 'storehouse_name', 'battery_name', 'model_name', 'bms_bt', 'h_ver', 's_ver', 'iccid']
 
 export default {
   components: { TagSelectOption },
@@ -87,11 +91,14 @@ export default {
     }
     return {
       form: this.$form.createForm(this),
-      orgList: []
+      orgList: [],
+      org: undefined
     }
   },
   created () {
     console.log('custom modal created')
+
+    this.getAdminOrgList()
 
     // 防止表单未注册
     fields.forEach(v => this.form.getFieldDecorator(v))
@@ -100,6 +107,21 @@ export default {
     this.$watch('model', () => {
       this.model && this.form.setFieldsValue(pick(this.model, fields))
     })
+  },
+  methods: {
+    filterTreeNode (input, option) {
+      return (
+        option.data.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      )
+    },
+    getAdminOrgList () {
+      return getAdminOrgTree(this.queryParam)
+        .then(res => {
+          console.log('org list', res)
+          this.orgList = []
+          this.orgList.push(res.data)
+        })
+    }
   }
 }
 </script>
