@@ -25,6 +25,7 @@ const constantRouterComponents = {
 
   // list
   'TableList': () => import('@/views/list/TableList'),
+  'Info': () => import('@/views/list/components/Info'),
   'StandardList': () => import('@/views/list/BasicList'),
   'CardList': () => import('@/views/list/CardList'),
   'SearchLayout': () => import('@/views/list/search/SearchLayout'),

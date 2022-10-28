@@ -1,7 +1,10 @@
 <template>
   <page-header-wrapper>
-    <a-card :bordered="false">
-      <div class="table-page-search-wrapper">
+    <a-card
+      :bordered="false"
+
+    >
+      <div v-if="!battery_detail_visible" class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
@@ -62,7 +65,7 @@
         </a-form>
       </div>
 
-      <div class="table-operator">
+      <div v-if="!battery_detail_visible" class="table-operator">
         <a-button type="primary" icon="plus" @click="handleAdd">添加</a-button>
         <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
           <a-menu slot="overlay">
@@ -77,6 +80,7 @@
       </div>
 
       <s-table
+        v-if="!battery_detail_visible"
         ref="table"
         size="default"
         rowKey="(record) => record.data.id"
@@ -137,19 +141,29 @@
             <a @click="handleEdit(record)">修改</a>
             <a-divider type="vertical" />
 <!--            <a @click="handleSub(record)">订阅报警</a>-->
+            <a @click="handleBatteryInfo(record)">电池详情</a>
           </template>
         </span>
       </s-table>
 
       <create-form
+        v-if="!battery_detail_visible"
         ref="createModal"
-        :visible="visible"
+        :visible="device_create_form_visible"
         :loading="confirmLoading"
-        :model="mdl"
-        @cancel="handleCancel"
-        @ok="handleOk"
+        :model="device_create_form_data"
+        @cancel="handleCreateFormCancel"
+        @ok="handleCreateFormOk"
       />
-      <step-by-step-modal ref="modal" @ok="handleOk"/>
+      <step-by-step-modal v-if="!battery_detail_visible" ref="modal" @ok="handleCreateFormOk"/>
+
+      <info
+        v-if="battery_detail_visible"
+        ref="batteryInfo"
+        :device-id="device_id"
+        @cancel="handleBatteryInfoCancel"
+        @ok="handleBatteryInfoOk"
+      />
     </a-card>
   </page-header-wrapper>
 </template>
@@ -161,6 +175,7 @@ import { addDevice, getDeviceList, getRoleList, updateDevice } from '@/api/manag
 
 import StepByStepModal from './modules/StepByStepModal'
 import CreateForm from './modules/CreateForm'
+import Info from '@/views/list/components/Info'
 
 const columns = [
   // {
@@ -260,15 +275,18 @@ export default {
     STable,
     Ellipsis,
     CreateForm,
-    StepByStepModal
+    StepByStepModal,
+    Info
   },
   data () {
     this.columns = columns
     return {
       // create model
-      visible: false,
+      device_create_form_visible: false,
+      battery_detail_visible: false,
       confirmLoading: false,
-      mdl: null,
+      device_create_form_data: null,
+      device_id: null,
       // 高级搜索 展开/关闭
       advanced: false,
       // 查询参数
@@ -326,15 +344,15 @@ export default {
   methods: {
     handleAdd () {
       console.log('handle add')
-      this.mdl = null
-      this.visible = true
+      this.device_create_form_data = null
+      this.device_create_form_visible = true
     },
     handleEdit (record) {
       console.log('handleEdit', record)
-      this.visible = true
-      this.mdl = { ...record }
+      this.device_create_form_visible = true
+      this.device_create_form_data = { ...record }
     },
-    handleOk () {
+    handleCreateFormOk () {
       const form = this.$refs.createModal.form
       this.confirmLoading = true
       form.validateFields((errors, values) => {
@@ -354,7 +372,7 @@ export default {
                   reject(err)
               })
             }).then(res => {
-              this.visible = false
+              this.device_create_form_visible = false
               this.confirmLoading = false
               // 重置表单数据
               form.resetFields()
@@ -379,7 +397,7 @@ export default {
                   reject(err)
               })
             }).then(res => {
-              this.visible = false
+              this.device_create_form_visible = false
               this.confirmLoading = false
               // 重置表单数据
               form.resetFields()
@@ -394,12 +412,18 @@ export default {
         }
       })
     },
-    handleCancel () {
+    handleCreateFormCancel () {
       console.log('handle cancel')
-      this.visible = false
+      this.device_create_form_visible = false
 
       const form = this.$refs.createModal.form
       form.resetFields() // 清理表单数据（可不做）
+    },
+    handleBatteryInfoCancel () {
+      this.battery_detail_visible = false
+    },
+    handleBatteryInfoOk () {
+      this.battery_detail_visible = false
     },
     handleSub (record) {
       if (record.status !== 0) {
@@ -407,6 +431,19 @@ export default {
       } else {
         this.$message.error(`${record.no} 订阅失败，规则已关闭`)
       }
+    },
+    handleBatteryInfo (record) {
+      // this.$router.push({ path: '/list/table-list/info/1' })
+      this.device_id = record.code
+      this.battery_detail_visible = true
+      console.log(this.$refs)
+      // batteryInfo 因为不可见，在这个循环里面，还没有被创建，所以 refs 里面没有
+      // 需要在下一个循环里面执行 batteryInfo 的代码
+      this.$nextTick(() => {
+        console.log(this.$refs)
+        this.$refs.batteryInfo.getBatteryInfo(record.code)
+      })
+      // this.$refs.batteryInfo.getBatteryInfo(record.code)
     },
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys

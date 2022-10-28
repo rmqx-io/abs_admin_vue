@@ -44,11 +44,22 @@ export const asyncRouterMap = [
             name: 'TableListWrapper',
             hideChildrenInMenu: true, // 强制显示 MenuItem 而不是 SubMenu
             component: () => import('@/views/list/TableList'),
-            meta: { title: 'menu.device', keepAlive: true, permission: ['table'] }
+            meta: { title: '设备列表', keepAlive: true, permission: ['table'] },
+            children: [
+            ]
+          },
+          {
+            path: '/list/table-list/info/:device_id([1-9]\\d*)?',
+            // hideChildrenInMenu: true,
+            hidden: true,
+            // name: 'ProfileBasic',
+            // component: () => import('@/views/profile/basic'),
+            name: 'Info',
+            component: () => import('@/views/list/components/Info'),
+            meta: { title: '电池详情', keepAlive: true, permission: ['table'] }
           }
         ]
       },
-
       {
         path: '/org',
         name: 'org',
