@@ -28,12 +28,20 @@
         <a-row :gutter="48">
           <a-col :md="8" :sm="24">
             <a-form-item aria-label="结束日期">
-              <a-date-picker v-model="queryData.end_date" style="width: 100%" placeholder="结束日期"/>
+              <a-date-picker
+                v-model="queryData.end_date"
+                style="width: 100%"
+                placeholder="结束日期"
+              />
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="24">
             <a-form-item aria-label="结束时间">
-              <a-time-picker v-model="queryData.end_time" style="width: 100%" placeholder="结束时间"/>
+              <a-time-picker
+                v-model="queryData.end_time"
+                style="width: 100%"
+                placeholder="结束时间"
+              />
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="24">
@@ -164,7 +172,10 @@ export default {
     this.columns = columns
     return {
       queryParam: {},
-      queryData: {},
+      queryData: {
+        start_date: moment(new Date() - 2 * 60 * 60 * 1000),
+        start_time: moment(new Date() - 2 * 60 * 60 * 1000)
+      },
       loadData: parameter => {
         // let arg = Object.assign(parameter, this.queryData)
         console.log('parameter', parameter)
