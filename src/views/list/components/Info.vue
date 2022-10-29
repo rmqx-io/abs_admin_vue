@@ -1,8 +1,47 @@
 <template>
   <a-card>
     <div><a @click="handleClose()"><< 返回</a></div>
-    <div>{{ this.deviceId }}</div>
+    <div>
+      <br />
+    </div>
+    <div>
+      设备：{{ this.deviceId }}
+    </div>
+    <div>
+      <br />
+    </div>
 <!--    <div>{{ this.data }}</div>-->
+    <div class="table-page-search-wrapper">
+      <a-form layout="inline">
+        <a-row :gutter="48">
+          <a-col :md="8" :sm="24">
+            <a-form-item aria-label="起始日期">
+              <a-date-picker v-model="queryData.start_date" style="width: 100%" placeholder="起始日期"/>
+            </a-form-item>
+          </a-col>
+          <a-col :md="8" :sm="24">
+            <a-form-item aria-label="起始时间">
+              <a-time-picker v-model="queryData.start_time" style="width: 100%" placeholder="起始时间"/>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="48">
+          <a-col :md="8" :sm="24">
+            <a-form-item aria-label="结束日期">
+              <a-date-picker v-model="queryData.end_date" style="width: 100%" placeholder="结束日期"/>
+            </a-form-item>
+          </a-col>
+          <a-col :md="8" :sm="24">
+            <a-form-item aria-label="结束时间">
+              <a-time-picker v-model="queryData.end_time" style="width: 100%" placeholder="结束时间"/>
+            </a-form-item>
+          </a-col>
+          <a-col :md="8" :sm="24">
+            <a-button type="primary" @click="$refs.batteryInfoTable.refresh(true)">查询</a-button>
+          </a-col>
+        </a-row>
+      </a-form>
+    </div>
     <s-table
       ref="batteryInfoTable"
       size="default"
@@ -43,6 +82,7 @@
 </template>
 
 <script>
+import moment from 'moment'
 import { getBatteryInfo } from '@/api/manage'
 import { STable } from '@/components'
 
@@ -55,7 +95,10 @@ const columns = [
   {
     title: '时间',
     dataIndex: 'time_tracking',
-    scopedSlots: { customRender: 'time_track' }
+    customRender: (value, row, index) => {
+      return moment(value).format('YYYY-MM-DD HH:MM:SS')
+    }
+    // scopedSlots: { customRender: 'time_track' }
   },
   {
     title: '单个电池电压',
@@ -120,8 +163,12 @@ export default {
   data () {
     this.columns = columns
     return {
+      queryParam: {},
+      queryData: {},
       loadData: parameter => {
-        const arg = {}
+        // let arg = Object.assign(parameter, this.queryData)
+        console.log('parameter', parameter)
+        let arg = this.queryData
         console.log('loadData request arg:', arg)
         return getBatteryInfo(this.deviceId, arg)
           .then(res => {
