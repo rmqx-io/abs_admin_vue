@@ -4,7 +4,7 @@
       :bordered="false"
 
     >
-      <div v-if="!battery_detail_visible" class="table-page-search-wrapper">
+      <div v-if="table_visible" class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
@@ -65,7 +65,7 @@
         </a-form>
       </div>
 
-      <div v-if="!battery_detail_visible" class="table-operator">
+      <div v-if="table_visible" class="table-operator">
         <a-button type="primary" icon="plus" @click="handleAdd">添加</a-button>
         <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
           <a-menu slot="overlay">
@@ -80,7 +80,7 @@
       </div>
 
       <s-table
-        v-if="!battery_detail_visible"
+        v-if="table_visible"
         ref="table"
         size="default"
         rowKey="(record) => record.data.id"
@@ -142,12 +142,14 @@
             <a-divider type="vertical" />
 <!--            <a @click="handleSub(record)">订阅报警</a>-->
             <a @click="handleBatteryInfo(record)">电池详情</a>
+            <a-divider type="vertical" />
+            <a @click="handleMap(record)">历史行程</a>
           </template>
         </span>
       </s-table>
 
       <create-form
-        v-if="!battery_detail_visible"
+        v-if="table_visible"
         ref="createModal"
         :visible="device_create_form_visible"
         :loading="confirmLoading"
@@ -155,7 +157,7 @@
         @cancel="handleCreateFormCancel"
         @ok="handleCreateFormOk"
       />
-      <step-by-step-modal v-if="!battery_detail_visible" ref="modal" @ok="handleCreateFormOk"/>
+      <step-by-step-modal v-if="table_visible" ref="modal" @ok="handleCreateFormOk"/>
 
       <info
         v-if="battery_detail_visible"
@@ -164,18 +166,84 @@
         @cancel="handleBatteryInfoCancel"
         @ok="handleBatteryInfoOk"
       />
+
+      <div
+        v-if="map_visible"
+        style="width: 100%; height: 600px"
+      >
+        <div><a @click="handleMapClose()"><< 返回</a></div>
+        <div><br /></div>
+        <div>设备：{{ device_id }}</div>
+        <div><br /></div>
+        <a-spin :spinning="map_loading">
+          <a-form layout="inline">
+            <a-row :gutter="48">
+              <a-col :md="8" :sm="24">
+                <a-form-item aria-label="起始日期">
+                  <a-date-picker v-model="queryData.start_date" style="width: 100%" placeholder="起始日期"/>
+                </a-form-item>
+              </a-col>
+              <a-col :md="8" :sm="24">
+                <a-form-item aria-label="起始时间">
+                  <a-time-picker v-model="queryData.start_time" style="width: 100%" placeholder="起始时间"/>
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="48">
+              <a-col :md="8" :sm="24">
+                <a-form-item aria-label="结束日期">
+                  <a-date-picker
+                    v-model="queryData.end_date"
+                    style="width: 100%"
+                    placeholder="结束日期"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :md="8" :sm="24">
+                <a-form-item aria-label="结束时间">
+                  <a-time-picker
+                    v-model="queryData.end_time"
+                    style="width: 100%"
+                    placeholder="结束时间"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :md="8" :sm="24">
+                <a-button type="primary" @click="refreshMap(device_id)">查询</a-button>
+              </a-col>
+            </a-row>
+          </a-form>
+        </a-spin>
+        <el-amap
+          vid="'amapDemo'"
+          :map-style="'fresh'"
+          size="mini"
+          :zoom="zoom"
+          :center="center"
+          v-if="refresh_map"
+        >
+          <el-amap-polyline
+            :path="polyline.path"
+            :line-join="'round'"
+          ></el-amap-polyline>
+        </el-amap>
+      </div>
+
     </a-card>
   </page-header-wrapper>
 </template>
 
 <script>
+import VueAMap from 'vue-amap'
 import moment from 'moment'
 import { STable, Ellipsis } from '@/components'
-import { addDevice, getDeviceList, getRoleList, updateDevice } from '@/api/manage'
+import { addDevice, getBatteryInfo, getDeviceList, getLocation, getRoleList, updateDevice } from '@/api/manage'
 
 import StepByStepModal from './modules/StepByStepModal'
 import CreateForm from './modules/CreateForm'
 import Info from '@/views/list/components/Info'
+
+let amapManager = new VueAMap.AMapManager()
 
 const columns = [
   // {
@@ -278,15 +346,26 @@ export default {
     StepByStepModal,
     Info
   },
-  data () {
+  data() {
     this.columns = columns
     return {
       // create model
       device_create_form_visible: false,
+      table_visible: true,
       battery_detail_visible: false,
+      map_visible: false,
       confirmLoading: false,
       device_create_form_data: null,
       device_id: null,
+      map_loading: false,
+      refresh_map: true,
+      polyline: {
+        path: [
+            [121.5389385, 31.21515044],
+            [121.5389385, 31.29615044],
+            [121.5273285, 31.21515044]
+        ]
+      },
       // 高级搜索 展开/关闭
       advanced: false,
       // 查询参数
@@ -296,7 +375,9 @@ export default {
         account: null,
         name: null,
         page_no: 1,
-        page_size: 5
+        page_size: 5,
+        start_date: moment(new Date() - 2 * 60 * 60 * 1000),
+        start_time: moment(new Date() - 2 * 60 * 60 * 1000)
       },
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
@@ -319,22 +400,26 @@ export default {
           })
       },
       selectedRowKeys: [],
-      selectedRows: []
+      selectedRows: [],
+      // 地图
+      zoom: 14,
+      center: [121.5389385, 31.29615044],
+      amapManager
     }
   },
   filters: {
-    statusFilter (type) {
+    statusFilter(type) {
       return statusMap[type].text
     },
-    statusTypeFilter (type) {
+    statusTypeFilter(type) {
       return statusMap[type].status
     }
   },
-  created () {
+  created() {
     // getRoleList({ t: new Date() })
   },
   computed: {
-    rowSelection () {
+    rowSelection() {
       return {
         selectedRowKeys: this.selectedRowKeys,
         onChange: this.onSelectChange
@@ -342,17 +427,17 @@ export default {
     }
   },
   methods: {
-    handleAdd () {
+    handleAdd() {
       console.log('handle add')
       this.device_create_form_data = null
       this.device_create_form_visible = true
     },
-    handleEdit (record) {
+    handleEdit(record) {
       console.log('handleEdit', record)
       this.device_create_form_visible = true
       this.device_create_form_data = { ...record }
     },
-    handleCreateFormOk () {
+    handleCreateFormOk() {
       const form = this.$refs.createModal.form
       this.confirmLoading = true
       form.validateFields((errors, values) => {
@@ -366,10 +451,10 @@ export default {
                   console.log(res)
                   resolve()
                 }).catch(err => {
-                  console.log('update device', err)
-                  this.confirmLoading = false
-                  this.$message.error(err)
-                  reject(err)
+                console.log('update device', err)
+                this.confirmLoading = false
+                this.$message.error(err)
+                reject(err)
               })
             }).then(res => {
               this.device_create_form_visible = false
@@ -391,10 +476,10 @@ export default {
                   console.log(res)
                   resolve()
                 }).catch(err => {
-                  console.log('add device', err)
-                  this.confirmLoading = false
-                  this.$message.error(err)
-                  reject(err)
+                console.log('add device', err)
+                this.confirmLoading = false
+                this.$message.error(err)
+                reject(err)
               })
             }).then(res => {
               this.device_create_form_visible = false
@@ -412,30 +497,33 @@ export default {
         }
       })
     },
-    handleCreateFormCancel () {
+    handleCreateFormCancel() {
       console.log('handle cancel')
       this.device_create_form_visible = false
 
       const form = this.$refs.createModal.form
       form.resetFields() // 清理表单数据（可不做）
     },
-    handleBatteryInfoCancel () {
+    handleBatteryInfoCancel() {
       this.battery_detail_visible = false
+      this.table_visible = true
     },
-    handleBatteryInfoOk () {
+    handleBatteryInfoOk() {
       this.battery_detail_visible = false
+      this.table_visible = true
     },
-    handleSub (record) {
+    handleSub(record) {
       if (record.status !== 0) {
         this.$message.info(`${record.no} 订阅成功`)
       } else {
         this.$message.error(`${record.no} 订阅失败，规则已关闭`)
       }
     },
-    handleBatteryInfo (record) {
+    handleBatteryInfo(record) {
       // this.$router.push({ path: '/list/table-list/info/1' })
       this.device_id = record.code
       this.battery_detail_visible = true
+      this.table_visible = false
       console.log(this.$refs)
       // batteryInfo 因为不可见，在这个循环里面，还没有被创建，所以 refs 里面没有
       // 需要在下一个循环里面执行 batteryInfo 的代码
@@ -445,17 +533,55 @@ export default {
       })
       // this.$refs.batteryInfo.getBatteryInfo(record.code)
     },
-    onSelectChange (selectedRowKeys, selectedRows) {
+    onSelectChange(selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
     },
-    toggleAdvanced () {
+    toggleAdvanced() {
       this.advanced = !this.advanced
     },
-    resetSearchForm () {
+    resetSearchForm() {
       this.queryParam = {
         date: moment(new Date())
       }
+    },
+    handleMapClose() {
+      this.map_visible = false
+      this.table_visible = true
+    },
+    handleMap(record) {
+      this.device_id = record.code
+      this.map_visible = true
+      this.table_visible = false
+      this.refreshMap(record.code)
+    },
+    refreshMap (deviceId) {
+      this.map_loading = true
+      let arg = this.queryData
+      console.log('loadData request arg:', arg)
+      return getLocation(deviceId, arg)
+        .then(res => {
+          this.map_loading = false
+          this.polyline.path = []
+          this.center = [res.data[0].mars_longitude, res.data[0].mars_latitude]
+          res.data.forEach((item, index) => {
+            this.polyline.path.push([item.mars_longitude, item.mars_latitude])
+          })
+          console.log('path', this.polyline.path)
+          this.refresh_map = false
+          this.$nextTick(() => {
+              this.refresh_map = true
+            }
+          )
+        }).catch(err => {
+          console.log('get location data failed', err)
+          this.map_loading = false
+          this.refresh_map = false
+          this.$nextTick(() => {
+              this.refresh_map = true
+            }
+          )
+        })
     }
   }
 }

@@ -12,43 +12,45 @@
     </div>
 <!--    <div>{{ this.data }}</div>-->
     <div class="table-page-search-wrapper">
-      <a-form layout="inline">
-        <a-row :gutter="48">
-          <a-col :md="8" :sm="24">
-            <a-form-item aria-label="起始日期">
-              <a-date-picker v-model="queryData.start_date" style="width: 100%" placeholder="起始日期"/>
-            </a-form-item>
-          </a-col>
-          <a-col :md="8" :sm="24">
-            <a-form-item aria-label="起始时间">
-              <a-time-picker v-model="queryData.start_time" style="width: 100%" placeholder="起始时间"/>
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="48">
-          <a-col :md="8" :sm="24">
-            <a-form-item aria-label="结束日期">
-              <a-date-picker
-                v-model="queryData.end_date"
-                style="width: 100%"
-                placeholder="结束日期"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :md="8" :sm="24">
-            <a-form-item aria-label="结束时间">
-              <a-time-picker
-                v-model="queryData.end_time"
-                style="width: 100%"
-                placeholder="结束时间"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :md="8" :sm="24">
-            <a-button type="primary" @click="$refs.batteryInfoTable.refresh(true)">查询</a-button>
-          </a-col>
-        </a-row>
-      </a-form>
+      <a-spin :spinning="bms_loading">
+        <a-form layout="inline">
+          <a-row :gutter="48">
+            <a-col :md="8" :sm="24">
+              <a-form-item aria-label="起始日期">
+                <a-date-picker v-model="queryData.start_date" style="width: 100%" placeholder="起始日期"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item aria-label="起始时间">
+                <a-time-picker v-model="queryData.start_time" style="width: 100%" placeholder="起始时间"/>
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <a-row :gutter="48">
+            <a-col :md="8" :sm="24">
+              <a-form-item aria-label="结束日期">
+                <a-date-picker
+                  v-model="queryData.end_date"
+                  style="width: 100%"
+                  placeholder="结束日期"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item aria-label="结束时间">
+                <a-time-picker
+                  v-model="queryData.end_time"
+                  style="width: 100%"
+                  placeholder="结束时间"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-button type="primary" @click="$refs.batteryInfoTable.refresh(true)">查询</a-button>
+            </a-col>
+          </a-row>
+        </a-form>
+      </a-spin>
     </div>
     <s-table
       ref="batteryInfoTable"
@@ -171,18 +173,21 @@ export default {
   data () {
     this.columns = columns
     return {
+      bms_loading: false,
       queryParam: {},
       queryData: {
         start_date: moment(new Date() - 2 * 60 * 60 * 1000),
         start_time: moment(new Date() - 2 * 60 * 60 * 1000)
       },
       loadData: parameter => {
+        this.bms_loading = true
         // let arg = Object.assign(parameter, this.queryData)
         console.log('parameter', parameter)
         let arg = this.queryData
         console.log('loadData request arg:', arg)
         return getBatteryInfo(this.deviceId, arg)
           .then(res => {
+            this.bms_loading = false
             return {
               pageSize: 1000,
               pageNo: 0,
@@ -190,6 +195,9 @@ export default {
               totalPage: 1,
               data: res.data
             }
+          }).catch(err => {
+            console.log('load bms data failed', err)
+            this.bms_loading = false
           })
       },
       selectedRowKeys: [],

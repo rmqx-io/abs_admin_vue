@@ -40,6 +40,7 @@ const api = {
   battery_model: '/admin/battery/model/page',
 
   battery_info: '/admin/device/bms/info',
+  location: '/admin/device/location',
 
   permission: '/permission',
   permissionNoPager: '/permission/no-pager',
@@ -147,6 +148,14 @@ export function getBatteryModelList (arg) {
 export function getBatteryInfo (deviceId, arg) {
   return request({
     url: api.battery_info + '/' + deviceId,
+    method: 'post',
+    data: arg
+  })
+}
+
+export function getLocation (deviceId, arg) {
+  return request({
+    url: api.location + '/' + deviceId,
     method: 'post',
     data: arg
   })

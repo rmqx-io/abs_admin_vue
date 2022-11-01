@@ -21,6 +21,8 @@ import './permission' // permission control
 import './utils/filter' // global filter
 import './assets/global.less' // global style
 
+import VueAMap from 'vue-amap'
+
 Vue.config.productionTip = false
 
 // mount axios to `Vue.$http` and `this.$http`
@@ -29,6 +31,25 @@ Vue.use(VueAxios)
 Vue.component('pro-layout', ProLayout)
 Vue.component('page-container', PageHeaderWrapper)
 Vue.component('page-header-wrapper', PageHeaderWrapper)
+
+// 初始化vue-amap
+Vue.use(VueAMap)
+VueAMap.initAMapApiLoader({
+  key: '5817d32d7eb114d90df69cbf22cf1c87',
+  plugin: [
+    'AMap.Autocomplete',
+    'AMap.Geocoder',
+    'AMap.PlaceSearch',
+    'AMap.Scale',
+    'AMap.OverView',
+    'AMap.ToolBar',
+    'AMap.MapType',
+    'AMap.AMapManager',
+    'AMap.Geolocation',
+  ],
+  v: '1.4.4',
+  uiVersion: '1.0.11',
+})
 
 window.umi_plugin_ant_themeVar = themePluginConfig.theme
 
