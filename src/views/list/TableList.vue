@@ -403,7 +403,7 @@ export default {
       selectedRows: [],
       // 地图
       zoom: 14,
-      center: [121.5389385, 31.29615044],
+      center: [113.94, 22.52],
       amapManager
     }
   },
