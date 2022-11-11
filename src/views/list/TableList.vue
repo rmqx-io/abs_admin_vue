@@ -226,6 +226,12 @@
             :path="polyline.path"
             :line-join="'round'"
           ></el-amap-polyline>
+          <el-amap-marker
+            v-for="(marker,i) in polyline.path"
+            :position="marker"
+            :key="i"
+          >
+          </el-amap-marker>
         </el-amap>
       </div>
 
