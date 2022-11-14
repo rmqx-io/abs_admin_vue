@@ -24,6 +24,7 @@
       </div>
 
       <s-table
+        v-if="false"
         ref="table"
         size="default"
         rowKey="(record) => record.data.id"
@@ -43,6 +44,36 @@
         @cancel="handleCancel"
         @ok="handleOk"
       />
+
+      <zk-table
+        ref="tree-table"
+        sum-text="sum"
+        index-text="#"
+        :data="orgList"
+        :columns="orgColumns"
+        :stripe="treeProps.stripe"
+        :border="treeProps.border"
+        :show-header="treeProps.showHeader"
+        :show-summary="treeProps.showSummary"
+        :show-row-hover="treeProps.showRowHover"
+        :show-index="treeProps.showIndex"
+        :tree-type="treeProps.treeType"
+        :is-fold="treeProps.isFold"
+        :expand-type="treeProps.expandType"
+        :selection-type="treeProps.selectionType">
+        <template slot="$expand" scope="scope">
+          {{ `My name is ${scope.row.name},
+     this rowIndex is ${scope.rowIndex}.`
+        }}
+        </template>
+        <template slot="likes" scope="scope">
+          {{ scope.row.likes.join(',') }}
+        </template>
+<!--        <template slot="opt" scope="scope">-->
+<!--          <a-button type="primary" icon="el-icon-edit" size="mini">编辑</a-button>-->
+<!--          <a-button type="danger" icon="el-icon-delete" size="mini">删除</a-button>-->
+<!--        </template>-->
+      </zk-table>
     </a-card>
   </page-header-wrapper>
 </template>
@@ -51,7 +82,12 @@
 import { Ellipsis, STable } from '@/components'
 import CreateOrgForm from '@/views/org/CreateOrgForm'
 import StepByStepModal from '@/views/list/modules/StepByStepModal'
-import { addOrg, getOrgList } from '@/api/manage'
+import { addOrg, getAdminOrgTree, getOrgList } from '@/api/manage'
+
+import Vue from 'vue'
+import ZkTable from 'vue-table-with-tree-grid'
+
+Vue.use(ZkTable)
 
 const columns = [
   {
@@ -115,7 +151,7 @@ export default {
         console.log('loadData request arg:', arg)
         return getOrgList(arg)
           .then(res => {
-            console.log('laod data', res)
+            console.log('load data', res)
             return {
               pageSize: res.data.page_size,
               pageNo: res.data.page_no,
@@ -126,8 +162,34 @@ export default {
           })
       },
       selectedRowKeys: [],
-      selectedRows: []
+      selectedRows: [],
+      treeProps: {
+        stripe: false,
+        border: false,
+        showHeader: true,
+        showSummary: false,
+        showRowHover: true,
+        showIndex: false,
+        treeType: true,
+        isFold: false,
+        expandType: false,
+        selectionType: false
+      },
+      orgList: [],
+       orgColumns: [
+         {
+           label: '名称',
+           prop: 'title'
+         },
+         {
+           label: '编号',
+          prop: 'value'
+        }
+      ]
     }
+  },
+  created () {
+    this.loadOrgTree()
   },
   computed: {
     rowSelection () {
@@ -165,7 +227,8 @@ export default {
               // 重置表单数据
               form.resetFields()
               // 刷新表格
-              this.$refs.table.refresh()
+              // this.$refs.table.refresh()
+              this.loadOrgTree()
 
               this.$message.info('修改成功')
             })
@@ -190,7 +253,8 @@ export default {
               // 重置表单数据
               form.resetFields()
               // 刷新表格
-              this.$refs.table.refresh()
+              // this.$refs.table.refresh()
+              this.loadOrgTree()
 
               this.$message.info('新增成功')
             })
@@ -206,6 +270,14 @@ export default {
 
       const form = this.$refs.createModal.form
       form.resetFields() // 清理表单数据（可不做）
+    },
+    loadOrgTree () {
+      getAdminOrgTree(this.queryParam)
+        .then(res => {
+          console.log('org tree', res)
+          this.orgList = []
+          this.orgList.push(res.data)
+        })
     }
   }
 }
