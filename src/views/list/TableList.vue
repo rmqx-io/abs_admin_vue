@@ -138,8 +138,8 @@
 
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleEdit(record)">修改</a>
-            <a-divider type="vertical" />
+            <a v-if="is_sysadmin" @click="handleEdit(record)">修改</a>
+            <a-divider v-if="is_sysadmin" type="vertical" />
 <!--            <a @click="handleSub(record)">订阅报警</a>-->
             <a @click="handleBatteryInfo(record)">电池详情</a>
             <a-divider type="vertical" />
@@ -248,6 +248,8 @@ import { addDevice, getBatteryInfo, getDeviceList, getLocation, getRoleList, upd
 import StepByStepModal from './modules/StepByStepModal'
 import CreateForm from './modules/CreateForm'
 import Info from '@/views/list/components/Info'
+import storage from 'store'
+import { ACCESS_TOKEN, ROLE } from '@/store/mutation-types'
 
 let amapManager = new VueAMap.AMapManager()
 
@@ -356,6 +358,7 @@ export default {
     this.columns = columns
     return {
       // create model
+      is_sysadmin: false,
       device_create_form_visible: false,
       table_visible: true,
       battery_detail_visible: false,
@@ -421,8 +424,13 @@ export default {
       return statusMap[type].status
     }
   },
-  created() {
+  created () {
     // getRoleList({ t: new Date() })
+    const role = storage.get(ROLE)
+    console.log('role', role)
+    if (role === 'sysadmin') {
+      this.is_sysadmin = true
+    }
   },
   computed: {
     rowSelection() {
@@ -459,7 +467,7 @@ export default {
                 }).catch(err => {
                 console.log('update device', err)
                 this.confirmLoading = false
-                this.$message.error(err)
+                this.$message.error(err.data.message)
                 reject(err)
               })
             }).then(res => {
@@ -484,7 +492,7 @@ export default {
                 }).catch(err => {
                 console.log('add device', err)
                 this.confirmLoading = false
-                this.$message.error(err)
+                this.$message.error(err.data.message)
                 reject(err)
               })
             }).then(res => {
