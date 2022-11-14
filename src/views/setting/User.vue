@@ -206,6 +206,10 @@ const columns = [
     // scopedSlots: {customRender: 'name'},
   },
   {
+    title: '组织',
+    dataIndex: 'organization_name'
+  },
+  {
     title: '状态',
     dataIndex: 'state',
     scopedSlots: { customRender: 'state' }
