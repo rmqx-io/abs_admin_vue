@@ -164,6 +164,16 @@
             placeholder='确认密码'>
           </a-input-password>
         </a-form-item>
+        <a-form-item label="上级组织">
+          <a-tree-select
+            v-model='dialogData.organization_id'
+            show-search
+            tree-default-expand-all
+            :filterTreeNode="filterTreeNode"
+            :treeData="orgList"
+          >
+          </a-tree-select>
+        </a-form-item>
         <a-form-item label='角色集'>
           <a-tree
             v-model='dialogData.role_ids'
@@ -176,7 +186,6 @@
           />
         </a-form-item>
       </a-form>
-
 
     </a-modal>
   </div>
@@ -226,7 +235,14 @@ const columns = [
   }
 ]
 
-import { sys_role_layer_top, sys_user_add, sys_user_remove, sys_user_page, sys_user_update } from '@/api/manage'
+import {
+  sys_role_layer_top,
+  sys_user_add,
+  sys_user_remove,
+  sys_user_page,
+  sys_user_update,
+  getAdminOrgTree
+} from '@/api/manage'
 import { showMsg } from '@/utils/data'
 
 export default {
@@ -253,14 +269,24 @@ export default {
         role_ids: [],
         role_id: null,
         password_confirm: null,
-        set_pwd: false
+        set_pwd: false,
+        organization_id: null
       },
       visible: false,
       dialogMode: 'add',
-      all_role: []
+      all_role: [],
+      orgList: []
     }
   },
+  created () {
+    this.getAdminOrgList()
+  },
   methods: {
+    filterTreeNode (input, option) {
+      return (
+        option.data.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      )
+    },
     handleTableChange(pagination, filters, sorter) {
       console.log(pagination)
       const pager = { ...this.pagination }
@@ -309,8 +335,9 @@ export default {
       this.visible = true
       this.dialogMode = 'add'
     },
-    //处理添加产品
+    // 处理添加产品
     handleAddData: function() {
+      console.log('dialog data', this.dialogData)
       if (this.dialogData.set_pwd && this.dialogData.password_confirm !== this.dialogData.password) {
         this.$message.info('密码不一致!')
         return
@@ -324,7 +351,6 @@ export default {
 
         })
       } else if (this.dialogMode === 'edit') {
-
         sys_user_update(this.dialogData)
           .then((res) => {
             this.visible = false
@@ -341,7 +367,7 @@ export default {
         this.dialogData = Object.assign({ role_ids: [], role_id: null }, scope)
       }
     },
-    //handleEdit
+    // handleEdit
     handleEdit: function(scope) {
       this.visible = true
       this.dialogMode = 'edit'
@@ -350,6 +376,7 @@ export default {
       } else {
         this.dialogData = Object.assign({ role_ids: [], role_id: null }, scope)
       }
+      this.dialogData.organization_id = scope.organization_id
     },
     handleDelete: function(scope) {
       let self = this
@@ -412,8 +439,15 @@ export default {
         this.dialogData.role_ids = []
         this.dialogData.role_id = null
       }
+    },
+    getAdminOrgList () {
+      return getAdminOrgTree(this.queryParam)
+        .then(res => {
+          console.log('org list', res)
+          this.orgList = []
+          this.orgList.push(res.data)
+        })
     }
-
   }
 }
 </script>
