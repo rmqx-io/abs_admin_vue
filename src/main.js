@@ -26,7 +26,8 @@ import VueAMap from 'vue-amap'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/display.css'
 
-// import '@/styles/element-variables.scss'
+import '@/styles/variables.scss'
+import '@/styles/element-variables.scss'
 
 Vue.config.productionTip = false
 Vue.use(ElementUI, {

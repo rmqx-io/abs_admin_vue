@@ -10,32 +10,38 @@
     <div>
       <br />
     </div>
-    <div class="content_bt" style="width: 300px; margin-top: 16px">
-      <span
-        style="
-          font-size: 14px;
-          font-weight: bold;
-          text-align: left;
-          line-height: 200%;
-        "
-      >
-<!--        电池编码：{{ this.batteryBt }}-->
-        <br />
-<!--        更新时间：{{ this.mRefreshDate }}-->
-<!--        <el-tag-->
-<!--          :type="this.mCurA == 0 ? 'info' : this.mCurA > 0 ? 'warning' : 'danger'"-->
-<!--        >-->
-<!--          {{ this.mCurA == 0 ? '搁置中' : this.mCurA > 0 ? '充电中' : '放电中' }}-->
-<!--        </el-tag>-->
-      </span>
-<!--      <span class="title_tx2">SOC:{{ this.mCurSoc }}%</span>-->
-      <el-image
-        style="margin-top: 15px; width: 300px; height: 160px"
-        class="img_battery"
-        fit="fill"
-        :src="require('@/assets/battery/icon_battery_' + this.mSocImg + '.png')"
-      />
-    </div><!--    <div>{{ this.data }}</div>-->
+    <el-row type="flex" align="middle" style="padding: 8px">
+      <el-col :span="10" type="flex" align="middle">
+        <div class="content_bt" style="width: 300px; margin-top: 16px">
+          <span
+            style="
+              font-size: 14px;
+              font-weight: bold;
+              text-align: left;
+              line-height: 200%;
+            "
+          >
+            电池编码：{{ this.batteryBt }}
+            <br />
+            更新时间：{{ this.mRefreshDate }}
+            <el-tag
+              :type="this.mCurA == 0 ? 'info' : this.mCurA > 0 ? 'warning' : 'danger'"
+            >
+              {{ this.mCurA == 0 ? '搁置中' : this.mCurA > 0 ? '充电中' : '放电中' }}
+            </el-tag>
+          </span>
+        </div>
+        <el-row>
+          <span class="title_tx2">SOC:{{ this.mCurSoc }}%</span>
+          <el-image
+            style="margin-top: 15px; width: 300px; height: 160px"
+            class="img_battery"
+            fit="fill"
+            :src="require('@/assets/battery/icon_battery_' + this.mSocImg + '.png')"
+          />
+        </el-row>
+      </el-col>
+    </el-row>
     <div class="table-page-search-wrapper">
       <a-spin :spinning="bms_loading">
         <a-form layout="inline">
@@ -227,7 +233,11 @@ export default {
       },
       selectedRowKeys: [],
       selectedRows: [],
-      mSocImg: 1
+      mSocImg: 1,
+      mCurSoc: 0,
+      batteryBt: '',
+      mRefreshDate: '',
+      mCurA: 0
     }
   },
   created () {
@@ -282,4 +292,126 @@ export default {
     background-color: @border-color-split;
   }
 }
+.img_battery {
+  height: 120px;
+  width: 230px;
+  margin-bottom: 8px;
+}
+.item_battery {
+  height: 30px;
+  width: 30px;
+}
+.title_tx2 {
+  position: absolute;
+  z-index: 1000;
+  font-size: 28px;
+  width: 290px;
+  top: 80px;
+  text-align: center;
+}
+.tx_soh {
+  color: #47ba80;
+  font-size: 16px;
+  font-weight: bold;
+}
+.content_bt {
+  flex-direction: column;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.content_start {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.content_center_dir {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.content_center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.content_between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.det_title {
+  font-size: 18px;
+  font-weight: bold;
+}
+.bg-suc-a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  color: #fff;
+  background: #47ba80;
+  border-radius: 4px;
+}
+.bg-suc-t {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  color: #fff;
+  background: #47ba80;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+.bg-suc-b {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  border-style: solid;
+  border-color: #47ba80;
+  text-decoration: none;
+}
+
+.bg-fail-a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  color: #fff;
+  background: #f34d37;
+  border-radius: 4px;
+}
+.bg-fail-t {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  color: #fff;
+  background: #f34d37;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+.bg-fail-b {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  border-style: solid;
+  border-color: #f34d37;
+  text-decoration: none;
+}
+.text-suc {
+  color: #47ba80;
+}
+.text-fail {
+  color: #5a5a5a;
+}
+
 </style>
