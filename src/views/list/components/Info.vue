@@ -40,7 +40,118 @@
             :src="require('@/assets/battery/icon_battery_' + this.mSocImg + '.png')"
           />
         </el-row>
+        <el-row type="flex" align="middle" style="margin-top: 20px">
+          <el-col :span="2" :offset="6" type="flex" align="middle">
+            <span
+              class="tx_soh"
+              :style="
+                mSoh < 30
+                  ? 'color:#f34d37'
+                  : mSoh < 70
+                    ? 'color:#F8B34D'
+                    : 'color:#47ba80'
+              "
+            >
+              SOH:
+            </span>
+          </el-col>
+          <el-col :span="10" type="flex" align="middle">
+            <el-progress
+              :text-inside="true"
+              :stroke-width="20"
+              :percentage="mSoh"
+              :color="customColorMethod"
+            ></el-progress>
+          </el-col>
+        </el-row>
+
+        <el-col
+          :span="24"
+          type="flex"
+          align="middle"
+          justify="middle"
+          style="margin-top: 30px; margin-bottom: 30px"
+        >
+          <el-descriptions :column="2" border>
+            <el-descriptions-item label="充电MOS" span="1">
+              <el-switch
+                v-model="isMosRec"
+                disabled
+                active-color="#41b584"
+                inactive-color="#f34d37"
+              ></el-switch>
+            </el-descriptions-item>
+            <el-descriptions-item label="放电MOS" span="1">
+              <el-switch
+                v-model="isMosDis"
+                disabled
+                active-color="#41b584"
+                inactive-color="#f34d37"
+              ></el-switch>
+            </el-descriptions-item>
+            <el-descriptions-item label="当前电流" span="1">
+              <el-tag
+                size="small"
+                :type="mCurA == 0 ? 'info' : mCurA > 0 ? 'warning' : 'danger'"
+              >
+                {{ mCurA }}A
+              </el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="当前电压" span="1">
+              <el-tag size="small">{{ mCurV }}V</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="剩余容量" span="1">
+              <el-tag size="small">{{ mSurplusCapacity }}ah</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="循环次数" span="1">
+              <el-tag size="small">{{ mRecIndex }}次</el-tag>
+            </el-descriptions-item>
+          </el-descriptions>
+        </el-col>
+
+        <el-row type="flex" align="middle" style="padding: 8px">
+          <el-col :span="12" type="flex" align="middle">
+            <span>放电MOS:</span>
+            <el-tag
+              size="mini"
+              type="danger"
+              effect="dark"
+              @click="onSendOrderTag('放电MOS关闭')"
+            >
+              关闭
+            </el-tag>
+            <el-tag
+              size="mini"
+              type="success"
+              effect="dark"
+              @click="onSendOrderTag('放电MOS打开')"
+            >
+              开启
+            </el-tag>
+          </el-col>
+          <el-col :span="12" type="flex" align="middle">
+            <span>充电MOS:</span>
+            <el-tag
+              size="mini"
+              type="danger"
+              effect="dark"
+              @click="onSendOrderTag('充电MOS关闭')"
+            >
+              关闭
+            </el-tag>
+            <el-tag
+              size="mini"
+              type="success"
+              effect="dark"
+              @click="onSendOrderTag('充电MOS打开')"
+            >
+              开启
+            </el-tag>
+          </el-col>
+        </el-row>
+        <el-row type="flex" align="middle" style="padding: 8px"></el-row>
       </el-col>
+
     </el-row>
     <div class="table-page-search-wrapper">
       <a-spin :spinning="bms_loading">
@@ -237,7 +348,13 @@ export default {
       mCurSoc: 0,
       batteryBt: '',
       mRefreshDate: '',
-      mCurA: 0
+      mCurA: 0,
+      mSoh: 0,
+      isMosRec: false,
+      isMosDis: false,
+      mCurV: 0,
+      mSurplusCapacity: 0,
+      mRecIndex: 0
     }
   },
   created () {
@@ -259,6 +376,15 @@ export default {
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
+    },
+    customColorMethod (percentage) {
+      if (percentage < 30) {
+        return '#f34d37'
+      } else if (percentage < 70) {
+        return '#F8B34D'
+      } else {
+        return '#47ba80'
+      }
     }
   }
 }
