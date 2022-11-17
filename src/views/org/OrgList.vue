@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+<!--  <page-header-wrapper>-->
     <a-card :bordered="false">
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
@@ -75,7 +75,7 @@
 <!--        </template>-->
       </zk-table>
     </a-card>
-  </page-header-wrapper>
+<!--  </page-header-wrapper>-->
 </template>
 
 <script>
