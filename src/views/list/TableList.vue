@@ -1,5 +1,5 @@
 <template>
-  <page-header-wrapper>
+<!--  <page-header-wrapper>-->
     <a-card
       :bordered="false"
 
@@ -236,7 +236,7 @@
       </div>
 
     </a-card>
-  </page-header-wrapper>
+<!--  </page-header-wrapper>-->
 </template>
 
 <script>
@@ -284,7 +284,7 @@ const columns = [
   },
   {
     title: '创建时间',
-    dataIndex: 'create_time'
+    dataIndex: 'create_date'
   },
   {
     title: '第一次 GPS 定位时间',
