@@ -432,6 +432,13 @@ export default {
       this.is_sysadmin = true
     }
   },
+  mounted () {
+    // console.log('mounted', this.$route)
+    if (this.$route.query.device_id) {
+      this.queryData.device_id = this.$route.query.device_id
+      this.$refs.table.refresh(true)
+    }
+  },
   computed: {
     rowSelection() {
       return {
