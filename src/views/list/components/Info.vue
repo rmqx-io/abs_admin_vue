@@ -152,6 +152,108 @@
         <el-row type="flex" align="middle" style="padding: 8px"></el-row>
       </el-col>
 
+      <!-- 电池图表 -->
+      <el-col :span="14" type="flex" align="middle">
+        <el-row>
+          <el-col type="flex" align="middle" justify="middle">
+            <chart-bms-more
+              ref="bmschart"
+            ></chart-bms-more>
+            <span
+              v-if="initHis && dataListBMS.length == 0"
+              style="border-style: solid; border-width: 1px; padding: 8px"
+            >
+              设备无数据
+            </span>
+          </el-col>
+          <el-col
+            :span="23"
+            :offset="1"
+            type="flex"
+            align="middle"
+            justify="middle"
+          >
+            <el-row
+              v-for="(itemList, indexList) in tempList"
+              :key="'temp' + indexList"
+              style="margin-top: 8px"
+              type="flex"
+              align="middle"
+            >
+              <el-col
+                v-for="(item, index) in itemList"
+                :key="'temp2' + index"
+                :span="7"
+                class="content_center"
+              >
+                <el-image
+                  class="item_battery"
+                  :src="require('@/assets/battery/icon_temp_item.png')"
+                />
+                <span style="font-size: 12px; margin-right: 4px">
+                  {{ item.name }}:
+                </span>
+                <span :style="'font-size: 12px; font-weight: bold;'">
+                  {{ item.value }}℃
+                </span>
+              </el-col>
+            </el-row>
+
+            <el-row type="flex" align="start" style="margin-top: 20px">
+              <el-col :span="7" type="flex" align="middle">
+                <el-tag size="small" effect="plain" type="success">
+                  最高单体电压：{{ maxVol }}V
+                </el-tag>
+              </el-col>
+              <el-col :span="7" type="flex" align="middle">
+                <el-tag size="small" effect="plain" type="danger">
+                  最低单体电压：{{ mixVol }}V
+                </el-tag>
+              </el-col>
+              <el-col :span="7" type="flex" align="middle">
+                <el-tag size="small" effect="plain" type="info">
+                  单体电压压差：{{ marginV }}V
+                </el-tag>
+              </el-col>
+            </el-row>
+
+            <!-- 第一排 -->
+            <el-row
+              v-for="(itemList, indexList) in batteryList"
+              :key="'battery' + indexList"
+              style="margin-top: 8px"
+              type="flex"
+            >
+              <el-col
+                v-for="(item, index) in itemList"
+                :key="'battery2' + index"
+                :span="5"
+                class="content_start"
+              >
+                <span style="font-size: 12px; width: 20px">
+                  [{{ indexList * 5 + index + 1 }}]
+                </span>
+                <el-image
+                  class="item_battery"
+                  :src="require('@/assets/battery/icon_battery_item.png')"
+                />
+                <span
+                  :style="
+                    'font-size: 12px; font-weight: bold;' +
+                    (item.value == maxVol
+                      ? 'color:#47ba80;'
+                      : item.value == mixVol
+                      ? 'color:#f34d37;'
+                      : 'color:#222222;')
+                  "
+                >
+                  {{ item.value }}V
+                </span>
+              </el-col>
+            </el-row>
+          </el-col>
+        </el-row>
+      </el-col>
     </el-row>
     <div class="table-page-search-wrapper">
       <a-spin :spinning="bms_loading">
@@ -237,6 +339,8 @@
 import moment from 'moment'
 import { getBatteryInfo } from '@/api/manage'
 import { STable } from '@/components'
+import ChartBmsMore from '@/views/history/bms_history/components/ChartBmsMore.vue'
+import { getDateStr } from '@/utils/dateUtils'
 
 const columns = [
   {
@@ -284,7 +388,8 @@ const columns = [
 export default {
   name: 'Info',
   components: {
-    STable
+    STable,
+    ChartBmsMore
   },
   props: {
     loading: {
@@ -344,20 +449,71 @@ export default {
       },
       selectedRowKeys: [],
       selectedRows: [],
-      mSocImg: 1,
-      mCurSoc: 0,
-      batteryBt: '',
-      mRefreshDate: '',
-      mCurA: 0,
-      mSoh: 0,
+
+      initHis: false,
+      valueDate: [],
+      dataListBMS: [],
+
+      mRefreshDate: '-',
+      mCurSn: '',
       isMosRec: false,
       isMosDis: false,
-      mCurV: 0,
-      mSurplusCapacity: 0,
-      mRecIndex: 0
+      isEleLink: false,
+      isRec: false,
+      mSocImg: 1,
+      mCurA: '-',
+      mCurV: '-',
+      mCurSoc: '-',
+      mSoh: 0,
+      mSurplusCapacity: '-',
+      mRecIndex: '-',
+
+      marginV: '-',
+      maxVol: '-',
+      mixVol: '-',
+      batterySpeSwitch: false,
+      batterySystime: '-',
+      batteryVer: '-',
+      batteryBt: '-',
+
+      mAlarm1: '-',
+      mAlarm2: '-',
+      mAlarm3: '-',
+      mAlarm4: '-',
+      mAlarm5: '-',
+      mAlarm6: '-',
+      mAlarm7: '-',
+      mAlarm8: '-',
+      mAlarm9: '-',
+      mAlarm10: '-',
+      mAlarm11: '-',
+      mAlarm12: '-',
+      mAlarm13: '-',
+      mAlarm14: '-',
+      mAlarm15: '-',
+      mAlarm16: '-',
+      mAlarm17: '-',
+      mAlarm18: '-',
+      mAlarm19: '-',
+      tempList: [],
+      batteryList: [
+        [
+          { pos: '', value: '-' },
+          { pos: '', value: '-' },
+          { pos: '', value: '-' },
+          { pos: '', value: '-' },
+          { pos: '', value: '-' }
+        ]
+      ]
     }
   },
   created () {
+  },
+  mounted () {
+    if (this.dataListBMS.length === 0) {
+      this.initBMSUI()
+      // this.getBmsHis(this.mCurSn, 227, 6)
+    }
   },
   computed: {
     rowSelection () {
@@ -385,6 +541,54 @@ export default {
       } else {
         return '#47ba80'
       }
+    },
+    initBMSUI () {
+      var dateStr = getDateStr(new Date())
+      setTimeout(() => {
+        this.$nextTick(() => {
+          this.$refs['bmschart'].init(
+            [
+              [
+                {
+                  value: 0,
+                  date: dateStr,
+                },
+                {
+                  value: 0,
+                  date: dateStr,
+                },
+                {
+                  value: 0,
+                  date: dateStr,
+                },
+                {
+                  value: 0,
+                  date: dateStr,
+                },
+                {
+                  value: 0,
+                  date: dateStr,
+                },
+                {
+                  value: 0,
+                  date: dateStr,
+                },
+              ],
+            ],
+            ['电压', '电流', 'SOC', '箱内温度', '电池温度', '功率管温度'],
+            ['V', 'A', '%', '℃', '℃', '℃'],
+            [
+              '#6AD6E6',
+              '#6F95DA',
+              '#47ba80',
+              '#E8A456',
+              '#DBBB5B',
+              '#E8E156'
+            ],
+            3
+          )
+        })
+      }, 300)
     }
   }
 }
