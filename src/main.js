@@ -23,7 +23,15 @@ import './assets/global.less' // global style
 
 import VueAMap from 'vue-amap'
 
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/display.css'
+
+// import '@/styles/element-variables.scss'
+
 Vue.config.productionTip = false
+Vue.use(ElementUI, {
+  size: 'small',
+})
 
 // mount axios to `Vue.$http` and `this.$http`
 Vue.use(VueAxios)

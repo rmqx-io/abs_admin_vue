@@ -10,7 +10,32 @@
     <div>
       <br />
     </div>
-<!--    <div>{{ this.data }}</div>-->
+    <div class="content_bt" style="width: 300px; margin-top: 16px">
+      <span
+        style="
+          font-size: 14px;
+          font-weight: bold;
+          text-align: left;
+          line-height: 200%;
+        "
+      >
+<!--        电池编码：{{ this.batteryBt }}-->
+        <br />
+<!--        更新时间：{{ this.mRefreshDate }}-->
+<!--        <el-tag-->
+<!--          :type="this.mCurA == 0 ? 'info' : this.mCurA > 0 ? 'warning' : 'danger'"-->
+<!--        >-->
+<!--          {{ this.mCurA == 0 ? '搁置中' : this.mCurA > 0 ? '充电中' : '放电中' }}-->
+<!--        </el-tag>-->
+      </span>
+<!--      <span class="title_tx2">SOC:{{ this.mCurSoc }}%</span>-->
+      <el-image
+        style="margin-top: 15px; width: 300px; height: 160px"
+        class="img_battery"
+        fit="fill"
+        :src="require('@/assets/battery/icon_battery_' + this.mSocImg + '.png')"
+      />
+    </div><!--    <div>{{ this.data }}</div>-->
     <div class="table-page-search-wrapper">
       <a-spin :spinning="bms_loading">
         <a-form layout="inline">
@@ -201,7 +226,8 @@ export default {
           })
       },
       selectedRowKeys: [],
-      selectedRows: []
+      selectedRows: [],
+      mSocImg: 1
     }
   },
   created () {
