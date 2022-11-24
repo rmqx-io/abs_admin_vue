@@ -227,7 +227,7 @@
             :line-join="'round'"
           ></el-amap-polyline>
           <el-amap-marker
-            v-for="(marker,i) in polyline.path"
+            v-for="(marker,i) in polyline.markers"
             :position="marker"
             :key="i"
           >
@@ -369,11 +369,8 @@ export default {
       map_loading: false,
       refresh_map: true,
       polyline: {
-        path: [
-            [121.5389385, 31.21515044],
-            [121.5389385, 31.29615044],
-            [121.5273285, 31.21515044]
-        ]
+        path: [],
+        markers: []
       },
       // 高级搜索 展开/关闭
       advanced: false,
@@ -583,17 +580,24 @@ export default {
       return getLocation(deviceId, arg)
         .then(res => {
           this.map_loading = false
-          this.polyline.path = []
-          this.center = [res.data[0].mars_longitude, res.data[0].mars_latitude]
-          res.data.forEach((item, index) => {
-            this.polyline.path.push([item.mars_longitude, item.mars_latitude])
-          })
-          console.log('path', this.polyline.path)
-          this.refresh_map = false
-          this.$nextTick(() => {
-              this.refresh_map = true
-            }
-          )
+          if (res.data.length > 0) {
+            this.polyline.path = []
+            this.polyline.markers = []
+            this.center = [res.data[0].mars_longitude, res.data[0].mars_latitude]
+            res.data.forEach((item, index) => {
+              // console.log('mars_lng', item.mars_longitude)
+              // console.log('mars_lat', item.mars_latitude)
+              // console.log('push', [item.mars_longitude, item.mars_latitude])
+              this.polyline.path.push([item.mars_longitude, item.mars_latitude])
+              this.polyline.markers.push([item.mars_longitude, item.mars_latitude])
+            })
+            console.log('path', this.polyline.path)
+            this.refresh_map = false
+            this.$nextTick(() => {
+                this.refresh_map = true
+              }
+            )
+          }
         }).catch(err => {
           console.log('get location data failed', err)
           this.map_loading = false
