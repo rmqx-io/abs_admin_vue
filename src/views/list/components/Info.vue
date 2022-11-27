@@ -11,7 +11,9 @@
       <br />
     </div>
 
-    <bms-info-charts>
+    <bms-info-charts
+      :device-id='deviceId'
+    >
     </bms-info-charts>
 
     <div class="table-page-search-wrapper">

@@ -11,23 +11,23 @@
               line-height: 200%;
             "
           >
-            电池编码：{{ this.batteryBt }}
+            电池编码：{{ this.batteryName }}
             <br />
-            更新时间：{{ this.mRefreshDate }}
+            更新时间：{{ this.time_tracking }}
             <el-tag
-              :type="this.mCurA == 0 ? 'info' : this.mCurA > 0 ? 'warning' : 'danger'"
+              :type="this.battery_currency === 0 ? 'info' : this.battery_currency > 0 ? 'warning' : 'danger'"
             >
-              {{ this.mCurA == 0 ? '搁置中' : this.mCurA > 0 ? '充电中' : '放电中' }}
+              {{ this.battery_currency === 0 ? '搁置中' : this.battery_currency > 0 ? '充电中' : '放电中' }}
             </el-tag>
           </span>
         </div>
         <el-row>
-          <span class="title_tx2">SOC:{{ this.mCurSoc }}%</span>
+          <span class="title_tx2">SOC:{{ this.battery_capacity_soc }}%</span>
           <el-image
             style="margin-top: 15px; width: 300px; height: 160px"
             class="img_battery"
             fit="fill"
-            :src="require('@/assets/battery/icon_battery_' + this.mSocImg + '.png')"
+            :src="require('@/assets/battery/icon_battery_' + this.getSocImg(this.battery_capacity_soc) + '.png')"
           />
         </el-row>
         <el-row type="flex" align="middle" style="margin-top: 20px">
@@ -35,9 +35,9 @@
             <span
               class="tx_soh"
               :style="
-                mSoh < 30
+                battery_healthy < 30
                   ? 'color:#f34d37'
-                  : mSoh < 70
+                  : battery_healthy < 70
                     ? 'color:#F8B34D'
                     : 'color:#47ba80'
               "
@@ -49,7 +49,7 @@
             <el-progress
               :text-inside="true"
               :stroke-width="20"
-              :percentage="mSoh"
+              :percentage="battery_healthy"
               :color="customColorMethod"
             ></el-progress>
           </el-col>
@@ -82,19 +82,19 @@
             <el-descriptions-item label="当前电流" span="1">
               <el-tag
                 size="small"
-                :type="mCurA == 0 ? 'info' : mCurA > 0 ? 'warning' : 'danger'"
+                :type="battery_currency === 0 ? 'info' : battery_currency > 0 ? 'warning' : 'danger'"
               >
-                {{ mCurA }}A
+                {{ battery_currency }}A
               </el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="当前电压" span="1">
-              <el-tag size="small">{{ mCurV }}V</el-tag>
+              <el-tag size="small">{{ battery_voltage }}V</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="剩余容量" span="1">
-              <el-tag size="small">{{ mSurplusCapacity }}ah</el-tag>
+              <el-tag size="small">{{ battery_capacity_soc * battery_capacity_config / 100 }} ah</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="循环次数" span="1">
-              <el-tag size="small">{{ mRecIndex }}次</el-tag>
+              <el-tag size="small">{{ battery_charging_cycle }} 次</el-tag>
             </el-descriptions-item>
           </el-descriptions>
         </el-col>
@@ -197,12 +197,12 @@
               </el-col>
               <el-col :span="7" type="flex" align="middle">
                 <el-tag size="small" effect="plain" type="danger">
-                  最低单体电压：{{ mixVol }}V
+                  最低单体电压：{{ minVol }}V
                 </el-tag>
               </el-col>
               <el-col :span="7" type="flex" align="middle">
                 <el-tag size="small" effect="plain" type="info">
-                  单体电压压差：{{ marginV }}V
+                  单体电压压差：{{ voltageDifference }}V
                 </el-tag>
               </el-col>
             </el-row>
@@ -230,9 +230,9 @@
                 <span
                   :style="
                     'font-size: 12px; font-weight: bold;' +
-                      (item.value == maxVol
+                      (item.value === maxVol
                         ? 'color:#47ba80;'
-                        : item.value == mixVol
+                        : item.value === minVol
                           ? 'color:#f34d37;'
                           : 'color:#222222;')
                   "
@@ -259,14 +259,14 @@
           <span class="det_title">基础信息</span>
         </el-col>
         <el-col :span="2">
-          <el-button
-            type="primary"
-            size="mini"
-            style="margin-left: 8px"
-            @click="onSendOrder()"
-          >
-            下发指令
-          </el-button>
+<!--          <el-button-->
+<!--            type="primary"-->
+<!--            size="mini"-->
+<!--            style="margin-left: 8px"-->
+<!--            @click="onSendOrder()"-->
+<!--          >-->
+<!--            下发指令-->
+<!--          </el-button>-->
         </el-col>
       </el-row>
 
@@ -281,7 +281,7 @@
         <el-descriptions-item span="2">
           <template slot="label">
             <i class="el-icon-stopwatch"></i>
-            GPS电压
+            GPS电压 ?
           </template>
           {{ mBatteryVoltage }}V
         </el-descriptions-item>
@@ -343,10 +343,10 @@
             {{ mACCON ? '运动中' : '静止' }}
           </el-tag>
           <el-tag
-            :type="mCurA == 0 ? 'info' : mCurA > 0 ? 'warning' : 'danger'"
+            :type="battery_currency === 0 ? 'info' : battery_currency > 0 ? 'warning' : 'danger'"
             size="mini"
           >
-            {{ mCurA == 0 ? '搁置中' : mCurA > 0 ? '充电中' : '放电中' }}
+            {{ battery_currency === 0 ? '搁置中' : battery_currency > 0 ? '充电中' : '放电中' }}
           </el-tag>
         <!-- <el-tag size="mini">油电开</el-tag> -->
         </el-descriptions-item>
@@ -775,6 +775,8 @@
 import { getDateStr } from '@/utils/dateUtils'
 import ChartBmsMore from '@/views/history/bms_history/components/ChartBmsMore.vue'
 import BmsInfoCharts from '@/views/list/components/BmsInfoCharts'
+import { getBatteryInfoLatest } from '@/api/manage'
+import moment from 'moment/moment'
 
 export default {
   // name: 'BmsInfoCharts',
@@ -782,7 +784,33 @@ export default {
     BmsInfoCharts,
     ChartBmsMore
   },
-  mounted() {
+  props: {
+    deviceId: {
+      type: String,
+      default: () => null
+    }
+  },
+  mounted () {
+    getBatteryInfoLatest(this.deviceId, {})
+      .then(res => {
+        console.log('battery info latest', res)
+        if (res.data && res.data.logs && res.data.logs.length > 0) {
+          const bmsInfo = res.data.logs[0]
+          this.time_tracking = moment(bmsInfo.time_tracking).format('YYYY-MM-DD HH:MM:SS')
+          this.battery_capacity_soc = bmsInfo.battery_capacity_soc
+          this.battery_healthy = bmsInfo.battery_healthy
+          this.battery_voltage = (bmsInfo.battery_voltage / 100.0).toFixed(2)
+          this.batteryList = this.form_battery_voltage_array_for_display(bmsInfo.single_battery_voltage_arr.split(','), 5)
+          // console.log('battery list', this.batteryList)
+          // single_battery_voltage_arr
+          this.battery_currency = (bmsInfo.battery_currency / 100.0).toFixed(2)
+          this.isMosRec = bmsInfo.battery_status_charging_mos === 1
+          this.isMosDis = bmsInfo.battery_status_discharging_mos === 1
+          this.battery_charging_cycle = bmsInfo.battery_charging_cycle
+        }
+      }).catch(err => {
+        console.log('battery info latest', err)
+    })
     if (this.dataListBMS.length === 0) {
       this.initBMSUI()
       // this.getBmsHis(this.mCurSn, 227, 6)
@@ -803,7 +831,7 @@ export default {
 
       dataListBMS: [],
 
-      mAlias: '未上线',
+      mAlias: '',
       mLocationTime: '-',
       mReceiveTime: '-',
       mLocationType: '-',
@@ -814,26 +842,28 @@ export default {
       mLat: 0,
       mLng: 0,
 
-      mRefreshDate: '-',
+      time_tracking: '-',
       mCurSn: '',
       isMosRec: false,
       isMosDis: false,
       isEleLink: false,
       isRec: false,
-      mSocImg: 1,
-      mCurA: '-',
-      mCurV: '-',
-      mCurSoc: '-',
-      mSoh: 0,
+      socImg: 1,
+      battery_currency: '-',
+      battery_voltage: '-',
+      battery_capacity_soc: '-',
+      battery_capacity_config: 50,
+      battery_charging_cycle: 0,
+      battery_healthy: 0,
       mSurplusCapacity: '-',
       mRecIndex: '-',
 
-      marginV: '-',
+      voltageDifference: '-',
       maxVol: '-',
-      mixVol: '-',
+      minVol: '-',
       batterySpeSwitch: false,
       batterySystime: '-',
-      batteryBt: '-',
+      batteryName: '-',
       batteryType: '-',
       batteryVer: '-',
 
@@ -918,6 +948,21 @@ export default {
         return '#47ba80'
       }
     },
+    getSocImg (soc) {
+      let img = 0
+      if (soc === 0) {
+        img = 0
+      } else if (soc <= 25) {
+        img = 1
+      } else if (soc <= 50) {
+        img = 2
+      } else if (soc <= 75) {
+        img = 3
+      } else if (soc > 75) {
+        img = 4
+      }
+      return img
+    },
     initBMSUI () {
       var dateStr = getDateStr(new Date())
       setTimeout(() => {
@@ -965,6 +1010,33 @@ export default {
           )
         })
       }, 300)
+    },
+    form_battery_voltage_array_for_display (array, subGroupLength) {
+      let index = 0
+      let batteryListTemp = []
+
+      array.forEach((items, index) => {
+        let vol = parseFloat(items).toFixed(2)
+        if (index === 0) {
+          this.maxVol = vol
+          this.minVol = vol
+        }
+        if (vol > this.maxVol) {
+          this.maxVol = vol
+        } else if (vol < this.minVol) {
+          this.minVol = vol
+        }
+        batteryListTemp.push({
+          pos: index,
+          value: vol
+        })
+      })
+      this.voltageDifference = (this.maxVol - this.minVol).toFixed(2)
+      let newArray = []
+      while (index < array.length) {
+        newArray.push(batteryListTemp.slice(index, (index += subGroupLength)))
+      }
+      return newArray
     }
   }
 }
