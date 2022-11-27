@@ -62,7 +62,7 @@
           justify="middle"
           style="margin-top: 30px; margin-bottom: 30px"
         >
-          <el-descriptions :column="2" border>
+          <el-descriptions :column="3" border>
             <el-descriptions-item label="充电MOS" span="1">
               <el-switch
                 v-model="isMosRec"
@@ -72,6 +72,14 @@
               ></el-switch>
             </el-descriptions-item>
             <el-descriptions-item label="放电MOS" span="1">
+              <el-switch
+                v-model="isMosDis"
+                disabled
+                active-color="#41b584"
+                inactive-color="#f34d37"
+              ></el-switch>
+            </el-descriptions-item>
+            <el-descriptions-item label="均衡开关" span="1">
               <el-switch
                 v-model="isMosDis"
                 disabled
@@ -89,6 +97,12 @@
             </el-descriptions-item>
             <el-descriptions-item label="当前电压" span="1">
               <el-tag size="small">{{ battery_voltage }}V</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="当前功率" span="1">
+              <el-tag size="small">W</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="当前湿度" span="1">
+              <el-tag size="small">W</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="剩余容量" span="1">
               <el-tag size="small">{{ battery_capacity_soc * battery_capacity_config / 100 }} ah</el-tag>
