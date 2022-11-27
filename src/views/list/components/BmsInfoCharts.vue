@@ -1,7 +1,7 @@
 <template>
   <a-card>
-    <el-row type="flex" align="middle" style="padding: 8px">
-      <el-col :span="10" type="flex" align="middle">
+    <el-row>
+      <el-col type="flex" align="middle" :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
         <div class="content_bt" style="width: 300px; margin-top: 16px">
           <span
             style="
@@ -21,7 +21,7 @@
             </el-tag>
           </span>
         </div>
-        <el-row>
+        <div>
           <span class="title_tx2">SOC:{{ this.battery_capacity_soc }}%</span>
           <el-image
             style="margin-top: 15px; width: 300px; height: 160px"
@@ -29,7 +29,7 @@
             fit="fill"
             :src="require('@/assets/battery/icon_battery_' + this.getSocImg(this.battery_capacity_soc) + '.png')"
           />
-        </el-row>
+        </div>
         <el-row type="flex" align="middle" style="margin-top: 20px">
           <el-col :span="2" :offset="6" type="flex" align="middle">
             <span
@@ -156,7 +156,7 @@
         <el-row type="flex" align="middle" style="padding: 8px"></el-row>
       </el-col>
 
-      <el-col :span="14" type="flex" align="middle">
+      <el-col type="flex" align="middle" :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
         <!-- 电池图表 -->
         <el-row>
           <el-col type="flex" align="middle" justify="middle">
@@ -1073,7 +1073,7 @@ export default {
   z-index: 1000;
   font-size: 28px;
   width: 290px;
-  top: 80px;
+  top: 160px;
   text-align: center;
 }
 .tx_soh {
