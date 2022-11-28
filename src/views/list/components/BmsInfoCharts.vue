@@ -1073,7 +1073,7 @@ export default {
   z-index: 1000;
   font-size: 28px;
   width: 290px;
-  top: 160px;
+  top: 150px;
   text-align: center;
 }
 .tx_soh {
