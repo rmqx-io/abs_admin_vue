@@ -92,20 +92,20 @@
                 size="small"
                 :type="battery_currency === 0 ? 'info' : battery_currency > 0 ? 'warning' : 'danger'"
               >
-                {{ battery_currency }}A
+                {{ battery_currency }} A
               </el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="当前电压" span="1">
-              <el-tag size="small">{{ battery_voltage }}V</el-tag>
+              <el-tag size="small">{{ battery_voltage }} V</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="当前功率" span="1">
-              <el-tag size="small">W</el-tag>
+              <el-tag size="small">{{ battery_voltage * battery_currency }} W</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="当前湿度" span="1">
               <el-tag size="small">{{ humidity }}%</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="剩余容量" span="1">
-              <el-tag size="small">{{ battery_capacity_soc * battery_capacity_config / 100 }} ah</el-tag>
+              <el-tag size="small">{{ battery_capacity_soc * battery_capacity_config / 100 }} Ah</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="循环次数" span="1">
               <el-tag size="small">{{ battery_charging_cycle }} 次</el-tag>
@@ -164,7 +164,7 @@
               ref="bmschart"
             ></chart-bms-more>
             <span
-              v-if="initHis && dataListBMS.length == 0"
+              v-if="initHis && dataListBMS.length === 0"
               style="border-style: solid; border-width: 1px; padding: 8px"
             >
               设备无数据
@@ -299,7 +299,7 @@
             <i class="el-icon-tickets"></i>
             二维码/别名
           </template>
-          {{ mAlias }}
+          {{ deviceId }}
         </el-descriptions-item>
         <el-descriptions-item span="2">
           <template slot="label">
@@ -682,7 +682,7 @@
             <i class="el-icon-tickets"></i>
             标称容量
           </template>
-          <el-tag size="small" :type="'success'">{{ mRatedCapacity }}ah</el-tag>
+          <el-tag size="small" :type="'success'">{{ mRatedCapacity }} Ah</el-tag>
         </el-descriptions-item>
 
         <el-descriptions-item span="2">
@@ -690,7 +690,7 @@
             <i class="el-icon-tickets"></i>
             主板额定电流
           </template>
-          <el-tag size="small" :type="'success'">{{ mRatedCurrent }}A</el-tag>
+          <el-tag size="small" :type="'success'">{{ mRatedCurrent }} A</el-tag>
         </el-descriptions-item>
 
         <!-- ################################## -->
@@ -798,7 +798,7 @@
 import { getDateStr } from '@/utils/dateUtils'
 import ChartBmsMore from '@/views/history/bms_history/components/ChartBmsMore.vue'
 import BmsInfoCharts from '@/views/list/components/BmsInfoCharts'
-import { getBatteryInfoLatest } from '@/api/manage'
+import { getBatteryInfo, getBatteryInfoLatest } from '@/api/manage'
 import moment from 'moment/moment'
 
 export default {
@@ -819,14 +819,15 @@ export default {
         console.log('battery info latest', res)
         if (res.data && res.data.logs && res.data.logs.length > 0) {
           const bmsInfo = res.data.logs[0]
-          this.time_tracking = moment(bmsInfo.time_tracking).format('YYYY-MM-DD HH:MM:SS')
+          this.time_tracking = moment(bmsInfo.time_tracking).format('YYYY-MM-DD HH:mm:ss')
           this.battery_capacity_soc = bmsInfo.battery_capacity_soc
           this.battery_healthy = bmsInfo.battery_healthy
-          this.battery_voltage = (bmsInfo.battery_voltage / 100.0).toFixed(2)
+          this.battery_voltage = bmsInfo.battery_voltage
           this.batteryList = this.form_battery_voltage_array_for_display(bmsInfo.single_battery_voltage_arr.split(','), 5)
+          this.tempList = this.form_temperature_array_for_display(bmsInfo)
           // console.log('battery list', this.batteryList)
           // single_battery_voltage_arr
-          this.battery_currency = (bmsInfo.battery_currency / 100.0).toFixed(2)
+          this.battery_currency = bmsInfo.battery_currency
           this.isMosRec = bmsInfo.battery_status_charging_mos === 1
           this.isMosDis = bmsInfo.battery_status_discharging_mos === 1
           this.battery_charging_cycle = bmsInfo.battery_charging_cycle
@@ -836,7 +837,9 @@ export default {
         console.log('battery info latest', err)
     })
     if (this.dataListBMS.length === 0) {
-      this.initBMSUI()
+      setTimeout(() => {
+        this.initBMSUI()
+      }, 1000)
       // this.getBmsHis(this.mCurSn, 227, 6)
     }
   },
@@ -875,6 +878,7 @@ export default {
       socImg: 1,
       battery_currency: '-',
       battery_voltage: '-',
+      humidity: '-',
       battery_capacity_soc: '-',
       battery_capacity_config: 50,
       battery_charging_cycle: 0,
@@ -988,52 +992,65 @@ export default {
       return img
     },
     initBMSUI () {
-      var dateStr = getDateStr(new Date())
-      setTimeout(() => {
-        this.$nextTick(() => {
-          this.$refs['bmschart'].init(
-            [
-              [
+      const arg = {
+        start_date: moment(new Date() - 2 * 60 * 60 * 1000),
+        start_time: moment(new Date() - 2 * 60 * 60 * 1000)
+      }
+      getBatteryInfo(this.deviceId, arg)
+        .then(res => {
+          console.log('get battery info', res)
+          let bmsList = []
+          if (res.data && res.data.length > 0) {
+            res.data.forEach(item => {
+              const timestamp = moment(item.time_tracking).format('YYYY-MM-DD HH:mm:ss')
+              console.log('timestamp', timestamp)
+              bmsList.push([
                 {
-                  value: 0,
-                  date: dateStr
+                  value: item.battery_voltage,
+                  date: timestamp
                 },
                 {
-                  value: 0,
-                  date: dateStr
+                  value: item.battery_currency,
+                  date: timestamp
                 },
                 {
-                  value: 0,
-                  date: dateStr
+                  value: item.battery_capacity_soc,
+                  date: timestamp
                 },
                 {
-                  value: 0,
-                  date: dateStr
+                  value: item.power_transistor_temperature,
+                  date: timestamp
                 },
                 {
-                  value: 0,
-                  date: dateStr
+                  value: item.battery_temperature,
+                  date: timestamp
                 },
                 {
-                  value: 0,
-                  date: dateStr
+                  value: item.battery_box_temperature,
+                  date: timestamp
                 }
-              ]
-            ],
-            ['电压', '电流', 'SOC', '箱内温度', '电池温度', '功率管温度'],
-            ['V', 'A', '%', '℃', '℃', '℃'],
-            [
-              '#6AD6E6',
-              '#6F95DA',
-              '#47ba80',
-              '#E8A456',
-              '#DBBB5B',
-              '#E8E156'
-            ],
-            3
-          )
+              ])
+            })
+            setTimeout(() => {
+              this.$nextTick(() => {
+                this.$refs['bmschart'].init(
+                  bmsList,
+                  ['电压', '电流', 'SOC', '箱内温度', '电池温度', '功率管温度'],
+                  ['V', 'A', '%', '℃', '℃', '℃'],
+                  [
+                    '#6AD6E6',
+                    '#6F95DA',
+                    '#47ba80',
+                    '#E8A456',
+                    '#DBBB5B',
+                    '#E8E156'
+                  ],
+                  3
+                )
+              })
+            }, 300)
+          }
         })
-      }, 300)
     },
     form_battery_voltage_array_for_display (array, subGroupLength) {
       let index = 0
@@ -1061,6 +1078,26 @@ export default {
         newArray.push(batteryListTemp.slice(index, (index += subGroupLength)))
       }
       return newArray
+    },
+    form_temperature_array_for_display (item) {
+      //温度数组
+      let tempList = []
+      tempList.push({
+        pos: 0,
+        name: '箱内温度',
+        value: item.battery_box_temperature
+      })
+      tempList.push({
+        pos: 1,
+        name: '电池温度',
+        value: item.battery_temperature
+      })
+      tempList.push({
+        pos: 2,
+        name: '功率管温度',
+        value: item.power_transistor_temperature
+      })
+      return [tempList]
     }
   }
 }
