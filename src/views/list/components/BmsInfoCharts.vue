@@ -102,7 +102,7 @@
               <el-tag size="small">W</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="当前湿度" span="1">
-              <el-tag size="small">W</el-tag>
+              <el-tag size="small">{{ humidity }}%</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="剩余容量" span="1">
               <el-tag size="small">{{ battery_capacity_soc * battery_capacity_config / 100 }} ah</el-tag>
@@ -205,18 +205,27 @@
 
             <el-row type="flex" align="start" style="margin-top: 20px">
               <el-col :span="7" type="flex" align="middle">
+                <el-tag>
+                  最高单体电压
+                </el-tag>
                 <el-tag size="small" effect="plain" type="success">
-                  最高单体电压：{{ maxVol }}V
+                  {{ maxVol }}V
                 </el-tag>
               </el-col>
               <el-col :span="7" type="flex" align="middle">
+                <el-tag>
+                  最低单体电压
+                </el-tag>
                 <el-tag size="small" effect="plain" type="danger">
-                  最低单体电压：{{ minVol }}V
+                  {{ minVol }}V
                 </el-tag>
               </el-col>
               <el-col :span="7" type="flex" align="middle">
+                <el-tag>
+                  单体电压压差
+                </el-tag>
                 <el-tag size="small" effect="plain" type="info">
-                  单体电压压差：{{ voltageDifference }}V
+                  {{ voltageDifference }}V
                 </el-tag>
               </el-col>
             </el-row>
@@ -821,6 +830,7 @@ export default {
           this.isMosRec = bmsInfo.battery_status_charging_mos === 1
           this.isMosDis = bmsInfo.battery_status_discharging_mos === 1
           this.battery_charging_cycle = bmsInfo.battery_charging_cycle
+          this.humidity = bmsInfo.humidity
         }
       }).catch(err => {
         console.log('battery info latest', err)
@@ -1030,7 +1040,7 @@ export default {
       let batteryListTemp = []
 
       array.forEach((items, index) => {
-        let vol = parseFloat(items).toFixed(2)
+        let vol = parseFloat(items).toFixed(3)
         if (index === 0) {
           this.maxVol = vol
           this.minVol = vol
@@ -1045,7 +1055,7 @@ export default {
           value: vol
         })
       })
-      this.voltageDifference = (this.maxVol - this.minVol).toFixed(2)
+      this.voltageDifference = (this.maxVol - this.minVol).toFixed(3)
       let newArray = []
       while (index < array.length) {
         newArray.push(batteryListTemp.slice(index, (index += subGroupLength)))
