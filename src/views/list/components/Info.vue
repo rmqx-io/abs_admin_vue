@@ -79,7 +79,7 @@
       </span>
       <span slot='single_battery_voltage' slot-scope="text, record">
         <template>
-          <span>{{ record.single_battery_voltage_arr }}</span>
+          <span>{{ record.single_battery_voltage_arr.split(',').join('V, ') }}</span>
         </template>
       </span>
       <span slot='battery_capacity_soc' slot-scope="text, record">
