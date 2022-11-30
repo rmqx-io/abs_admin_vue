@@ -89,6 +89,7 @@
         :alert="true"
         :rowSelection="rowSelection"
         showPagination="auto"
+        :scroll="{ x: 1300 }"
       >
         <span slot="serial" slot-scope="text, record, index">
           {{ index + 1 }}
@@ -281,18 +282,22 @@ const columns = [
   {
     title: '上线时间',
     dataIndex: 'register_time',
+    width: '136px'
   },
   {
     title: '创建时间',
-    dataIndex: 'create_date'
+    dataIndex: 'create_date',
+    width: '136px'
   },
   {
     title: '第一次 GPS 定位时间',
-    dataIndex: 'first_gps_location_time'
+    dataIndex: 'first_gps_location_time',
+    width: '136px'
   },
   {
     title: '第一次基站定位时间',
-    dataIndex: 'first_cell_location_time'
+    dataIndex: 'first_cell_location_time',
+    width: '136px'
   }
   // ,
   // {
@@ -321,8 +326,9 @@ const columns = [
   {
     title: '操作',
     dataIndex: 'action23',
-    width: '150px',
-    scopedSlots: { customRender: 'action' }
+    width: '160px',
+    scopedSlots: { customRender: 'action' },
+    fixed: 'right'
   }
 ]
 
