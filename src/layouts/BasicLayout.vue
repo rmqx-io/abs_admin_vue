@@ -82,7 +82,7 @@ export default {
       // base
       menus: [],
       // 侧栏收起状态
-      collapsed: false,
+      collapsed: true,
       title: defaultSettings.title,
       settings: {
         // 布局类型
