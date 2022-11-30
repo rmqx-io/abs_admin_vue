@@ -112,7 +112,7 @@ const columns = [
     title: '时间',
     dataIndex: 'time_tracking',
     customRender: (value, row, index) => {
-      return moment(value).format('YYYY-MM-DD HH:MM:SS')
+      return moment(value).format('YYYY-MM-DD HH:mm:ss')
     }
     // scopedSlots: { customRender: 'time_track' }
   },
