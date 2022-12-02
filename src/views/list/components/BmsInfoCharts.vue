@@ -315,8 +315,8 @@
           </template>
           <el-tag size="mini">GSM:{{ rssi }}</el-tag>
           <el-tag size="mini">GPS:{{ gnss }}</el-tag>
-          <el-tag size="mini" :type="mLocationType == 1 ? 'success' : 'danger'">
-            {{ mLocationType == 1 ? 'GPS定位' : '基站定位' }}
+          <el-tag size="mini" :type="gps_location == 1 ? 'success' : 'danger'">
+            {{ gps_location == 1 ? 'GPS定位' : '基站定位' }}
           </el-tag>
         </el-descriptions-item>
         <!-- ################################## -->
@@ -325,14 +325,14 @@
             <i class="el-icon-time"></i>
             GPS信号时间
           </template>
-          {{ mReceiveTime }}
+          {{ receive_time }}
         </el-descriptions-item>
         <el-descriptions-item span="2">
           <template slot="label">
             <i class="el-icon-time"></i>
             GPS定位时间
           </template>
-          {{ mLocationTime }}
+          {{ gps_location_time }}
         </el-descriptions-item>
         <el-descriptions-item span="2">
           <template slot="label">
@@ -818,10 +818,13 @@ export default {
       .then(res => {
         console.log('battery info latest', res)
         if (res.data && res.data.vehicle_detail_vo) {
-          this.battery_capacity_config = res.data.vehicle_detail_vo.battery_capacity
+          this.battery_capacity_config = res.data.battery_capacity
           this.gps_battery_voltage = res.data.vehicle_detail_vo.gps_battery_voltage
           this.rssi = res.data.vehicle_detail_vo.rssi
           this.gnss = res.data.vehicle_detail_vo.gnss
+          this.gps_location = res.data.vehicle_detail_vo.gps_location
+          this.gps_location_time = moment(res.data.vehicle_detail_vo.time_tracking).format('YYYY-MM-DD HH:mm:ss')
+          this.receive_time = moment(res.data.vehicle_detail_vo.receive_time).format('YYYY-MM-DD HH:mm:ss')
         }
         if (res.data && res.data.logs && res.data.logs.length > 0) {
           const bmsInfo = res.data.logs[0]
@@ -865,9 +868,9 @@ export default {
       dataListBMS: [],
 
       mAlias: '',
-      mLocationTime: '-',
-      mReceiveTime: '-',
-      mLocationType: '-',
+      gps_location_time: '-',
+      receive_time: '-',
+      gps_location: '-',
       rssi: '-',
       gnss: '-',
       gps_battery_voltage: '-',
