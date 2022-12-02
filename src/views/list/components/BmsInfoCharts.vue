@@ -304,9 +304,9 @@
         <el-descriptions-item span="2">
           <template slot="label">
             <i class="el-icon-stopwatch"></i>
-            GPS电压 ?
+            GPS电压
           </template>
-          {{ mBatteryVoltage }}V
+          {{ gps_battery_voltage }}V
         </el-descriptions-item>
         <el-descriptions-item span="2">
           <template slot="label">
@@ -817,6 +817,10 @@ export default {
     getBatteryInfoLatest(this.deviceId, {})
       .then(res => {
         console.log('battery info latest', res)
+        if (res.data) {
+          this.battery_capacity_config = res.data.battery_capacity
+          this.gps_battery_voltage = res.data.gps_battery_voltage
+        }
         if (res.data && res.data.logs && res.data.logs.length > 0) {
           const bmsInfo = res.data.logs[0]
           this.time_tracking = moment(bmsInfo.time_tracking).format('YYYY-MM-DD HH:mm:ss')
@@ -864,7 +868,7 @@ export default {
       mLocationType: '-',
       mSignal: '-',
       mSatellites: '-',
-      mBatteryVoltage: '-',
+      gps_battery_voltage: '-',
       mACCON: false,
       mLat: 0,
       mLng: 0,
@@ -880,7 +884,7 @@ export default {
       battery_voltage: '-',
       humidity: '-',
       battery_capacity_soc: '-',
-      battery_capacity_config: 50,
+      battery_capacity_config: 0,
       battery_charging_cycle: 0,
       battery_healthy: 0,
       mSurplusCapacity: '-',
