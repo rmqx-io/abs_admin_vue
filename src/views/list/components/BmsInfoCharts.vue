@@ -313,8 +313,8 @@
             <i class="el-icon-tickets"></i>
             信号
           </template>
-          <el-tag size="mini">GSM:{{ mSignal }}</el-tag>
-          <el-tag size="mini">GPS:{{ mSatellites }}</el-tag>
+          <el-tag size="mini">GSM:{{ rssi }}</el-tag>
+          <el-tag size="mini">GPS:{{ gnss }}</el-tag>
           <el-tag size="mini" :type="mLocationType == 1 ? 'success' : 'danger'">
             {{ mLocationType == 1 ? 'GPS定位' : '基站定位' }}
           </el-tag>
@@ -817,9 +817,11 @@ export default {
     getBatteryInfoLatest(this.deviceId, {})
       .then(res => {
         console.log('battery info latest', res)
-        if (res.data) {
-          this.battery_capacity_config = res.data.battery_capacity
-          this.gps_battery_voltage = res.data.gps_battery_voltage
+        if (res.data && res.data.vehicle_detail_vo) {
+          this.battery_capacity_config = res.data.vehicle_detail_vo.battery_capacity
+          this.gps_battery_voltage = res.data.vehicle_detail_vo.gps_battery_voltage
+          this.rssi = res.data.vehicle_detail_vo.rssi
+          this.gnss = res.data.vehicle_detail_vo.gnss
         }
         if (res.data && res.data.logs && res.data.logs.length > 0) {
           const bmsInfo = res.data.logs[0]
@@ -866,8 +868,8 @@ export default {
       mLocationTime: '-',
       mReceiveTime: '-',
       mLocationType: '-',
-      mSignal: '-',
-      mSatellites: '-',
+      rssi: '-',
+      gnss: '-',
       gps_battery_voltage: '-',
       mACCON: false,
       mLat: 0,
