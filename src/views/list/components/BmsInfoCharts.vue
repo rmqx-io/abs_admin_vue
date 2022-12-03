@@ -1,7 +1,14 @@
 <template>
   <a-card>
     <el-row>
-      <el-col type="flex" align="middle" :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
+      <el-col
+        type="flex"
+        align="middle"
+        :xs="24"
+        :sm="24"
+        :md="24"
+        :lg="12"
+        :xl="12">
         <div class="content_bt" style="width: 300px; margin-top: 16px">
           <span
             style="
@@ -156,7 +163,14 @@
         <el-row type="flex" align="middle" style="padding: 8px"></el-row>
       </el-col>
 
-      <el-col type="flex" align="middle" :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
+      <el-col
+        type="flex"
+        align="middle"
+        :xs="24"
+        :sm="24"
+        :md="24"
+        :lg="12"
+        :xl="12">
         <!-- 电池图表 -->
         <el-row>
           <el-col type="flex" align="middle" justify="middle">
@@ -282,14 +296,14 @@
           <span class="det_title">基础信息</span>
         </el-col>
         <el-col :span="2">
-<!--          <el-button-->
-<!--            type="primary"-->
-<!--            size="mini"-->
-<!--            style="margin-left: 8px"-->
-<!--            @click="onSendOrder()"-->
-<!--          >-->
-<!--            下发指令-->
-<!--          </el-button>-->
+          <!--          <el-button-->
+          <!--            type="primary"-->
+          <!--            size="mini"-->
+          <!--            style="margin-left: 8px"-->
+          <!--            @click="onSendOrder()"-->
+          <!--          >-->
+          <!--            下发指令-->
+          <!--          </el-button>-->
         </el-col>
       </el-row>
 
@@ -377,7 +391,6 @@
     </el-row>
 
     <el-row>
-      <!-- 基础信息 -->
       <el-row
         type="flex"
         justify="space-between"
@@ -389,422 +402,29 @@
         </el-col>
       </el-row>
       <el-descriptions :column="10" size="mini" border>
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            低容量报警
-          </template>
-          <el-tag
-            size="small"
-            :type="
-              mAlarm1 == '0' ? 'success' : mAlarm1 == '1' ? 'danger' : 'info'
-            "
-          >
-            {{ mAlarm1 == '0' ? '正常' : mAlarm1 == '1' ? '异常' : '未读取' }}
-          </el-tag>
+        <el-descriptions-item
+          span="2"
+          v-for="item in alarms"
+          :key="item.key"
+          :label="item.key"
+        >
+          {{ alarm_display(item.value) }}
         </el-descriptions-item>
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            MOS管超温报警
-          </template>
-          <el-tag
-            size="small"
-            :type="
-              mAlarm2 == '0' ? 'success' : mAlarm2 == '1' ? 'danger' : 'info'
-            "
-          >
-            {{ mAlarm2 == '0' ? '正常' : mAlarm2 == '1' ? '异常' : '未读取' }}
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            充电过压报警
-          </template>
-          <el-tag
-            size="small"
-            :type="
-              mAlarm3 == '0' ? 'success' : mAlarm3 == '1' ? 'danger' : 'info'
-            "
-          >
-            {{ mAlarm3 == '0' ? '正常' : mAlarm3 == '1' ? '异常' : '未读取' }}
-          </el-tag>
-        </el-descriptions-item>
-        <!-- ################################## -->
-
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            放电欠压报警
-          </template>
-          <el-tag
-            size="small"
-            :type="
-              mAlarm4 == '0' ? 'success' : mAlarm4 == '1' ? 'danger' : 'info'
-            "
-          >
-            {{ mAlarm4 == '0' ? '正常' : mAlarm4 == '1' ? '异常' : '未读取' }}
-          </el-tag>
-        </el-descriptions-item>
-
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            电池超温报警
-          </template>
-          <el-tag
-            size="small"
-            :type="
-              mAlarm5 == '0' ? 'success' : mAlarm5 == '1' ? 'danger' : 'info'
-            "
-          >
-            {{ mAlarm5 == '0' ? '正常' : mAlarm5 == '1' ? '异常' : '未读取' }}
-          </el-tag>
-        </el-descriptions-item>
-
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            充电过流报警
-          </template>
-          <el-tag
-            size="small"
-            :type="
-              mAlarm6 == '0' ? 'success' : mAlarm6 == '1' ? 'danger' : 'info'
-            "
-          >
-            {{ mAlarm6 == '0' ? '正常' : mAlarm6 == '1' ? '异常' : '未读取' }}
-          </el-tag>
-        </el-descriptions-item>
-        <!-- ################################## -->
-
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            放电过流报警
-          </template>
-          <el-tag
-            size="small"
-            :type="
-              mAlarm7 == '0' ? 'success' : mAlarm7 == '1' ? 'danger' : 'info'
-            "
-          >
-            {{ mAlarm7 == '0' ? '正常' : mAlarm7 == '1' ? '异常' : '未读取' }}
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            电芯压差报警
-          </template>
-          <el-tag
-            size="small"
-            :type="
-              mAlarm8 == '0' ? 'success' : mAlarm8 == '1' ? 'danger' : 'info'
-            "
-          >
-            {{ mAlarm8 == '0' ? '正常' : mAlarm8 == '1' ? '异常' : '未读取' }}
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            电池箱内超温报警
-          </template>
-          <el-tag
-            size="small"
-            :type="
-              mAlarm9 == '0' ? 'success' : mAlarm9 == '1' ? 'danger' : 'info'
-            "
-          >
-            {{ mAlarm9 == '0' ? '正常' : mAlarm9 == '1' ? '异常' : '未读取' }}
-          </el-tag>
-        </el-descriptions-item>
-        <!-- ################################## -->
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            电池低温报警
-          </template>
-          <el-tag
-            size="small"
-            :type="
-              mAlarm10 == '0' ? 'success' : mAlarm10 == '1' ? 'danger' : 'info'
-            "
-          >
-            {{ mAlarm10 == '0' ? '正常' : mAlarm10 == '1' ? '异常' : '未读取' }}
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            单体过压报警
-          </template>
-          <el-tag
-            size="small"
-            :type="
-              mAlarm11 == '0' ? 'success' : mAlarm11 == '1' ? 'danger' : 'info'
-            "
-          >
-            {{ mAlarm11 == '0' ? '正常' : mAlarm11 == '1' ? '异常' : '未读取' }}
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            单体欠压报警
-          </template>
-          <el-tag
-            size="small"
-            :type="
-              mAlarm12 == '0' ? 'success' : mAlarm12 == '1' ? 'danger' : 'info'
-            "
-          >
-            {{ mAlarm12 == '0' ? '正常' : mAlarm12 == '1' ? '异常' : '未读取' }}
-          </el-tag>
-        </el-descriptions-item>
-        <!-- ################################## -->
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            309_A保护
-          </template>
-          <el-tag
-            size="small"
-            :type="
-              mAlarm13 == '0' ? 'success' : mAlarm13 == '1' ? 'danger' : 'info'
-            "
-          >
-            {{ mAlarm13 == '0' ? '正常' : mAlarm13 == '1' ? '异常' : '未读取' }}
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            309_B保护
-          </template>
-          <el-tag
-            size="small"
-            :type="
-              mAlarm14 == '0' ? 'success' : mAlarm14 == '1' ? 'danger' : 'info'
-            "
-          >
-            {{ mAlarm14 == '0' ? '正常' : mAlarm14 == '1' ? '异常' : '未读取' }}
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            湿度报警
-          </template>
-          <el-tag
-            size="small"
-            :type="
-              mAlarm15 == '0' ? 'success' : mAlarm15 == '1' ? 'danger' : 'info'
-            "
-          >
-            {{ mAlarm15 == '0' ? '正常' : mAlarm15 == '1' ? '异常' : '未读取' }}
-          </el-tag>
-        </el-descriptions-item>
-      </el-descriptions>
-    </el-row>
-
-    <el-row>
-      <!-- 配置信息 -->
-      <el-row
-        type="flex"
-        justify="space-between"
-        align="middle"
-        style="padding: 8px; margin-top: 8px"
-      >
-        <el-col :span="20">
-          <span class="det_title">配置信息</span>
-        </el-col>
-      </el-row>
-
-      <el-descriptions :column="8" size="mini" border>
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            开关状态
-          </template>
-          <el-tag
-            size="small"
-            :type="
-              mChargeSwitch == '1'
-                ? 'success'
-                : mChargeSwitch == '0'
-                  ? 'danger'
-                  : 'info'
-            "
-          >
-            {{
-              mChargeSwitch == '1'
-                ? '充电开'
-                : mChargeSwitch == '0'
-                  ? '充电关'
-                  : '未读取'
-            }}
-          </el-tag>
-          <el-tag
-            size="small"
-            :type="
-              mDischargeSwitch == '1'
-                ? 'success'
-                : mDischargeSwitch == '0'
-                  ? 'danger'
-                  : 'info'
-            "
-          >
-            {{
-              mDischargeSwitch == '1'
-                ? '放电开'
-                : mDischargeSwitch == '0'
-                  ? '放电关'
-                  : '未读取'
-            }}
-          </el-tag>
-        </el-descriptions-item>
-
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            低容量报警
-          </template>
-          <el-tag size="small" :type="'success'">
-            {{ mLowSOCAlarmValue }}%
-          </el-tag>
-        </el-descriptions-item>
-
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            标称容量
-          </template>
-          <el-tag size="small" :type="'success'">{{ mRatedCapacity }} Ah</el-tag>
-        </el-descriptions-item>
-
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            主板额定电流
-          </template>
-          <el-tag size="small" :type="'success'">{{ mRatedCurrent }} A</el-tag>
-        </el-descriptions-item>
-
-        <!-- ################################## -->
-
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            单体[充电/放电]保护电压
-          </template>
-          <el-tag size="small" :type="'success'">
-            {{ mSingleChargeProtectionVoltage }}V
-          </el-tag>
-          <el-tag size="small" :type="'success'">
-            {{ mSingleDischargeProtectionVoltage }}V
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            单体[充电/放电]恢复电压
-          </template>
-          <el-tag size="small" :type="'success'">
-            {{ mSingleChargRecoverVoltage }}V
-          </el-tag>
-          <el-tag size="small" :type="'success'">
-            {{ mSingleDifferentialPressureProtectionVoltage }}V
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            总体[充电/放电]保护电压
-          </template>
-          <el-tag size="small" :type="'success'">
-            {{ mChargeProtectionVoltage }}V
-          </el-tag>
-          <el-tag size="small" :type="'success'">
-            {{ mDischargeProtectionVoltage }}V
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            总体[充电/放电]保护电压
-          </template>
-          <el-tag size="small" :type="'success'">
-            {{ mChargeRecoverVoltage }}V
-          </el-tag>
-          <el-tag size="small" :type="'success'">
-            {{ mDischargeRecoverVoltage }}V
-          </el-tag>
-        </el-descriptions-item>
-
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            二次[充电/放电]保护电压
-          </template>
-          <el-tag size="small" :type="'success'">
-            {{ mSecondChargeProtectionVoltage }}V
-          </el-tag>
-          <el-tag size="small" :type="'success'">
-            {{ mSecondDischargeProtectionVoltage }}V
-          </el-tag>
-        </el-descriptions-item>
-
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            单节压差保护电压
-          </template>
-          <el-tag size="small" :type="'success'">
-            {{ mSingleDifferentialPressureProtectionVoltage }}V
-          </el-tag>
-        </el-descriptions-item>
-
-        <!-- ################################## -->
-
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            均衡启控电压
-          </template>
-          <el-tag size="small" :type="'success'">
-            {{ mEquilibriumVoltage }}V
-          </el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item span="2">
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            均衡电流
-          </template>
-          <el-tag size="small" :type="'success'">
-            {{ mEquilibriumCurrent }}A
-          </el-tag>
-        </el-descriptions-item>
-
-      <!-- ################################## -->
       </el-descriptions>
     </el-row>
   </a-card>
 </template>
 
 <script>
-import { getDateStr } from '@/utils/dateUtils'
 import ChartBmsMore from '@/views/history/bms_history/components/ChartBmsMore.vue'
-import BmsInfoCharts from '@/views/list/components/BmsInfoCharts'
+// import BmsInfoCharts from '@/views/list/components/BmsInfoCharts'
 import { getBatteryInfo, getBatteryInfoLatest } from '@/api/manage'
 import moment from 'moment/moment'
 
 export default {
-  // name: 'BmsInfoCharts',
+  name: 'BmsInfoCharts',
   components: {
-    BmsInfoCharts,
+    // BmsInfoCharts,
     ChartBmsMore
   },
   props: {
@@ -841,6 +461,25 @@ export default {
           this.isMosDis = bmsInfo.battery_status_discharging_mos === 1
           this.battery_charging_cycle = bmsInfo.battery_charging_cycle
           this.humidity = bmsInfo.humidity
+
+          this.battery_alarm_low_power = bmsInfo.battery_alarm_low_power
+          this.battery_alarm_mos_high_temperature = bmsInfo.battery_alarm_mos_high_temperature
+          this.battery_alarm_charging_high_voltage = bmsInfo.battery_alarm_charging_high_voltage
+          this.battery_alarm_discharging_low_voltage = bmsInfo.battery_alarm_discharging_low_voltage
+          this.battery_alarm_high_temperature = bmsInfo.battery_alarm_high_temperature
+          this.battery_alarm_charging_high_current = bmsInfo.battery_alarm_charging_high_current
+          this.battery_alarm_discharging_high_current = bmsInfo.battery_alarm_discharging_high_current
+          this.battery_alarm_voltage_difference = bmsInfo.battery_alarm_voltage_difference
+          this.battery_alarm_box_high_temperature = bmsInfo.battery_alarm_box_high_temperature
+          this.battery_alarm_low_temperature = bmsInfo.battery_alarm_low_temperature
+          this.battery_alarm_single_cell_high_voltage = bmsInfo.battery_alarm_single_cell_high_voltage
+          this.battery_alarm_single_cell_low_voltage = bmsInfo.battery_alarm_single_cell_low_voltage
+          this.battery_alarm_309_a = bmsInfo.battery_alarm_309_a
+          this.battery_alarm_309_b = bmsInfo.battery_alarm_309_b
+          this.battery_alarm_humidity = bmsInfo.battery_alarm_humidity
+          this.battery_alarm_disassemble = bmsInfo.battery_alarm_disassemble
+
+          this.set_alarms()
         }
       }).catch(err => {
         console.log('battery info latest', err)
@@ -904,21 +543,24 @@ export default {
       batteryType: '-',
       batteryVer: '-',
 
-      mAlarm1: '-',
-      mAlarm2: '-',
-      mAlarm3: '-',
-      mAlarm4: '-',
-      mAlarm5: '-',
-      mAlarm6: '-',
-      mAlarm7: '-',
-      mAlarm8: '-',
-      mAlarm9: '-',
-      mAlarm10: '-',
-      mAlarm11: '-',
-      mAlarm12: '-',
-      mAlarm13: '-',
-      mAlarm14: '-',
-      mAlarm15: '-',
+      alarms: [],
+
+      battery_alarm_low_power: null,
+      battery_alarm_mos_high_temperature: null,
+      battery_alarm_charging_high_voltage: null,
+      battery_alarm_discharging_low_voltage: null,
+      battery_alarm_high_temperature: null,
+      battery_alarm_charging_high_current: null,
+      battery_alarm_discharging_high_current: null,
+      battery_alarm_voltage_difference: null,
+      battery_alarm_box_high_temperature: null,
+      battery_alarm_low_temperature: null,
+      battery_alarm_single_cell_high_voltage: null,
+      battery_alarm_single_cell_low_voltage: null,
+      battery_alarm_309_a: null,
+      battery_alarm_309_b: null,
+      battery_alarm_humidity: null,
+      battery_alarm_disassemble: null,
       mAlarm16: '-',
       mAlarm17: '-',
       mAlarm18: '-',
@@ -1008,7 +650,7 @@ export default {
       getBatteryInfo(this.deviceId, arg)
         .then(res => {
           console.log('get battery info', res)
-          let bmsList = []
+          const bmsList = []
           if (res.data && res.data.length > 0) {
             res.data.forEach(item => {
               const timestamp = moment(item.time_tracking).format('YYYY-MM-DD HH:mm:ss')
@@ -1040,33 +682,38 @@ export default {
                 }
               ])
             })
-            setTimeout(() => {
-              this.$nextTick(() => {
-                this.$refs['bmschart'].init(
-                  bmsList,
-                  ['电压', '电流', 'SOC', '箱内温度', '电池温度', '功率管温度'],
-                  ['V', 'A', '%', '℃', '℃', '℃'],
-                  [
-                    '#6AD6E6',
-                    '#6F95DA',
-                    '#47ba80',
-                    '#E8A456',
-                    '#DBBB5B',
-                    '#E8E156'
-                  ],
-                  3
-                )
-              })
-            }, 300)
           }
+          if (bmsList.length === 0) {
+            const timestamp = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+            bmsList.push([{ value: 0, date: timestamp }, { value: 0, date: timestamp }, { value: 0, date: timestamp },
+              { value: 0, date: timestamp }, { value: 0, date: timestamp }, { value: 0, date: timestamp }])
+          }
+          setTimeout(() => {
+            this.$nextTick(() => {
+              this.$refs['bmschart'].init(
+                bmsList,
+                ['电压', '电流', 'SOC', '箱内温度', '电池温度', '功率管温度'],
+                ['V', 'A', '%', '℃', '℃', '℃'],
+                [
+                  '#6AD6E6',
+                  '#6F95DA',
+                  '#47ba80',
+                  '#E8A456',
+                  '#DBBB5B',
+                  '#E8E156'
+                ],
+                3
+              )
+            })
+          }, 300)
         })
     },
     form_battery_voltage_array_for_display (array, subGroupLength) {
       let index = 0
-      let batteryListTemp = []
+      const batteryListTemp = []
 
       array.forEach((items, index) => {
-        let vol = parseFloat(items).toFixed(3)
+        const vol = parseFloat(items).toFixed(3)
         if (index === 0) {
           this.maxVol = vol
           this.minVol = vol
@@ -1082,15 +729,15 @@ export default {
         })
       })
       this.voltageDifference = (this.maxVol - this.minVol).toFixed(3)
-      let newArray = []
+      const newArray = []
       while (index < array.length) {
         newArray.push(batteryListTemp.slice(index, (index += subGroupLength)))
       }
       return newArray
     },
     form_temperature_array_for_display (item) {
-      //温度数组
-      let tempList = []
+      // 温度数组
+      const tempList = []
       tempList.push({
         pos: 0,
         name: '箱内温度',
@@ -1107,6 +754,35 @@ export default {
         value: item.power_transistor_temperature
       })
       return [tempList]
+    },
+    alarm_display (alarm) {
+      if (alarm === true) {
+        return '异常'
+      }
+      if (alarm === false) {
+        return '正常'
+      }
+      return '未读取'
+    },
+    set_alarms () {
+      this.alarms = [
+        { key: '低容量报警', value: this.battery_alarm_low_power },
+        { key: 'MOS管超温报警', value: this.battery_alarm_mos_high_temperature },
+        { key: '充电过压报警', value: this.battery_alarm_charging_high_voltage },
+        { key: '放电欠压报警', value: this.battery_alarm_discharging_low_voltage },
+        { key: '电池超温报警', value: this.battery_alarm_high_temperature },
+        { key: '充电过流报警', value: this.battery_alarm_charging_high_current },
+        { key: '放电过流报警', value: this.battery_alarm_discharging_high_current },
+        { key: '电芯压差报警', value: this.battery_alarm_voltage_difference },
+        { key: '电池箱内超温报警', value: this.battery_alarm_box_high_temperature },
+        { key: '电池低温报警', value: this.battery_alarm_low_temperature },
+        { key: '单体过压报警', value: this.battery_alarm_single_cell_high_voltage },
+        { key: '单体欠压报警', value: this.battery_alarm_single_cell_low_voltage },
+        { key: '309_A保护', value: this.battery_alarm_309_a },
+        { key: '309_B保护', value: this.battery_alarm_309_b },
+        { key: '湿度报警', value: this.battery_alarm_humidity },
+        { key: '防拆报警', value: this.battery_alarm_disassemble }
+      ]
     }
   }
 }
