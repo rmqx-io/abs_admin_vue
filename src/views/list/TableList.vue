@@ -11,6 +11,15 @@
               <a-form-item label="编号">
                 <a-input v-model="queryData.device_id" placeholder=""/>
               </a-form-item>
+              <a-form-item label="运营单位">
+                <a-tree-select
+                  show-search
+                  tree-default-expand-all
+                  :filterTreeNode="filterTreeNode"
+                  :treeData="orgList"
+                  v-model="queryData.organization_id"
+                ></a-tree-select>
+              </a-form-item>
             </a-col>
 <!--            <a-col :md="8" :sm="24">-->
 <!--              <a-form-item label="使用状态">-->
@@ -244,7 +253,15 @@
 import VueAMap from 'vue-amap'
 import moment from 'moment'
 import { STable, Ellipsis } from '@/components'
-import { addDevice, getBatteryInfo, getDeviceList, getLocation, getRoleList, updateDevice } from '@/api/manage'
+import {
+  addDevice,
+  getAdminOrgTree,
+  getBatteryInfo,
+  getDeviceList,
+  getLocation,
+  getRoleList,
+  updateDevice
+} from '@/api/manage'
 
 import StepByStepModal from './modules/StepByStepModal'
 import CreateForm from './modules/CreateForm'
@@ -389,7 +406,8 @@ export default {
         page_no: 1,
         page_size: 5,
         start_date: moment(new Date() - 2 * 60 * 60 * 1000),
-        start_time: moment(new Date() - 2 * 60 * 60 * 1000)
+        start_time: moment(new Date() - 2 * 60 * 60 * 1000),
+        organization_id: null
       },
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
@@ -416,7 +434,8 @@ export default {
       // 地图
       zoom: 14,
       center: [113.94, 22.52],
-      amapManager
+      amapManager,
+      orgList: []
     }
   },
   filters: {
@@ -441,6 +460,8 @@ export default {
       this.queryData.device_id = this.$route.query.device_id
       this.$refs.table.refresh(true)
     }
+
+    this.getAdminOrgList()
   },
   computed: {
     rowSelection() {
@@ -612,6 +633,19 @@ export default {
               this.refresh_map = true
             }
           )
+        })
+    },
+    filterTreeNode (input, option) {
+      return (
+        option.data.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      )
+    },
+    getAdminOrgList () {
+      return getAdminOrgTree(this.queryParam)
+        .then(res => {
+          console.log('org list', res)
+          this.orgList = []
+          this.orgList.push(res.data)
         })
     }
   }
