@@ -1,6 +1,12 @@
 <template>
   <a-card>
-    <div><a @click="handleClose()"><< 返回</a></div>
+    <div width='100%'>
+      <a @click="handleClose()"><< 返回</a>
+      <a-radio-group v-model:value="mode" :style="{ marginBottom: '8px', marginRight: '8px', float: 'right' }">
+        <a-radio-button value="basic">基础信息</a-radio-button>
+        <a-radio-button value="config">配置信息</a-radio-button>
+      </a-radio-group>
+    </div>
     <div>
       <br />
     </div>
@@ -11,88 +17,92 @@
       <br />
     </div>
 
-    <bms-info-charts
-      :device-id='deviceId'
-    >
-    </bms-info-charts>
+    <component v-if='mode === "basic"'>
+      <bms-info-charts
+        :device-id='deviceId'
+      >
+      </bms-info-charts>
 
-    <div class="table-page-search-wrapper">
-      <a-spin :spinning="bms_loading">
-        <a-form layout="inline">
-          <a-row :gutter="48">
-            <a-col :md="8" :sm="24">
-              <a-form-item aria-label="起始日期">
-                <a-date-picker v-model="queryData.start_date" style="width: 100%" placeholder="起始日期"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="8" :sm="24">
-              <a-form-item aria-label="起始时间">
-                <a-time-picker v-model="queryData.start_time" style="width: 100%" placeholder="起始时间"/>
-              </a-form-item>
-            </a-col>
-          </a-row>
-          <a-row :gutter="48">
-            <a-col :md="8" :sm="24">
-              <a-form-item aria-label="结束日期">
-                <a-date-picker
-                  v-model="queryData.end_date"
-                  style="width: 100%"
-                  placeholder="结束日期"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col :md="8" :sm="24">
-              <a-form-item aria-label="结束时间">
-                <a-time-picker
-                  v-model="queryData.end_time"
-                  style="width: 100%"
-                  placeholder="结束时间"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col :md="8" :sm="24">
-              <a-button type="primary" @click="$refs.batteryInfoTable.refresh(true)">查询</a-button>
-            </a-col>
-          </a-row>
-        </a-form>
-      </a-spin>
-    </div>
-    <s-table
-      ref="batteryInfoTable"
-      size="default"
-      rowKey="(record) => record.data.id"
-      :columns="columns"
-      :data="loadData"
-      :alert="true"
-      :rowSelection="rowSelection"
-      :showPagination="false"
-    >
-      <span slot='info_id' slot-scope="text, record">
-        <template>
-          <span>{{ record.id }}</span>
-        </template>
-      </span>
-      <span slot='time_track' slot-scope="text, record">
-        <template>
-          <span>{{ record.time_tracking }}</span>
-        </template>
-      </span>
-      <span slot='single_battery_voltage' slot-scope="text, record">
-        <template>
-          <span>{{ record.single_battery_voltage_arr.split(',').join('V, ') + 'V' }}</span>
-        </template>
-      </span>
-      <span slot='battery_capacity_soc' slot-scope="text, record">
-        <template>
-          <span>{{ record.battery_capacity_soc }}</span>
-        </template>
-      </span>
-      <span slot='battery_voltage' slot-scope="text, record">
-        <template>
-          <span>{{ record.battery_voltage }}</span>
-        </template>
-      </span>
-    </s-table>
+      <div class="table-page-search-wrapper">
+        <a-spin :spinning="bms_loading">
+          <a-form layout="inline">
+            <a-row :gutter="48">
+              <a-col :md="8" :sm="24">
+                <a-form-item aria-label="起始日期">
+                  <a-date-picker v-model="queryData.start_date" style="width: 100%" placeholder="起始日期"/>
+                </a-form-item>
+              </a-col>
+              <a-col :md="8" :sm="24">
+                <a-form-item aria-label="起始时间">
+                  <a-time-picker v-model="queryData.start_time" style="width: 100%" placeholder="起始时间"/>
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="48">
+              <a-col :md="8" :sm="24">
+                <a-form-item aria-label="结束日期">
+                  <a-date-picker
+                    v-model="queryData.end_date"
+                    style="width: 100%"
+                    placeholder="结束日期"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :md="8" :sm="24">
+                <a-form-item aria-label="结束时间">
+                  <a-time-picker
+                    v-model="queryData.end_time"
+                    style="width: 100%"
+                    placeholder="结束时间"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :md="8" :sm="24">
+                <a-button type="primary" @click="$refs.batteryInfoTable.refresh(true)">查询</a-button>
+              </a-col>
+            </a-row>
+          </a-form>
+        </a-spin>
+      </div>
+      <s-table
+        ref="batteryInfoTable"
+        size="default"
+        rowKey="(record) => record.data.id"
+        :columns="columns"
+        :data="loadData"
+        :alert="true"
+        :rowSelection="rowSelection"
+        :showPagination="false"
+      >
+        <span slot='info_id' slot-scope="text, record">
+          <template>
+            <span>{{ record.id }}</span>
+          </template>
+        </span>
+        <span slot='time_track' slot-scope="text, record">
+          <template>
+            <span>{{ record.time_tracking }}</span>
+          </template>
+        </span>
+        <span slot='single_battery_voltage' slot-scope="text, record">
+          <template>
+            <span>{{ record.single_battery_voltage_arr.split(',').join('V, ') + 'V' }}</span>
+          </template>
+        </span>
+        <span slot='battery_capacity_soc' slot-scope="text, record">
+          <template>
+            <span>{{ record.battery_capacity_soc }}</span>
+          </template>
+        </span>
+        <span slot='battery_voltage' slot-scope="text, record">
+          <template>
+            <span>{{ record.battery_voltage }}</span>
+          </template>
+        </span>
+      </s-table>
+    </component>
+    <bms-config v-if='mode === "config"' :device-id='deviceId'>
+    </bms-config>
   </a-card>
 </template>
 
@@ -101,6 +111,7 @@ import moment from 'moment'
 import { getBatteryInfo } from '@/api/manage'
 import { STable } from '@/components'
 import BmsInfoCharts from '@/views/list/components/BmsInfoCharts'
+import BmsConfig from '@/views/list/components/BmsConfig'
 
 const columns = [
   {
@@ -148,6 +159,7 @@ const columns = [
 export default {
   name: 'Info',
   components: {
+    BmsConfig,
     STable,
     BmsInfoCharts
   },
@@ -208,7 +220,8 @@ export default {
           })
       },
       selectedRowKeys: [],
-      selectedRows: []
+      selectedRows: [],
+      mode: 'basic'
     }
   },
   created () {
