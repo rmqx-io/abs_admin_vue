@@ -690,20 +690,22 @@ export default {
           }
           setTimeout(() => {
             this.$nextTick(() => {
-              this.$refs['bmschart'].init(
-                bmsList,
-                ['电压', '电流', 'SOC', '箱内温度', '电池温度', '功率管温度'],
-                ['V', 'A', '%', '℃', '℃', '℃'],
-                [
-                  '#6AD6E6',
-                  '#6F95DA',
-                  '#47ba80',
-                  '#E8A456',
-                  '#DBBB5B',
-                  '#E8E156'
-                ],
-                3
-              )
+              if (this.$refs && this.$refs.bmschart) {
+                this.$refs.bmschart.init(
+                  bmsList,
+                  ['电压', '电流', 'SOC', '箱内温度', '电池温度', '功率管温度'],
+                  ['V', 'A', '%', '℃', '℃', '℃'],
+                  [
+                    '#6AD6E6',
+                    '#6F95DA',
+                    '#47ba80',
+                    '#E8A456',
+                    '#DBBB5B',
+                    '#E8E156'
+                  ],
+                  3
+                )
+              }
             })
           }, 300)
         })
