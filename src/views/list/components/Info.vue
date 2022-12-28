@@ -17,7 +17,7 @@
       <br />
     </div>
 
-    <component v-if='mode === "basic"'>
+    <div v-if='mode === "basic"'>
       <bms-info-charts
         :device-id='deviceId'
       >
@@ -100,7 +100,7 @@
           </template>
         </span>
       </s-table>
-    </component>
+    </div>
     <bms-config v-if='mode === "config"' :device-id='deviceId'>
     </bms-config>
   </a-card>
