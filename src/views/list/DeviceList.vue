@@ -169,7 +169,7 @@
       />
       <step-by-step-modal v-if="table_visible" ref="modal" @ok="handleCreateFormOk"/>
 
-      <info
+      <battery-info
         v-if="battery_detail_visible"
         ref="batteryInfo"
         :device-id="device_id"
@@ -265,7 +265,7 @@ import {
 
 import StepByStepModal from './modules/StepByStepModal'
 import CreateForm from './modules/CreateForm'
-import Info from '@/views/list/components/Info'
+import BatteryInfo from '@/views/list/components/BatteryInfo'
 import storage from 'store'
 import { ACCESS_TOKEN, ROLE } from '@/store/mutation-types'
 
@@ -375,7 +375,7 @@ export default {
     Ellipsis,
     CreateForm,
     StepByStepModal,
-    Info
+    BatteryInfo
   },
   data() {
     this.columns = columns

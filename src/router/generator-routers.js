@@ -24,8 +24,8 @@ const constantRouterComponents = {
   'AdvanceForm': () => import('@/views/form/advancedForm/AdvancedForm'),
 
   // list
-  'TableList': () => import('@/views/list/TableList'),
-  'Info': () => import('@/views/list/components/Info'),
+  'TableList': () => import('@/views/list/DeviceList'),
+  'Info': () => import('@/views/list/components/BatteryInfo'),
   'StandardList': () => import('@/views/list/BasicList'),
   'CardList': () => import('@/views/list/CardList'),
   'SearchLayout': () => import('@/views/list/search/SearchLayout'),

@@ -36,26 +36,26 @@ export const asyncRouterMap = [
         path: '/list',
         name: 'list',
         component: RouteView,
-        redirect: '/list/table-list',
+        redirect: '/list/device-list',
         meta: { title: 'menu.device', icon: 'bars', permission: ['table'] },
         children: [
           {
-            path: '/list/table-list/:page_no([1-9]\\d*)?',
+            path: '/list/device-list/:page_no([1-9]\\d*)?',
             name: 'TableListWrapper',
             hideChildrenInMenu: true, // 强制显示 MenuItem 而不是 SubMenu
-            component: () => import('@/views/list/TableList'),
+            component: () => import('@/views/list/DeviceList'),
             meta: { title: '设备列表', keepAlive: true, permission: ['table'] },
             children: [
             ]
           },
           {
-            path: '/list/table-list/info/:device_id([1-9]\\d*)?',
+            path: '/list/device-list/info/:device_id([1-9]\\d*)?',
             // hideChildrenInMenu: true,
             hidden: true,
             // name: 'ProfileBasic',
             // component: () => import('@/views/profile/basic'),
             name: 'Info',
-            component: () => import('@/views/list/components/Info'),
+            component: () => import('@/views/list/components/BatteryInfo'),
             meta: { title: '电池详情', keepAlive: true, permission: ['table'] }
           }
         ]
