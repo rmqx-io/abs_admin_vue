@@ -41,6 +41,9 @@ const api = {
 
   battery_info: '/admin/device/bms/info',
   battery_info_latest: '/admin/device/bms/info/latest',
+  bms_config: '/admin/device/bms/config',
+  bms_config_data_types: '/admin/device/bms/config/data_types',
+  bms_config_data_types_map: '/admin/device/bms/config/data_types/map',
   location: '/admin/device/location',
 
   permission: '/permission',
@@ -159,6 +162,28 @@ export function getBatteryInfoLatest (deviceId, arg) {
     url: api.battery_info_latest + '/' + deviceId,
     method: 'post',
     data: arg
+  })
+}
+
+export function setBmsConfig (deviceId, arg) {
+  return request({
+    url: api.bms_config + '/' + deviceId,
+    method: 'post',
+    data: arg
+  })
+}
+
+export function getBmsConfigDataTypes (bmsType) {
+  return request({
+    url: api.bms_config_data_types + '/' + bmsType,
+    method: 'get'
+  })
+}
+
+export function getBmsConfigDataTypesMap (bmsType) {
+  return request({
+    url: api.bms_config_data_types_map + '/' + bmsType,
+    method: 'get'
   })
 }
 
