@@ -14,7 +14,8 @@
       <h3>修改 BMS 配置</h3>
       <a-form>
         <a-form-item :label="configItem.name_cn">
-          <div>当前值 {{ configItem.value }}</div>
+          <div>当前值: {{ configItem.value }} 范围: {{ configItem.min }} ~ {{ configItem.max }}</div>
+          <div>{{ configItem.comment }}</div>
           <a-input type="text" v-model="configItem.value" />
         </a-form-item>
       </a-form>
