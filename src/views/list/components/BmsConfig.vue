@@ -16,6 +16,7 @@
         <a-form-item :label="configItem.name_cn">
           <div>当前值: {{ configItem.value }} 范围: {{ configItem.min }} ~ {{ configItem.max }}</div>
           <div>{{ configItem.comment }}</div>
+          <div v-if='formErrorMessage' class='error'>{{ this.formErrorMessage}}</div>
           <a-input type="text" v-model="configItem.value" />
         </a-form-item>
       </a-form>
@@ -130,6 +131,7 @@ export default {
       bmsConfig: {},
       errorMsg: null,
       statusMsg: null,
+      formErrorMessage: null,
       showSetConfigForm: false,
       configItem: {
         name: '',
@@ -142,6 +144,7 @@ export default {
       // clear error & status message
       this.errorMsg = null
       this.statusMsg = null
+      this.formErrorMessage = null
       setBmsConfig(this.deviceId, arg)
         .then(res => {
           console.log('res', res)
@@ -180,6 +183,10 @@ export default {
         })
     },
     handleSetBmsConfig (item, value) {
+      this.errorMsg = null
+      this.statusMsg = null
+      this.formErrorMessage = null
+
       this.showSetConfigForm = true
       this.configItem = item
       this.configItem.value = value
@@ -191,8 +198,16 @@ export default {
       const arg = {
         name: this.configItem.name, value: '' + this.configItem.value
       }
-      this.doSetBmsConfig(arg)
-      this.showSetConfigForm = false
+      console.log('handleOk', this.configItem)
+      if (this.configItem.min != null && this.configItem.max != null) {
+        if (this.configItem.value < this.configItem.min || this.configItem.value > this.configItem.max) {
+          this.errorMsg = '输入值超出范围'
+          this.formErrorMessage = this.errorMsg
+        } else {
+          this.doSetBmsConfig(arg)
+          this.showSetConfigForm = false
+        }
+      }
     },
     handleCancel () {
       this.showSetConfigForm = false
