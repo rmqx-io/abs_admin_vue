@@ -153,7 +153,9 @@
 <!--            <a @click="handleSub(record)">订阅报警</a>-->
             <a @click="handleBatteryInfo(record)">电池详情</a>
             <a-divider type="vertical" />
-            <a @click="handleMap(record)">历史行程</a>
+            <span><a @click="handleMap(record)">历史行程</a></span> <!-- TODO: 避免被分行显示 -->
+            <a-divider type="vertical" />
+            <a @click="handleSendCommand(record)">下发指令</a>
           </template>
         </span>
       </s-table>
@@ -166,6 +168,15 @@
         :model="device_create_form_data"
         @cancel="handleCreateFormCancel"
         @ok="handleCreateFormOk"
+      />
+
+      <send-command-form
+        ref="sendCommandModal"
+        :visible="send_command_form_visible"
+        :loading="confirmLoading"
+        :model="send_command_form_data"
+        @cancel="handleSendCommandFormCancel"
+        @ok="handleSendCommandFormOk"
       />
       <step-by-step-modal v-if="table_visible" ref="modal" @ok="handleCreateFormOk"/>
 
@@ -265,6 +276,7 @@ import {
 
 import StepByStepModal from './modules/StepByStepModal'
 import CreateForm from './modules/CreateForm'
+import SendCommandForm from '@/views/list/modules/SendCommandForm'
 import BatteryInfo from '@/views/list/components/BatteryInfo'
 import storage from 'store'
 import { ACCESS_TOKEN, ROLE } from '@/store/mutation-types'
@@ -374,6 +386,7 @@ export default {
     STable,
     Ellipsis,
     CreateForm,
+    SendCommandForm,
     StepByStepModal,
     BatteryInfo
   },
@@ -384,10 +397,12 @@ export default {
       is_sysadmin: false,
       device_create_form_visible: false,
       table_visible: true,
+      send_command_form_visible: false,
       battery_detail_visible: false,
       map_visible: false,
       confirmLoading: false,
       device_create_form_data: null,
+      send_command_form_data: null,
       device_id: null,
       map_loading: false,
       refresh_map: true,
@@ -553,6 +568,12 @@ export default {
       this.battery_detail_visible = false
       this.table_visible = true
     },
+    handleSendCommandFormCancel () {
+      this.send_command_form_visible = false
+    },
+    handleSendCommandFormOk () {
+
+    },
     handleBatteryInfoOk() {
       this.battery_detail_visible = false
       this.table_visible = true
@@ -599,6 +620,10 @@ export default {
       this.map_visible = true
       this.table_visible = false
       this.refreshMap(record.code)
+    },
+    handleSendCommand (record) {
+      console.log('send command')
+      this.send_command_form_visible = true
     },
     refreshMap (deviceId) {
       this.map_loading = true

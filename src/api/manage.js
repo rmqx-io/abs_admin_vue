@@ -46,6 +46,8 @@ const api = {
   bms_config_data_types_map: '/admin/device/bms/config/data_types/map',
   location: '/admin/device/location',
 
+  send_command_list: '/admin/device/config/commands',
+
   permission: '/permission',
   permissionNoPager: '/permission/no-pager',
   orgTree: '/org/tree'
@@ -200,6 +202,13 @@ export function getOrgTree (parameter) {
     url: api.orgTree,
     method: 'get',
     params: parameter
+  })
+}
+
+export function getSendCommandList (provider) {
+  return request({
+    url: api.send_command_list + '/' + provider,
+    method: 'get'
   })
 }
 
