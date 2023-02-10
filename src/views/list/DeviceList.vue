@@ -175,6 +175,7 @@
         :visible="send_command_form_visible"
         :loading="confirmLoading"
         :model="send_command_form_data"
+        :device-id="device_id"
         @cancel="handleSendCommandFormCancel"
         @ok="handleSendCommandFormOk"
       />
@@ -622,6 +623,7 @@ export default {
       this.refreshMap(record.code)
     },
     handleSendCommand (record) {
+      this.device_id = record.code
       console.log('send command')
       this.send_command_form_visible = true
     },

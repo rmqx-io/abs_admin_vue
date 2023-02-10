@@ -1,13 +1,12 @@
 <template>
   <a-modal
     title="下发指令"
-    :width="640"
+    :width="800"
     :visible="visible"
     :confirmLoading="loading"
-    @ok="() => { $emit('ok') }"
-    @cancel="() => { $emit('cancel') }"
+    @ok="() => { handleOk(); $emit('ok') }"
+    @cancel="() => { handleCancel(); $emit('cancel') }"
   >
-    <div>send command form</div>
     <a-table
       :dataSource="sendCommandList"
       :columns="columns"
@@ -17,14 +16,17 @@
     <a-form-item
       v-if="currentRow"
       :label="currentRow.name_cn"
-      >
-      <a-input placeholder="输入参数"></a-input>
+    >
+      <a-input
+        v-model='param'
+        placeholder="输入参数"
+      ></a-input>
     </a-form-item>
   </a-modal>
 </template>
 
 <script>
-import { getSendCommandList } from '@/api/manage'
+import { getSendCommandList, sendCommand } from '@/api/manage'
 
 export default {
   props: {
@@ -38,6 +40,10 @@ export default {
     },
     model: {
       type: Object,
+      default: () => null
+    },
+    deviceId: {
+      type: String,
       default: () => null
     }
   },
@@ -66,7 +72,8 @@ export default {
           key: 'sub_command'
         }
       ],
-      currentRow: null
+      currentRow: null,
+      param: null
     }
   },
   created () {
@@ -88,6 +95,20 @@ export default {
           }
         }
       }
+    },
+    handleOk () {
+      console.log('handleOk', this.currentRow, this.param)
+      const arg = {
+        id: (new Date()).getTime(), // current timestamp in milliseconds
+        name: this.currentRow.name,
+        command: this.currentRow.command,
+        sub_command: this.currentRow.sub_command,
+        param: this.param
+      }
+      sendCommand(this.deviceId, arg)
+    },
+    handleCancel () {
+      console.log('handleCancel')
     }
   }
 }

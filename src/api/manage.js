@@ -47,6 +47,7 @@ const api = {
   location: '/admin/device/location',
 
   send_command_list: '/admin/device/config/commands',
+  send_command: '/admin/device/control/send/command',
 
   permission: '/permission',
   permissionNoPager: '/permission/no-pager',
@@ -209,6 +210,14 @@ export function getSendCommandList (provider) {
   return request({
     url: api.send_command_list + '/' + provider,
     method: 'get'
+  })
+}
+
+export function sendCommand (deviceId, arg) {
+  return request({
+    url: api.send_command + '/' + deviceId,
+    method: 'post',
+    data: arg
   })
 }
 
