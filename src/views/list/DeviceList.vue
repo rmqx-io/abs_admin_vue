@@ -1,26 +1,25 @@
 <template>
 <!--  <page-header-wrapper>-->
-    <a-card
-      :bordered="false"
-
-    >
-      <div v-if="table_visible" class="table-page-search-wrapper">
-        <a-form layout="inline">
-          <a-row :gutter="48">
-            <a-col :md="8" :sm="24">
-              <a-form-item label="编号">
-                <a-input v-model="queryData.device_id" placeholder=""/>
-              </a-form-item>
-              <a-form-item label="运营单位">
-                <a-tree-select
-                  show-search
-                  tree-default-expand-all
-                  :filterTreeNode="filterTreeNode"
-                  :treeData="orgList"
-                  v-model="queryData.organization_id"
-                ></a-tree-select>
-              </a-form-item>
-            </a-col>
+  <a-card
+    :bordered="false"
+  >
+    <div v-if="table_visible" class="table-page-search-wrapper">
+      <a-form layout="inline">
+        <a-row :gutter="48">
+          <a-col :md="8" :sm="24">
+            <a-form-item label="编号">
+              <a-input v-model="queryData.device_id" placeholder=""/>
+            </a-form-item>
+            <a-form-item label="运营单位">
+              <a-tree-select
+                show-search
+                tree-default-expand-all
+                :filterTreeNode="filterTreeNode"
+                :treeData="orgList"
+                v-model="queryData.organization_id"
+              ></a-tree-select>
+            </a-form-item>
+          </a-col>
 <!--            <a-col :md="8" :sm="24">-->
 <!--              <a-form-item label="使用状态">-->
 <!--                <a-select v-model="queryParam.status" placeholder="请选择" default-value="0">-->
@@ -60,202 +59,202 @@
 <!--                </a-form-item>-->
 <!--              </a-col>-->
 <!--            </template>-->
-            <a-col :md="!advanced && 8 || 24" :sm="24">
-              <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
-                <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
+          <a-col :md="!advanced && 8 || 24" :sm="24">
+            <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
+              <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
 <!--                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>-->
-                <a @click="toggleAdvanced" style="margin-left: 8px">
-                  {{ advanced ? '收起' : '展开' }}
-                  <a-icon :type="advanced ? 'up' : 'down'"/>
-                </a>
-              </span>
+              <a @click="toggleAdvanced" style="margin-left: 8px">
+                {{ advanced ? '收起' : '展开' }}
+                <a-icon :type="advanced ? 'up' : 'down'"/>
+              </a>
+            </span>
+          </a-col>
+        </a-row>
+      </a-form>
+    </div>
+
+    <div v-if="table_visible" class="table-operator">
+      <a-button type="primary" icon="plus" @click="handleAdd">添加</a-button>
+      <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
+        <a-menu slot="overlay">
+          <a-menu-item key="1"><a-icon type="delete" />删除</a-menu-item>
+          <!-- lock | unlock -->
+          <a-menu-item key="2"><a-icon type="lock" />锁定</a-menu-item>
+        </a-menu>
+        <a-button style="margin-left: 8px">
+          批量操作 <a-icon type="down" />
+        </a-button>
+      </a-dropdown>
+    </div>
+
+    <s-table
+      v-if="table_visible"
+      ref="table"
+      size="default"
+      rowKey="(record) => record.data.id"
+      :columns="columns"
+      :data="loadData"
+      :alert="true"
+      :rowSelection="rowSelection"
+      showPagination="auto"
+      :scroll="{ x: 1300 }"
+    >
+      <span slot="serial" slot-scope="text, record, index">
+        {{ index + 1 }}
+      </span>
+      <span slot="status" slot-scope="text">
+        <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
+      </span>
+      <span slot="description" slot-scope="text">
+        <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
+      </span>
+
+      <span slot="device_info" slot-scope="text, record">
+        <template>
+          编号: <span>{{ record.code }}</span>
+          <br />
+          别名: <span>{{ record.alias }}</span>
+          <br />
+          ICCID: <span>{{ record.iccid }}</span>
+        </template>
+      </span>
+
+      <span slot="organization_info" slot-scope="text, record">
+        <template>
+          组织: <span>{{ record.organization_name }}</span>
+          <br />
+          仓库: <span>{{ record.storehouse_name }}</span>
+        </template>
+      </span>
+
+      <span slot="model_info" slot-scope="text, record">
+        <template>
+          电池型号: <span>{{ record.battery_name }}</span>
+          <br />
+          设备型号: <span>{{ record.model_name }}</span>
+          <br />
+          BT码: <span>{{ record.bms_bt }}</span>
+        </template>
+      </span>
+
+      <span slot="version_info" slot-scope="text, record">
+        <template>
+          软件: <span>{{ record.s_ver }}</span>
+          <br />
+          硬件: <span>{{ record.h_ver }}</span>
+        </template>
+      </span>
+
+      <span slot="action" slot-scope="text, record">
+        <template>
+          <a v-if="is_sysadmin" @click="handleEdit(record)">修改</a>
+          <a-divider v-if="is_sysadmin" type="vertical" />
+<!--            <a @click="handleSub(record)">订阅报警</a>-->
+          <a @click="handleBatteryInfo(record)">电池详情</a>
+          <a-divider type="vertical" />
+          <span><a @click="handleMap(record)">历史行程</a></span> <!-- TODO: 避免被分行显示 -->
+          <a-divider type="vertical" />
+          <a @click="handleSendCommand(record)">下发指令</a>
+        </template>
+      </span>
+    </s-table>
+
+    <create-form
+      v-if="table_visible"
+      ref="createModal"
+      :visible="device_create_form_visible"
+      :loading="confirmLoading"
+      :model="device_create_form_data"
+      @cancel="handleCreateFormCancel"
+      @ok="handleCreateFormOk"
+    />
+
+    <send-command-form
+      ref="sendCommandModal"
+      :visible="send_command_form_visible"
+      :loading="confirmLoading"
+      :model="send_command_form_data"
+      :device-id="device_id"
+      @cancel="handleSendCommandFormCancel"
+      @ok="handleSendCommandFormOk"
+    />
+    <step-by-step-modal v-if="table_visible" ref="modal" @ok="handleCreateFormOk"/>
+
+    <battery-info
+      v-if="battery_detail_visible"
+      ref="batteryInfo"
+      :device-id="device_id"
+      @cancel="handleBatteryInfoCancel"
+      @ok="handleBatteryInfoOk"
+    />
+
+    <div
+      v-if="map_visible"
+      style="width: 100%; height: 600px"
+    >
+      <div><a @click="handleMapClose()"><< 返回</a></div>
+      <div><br /></div>
+      <div>设备：{{ device_id }}</div>
+      <div><br /></div>
+      <a-spin :spinning="map_loading">
+        <a-form layout="inline">
+          <a-row :gutter="48">
+            <a-col :md="8" :sm="24">
+              <a-form-item aria-label="起始日期">
+                <a-date-picker v-model="queryData.start_date" style="width: 100%" placeholder="起始日期"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item aria-label="起始时间">
+                <a-time-picker v-model="queryData.start_time" style="width: 100%" placeholder="起始时间"/>
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <a-row :gutter="48">
+            <a-col :md="8" :sm="24">
+              <a-form-item aria-label="结束日期">
+                <a-date-picker
+                  v-model="queryData.end_date"
+                  style="width: 100%"
+                  placeholder="结束日期"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item aria-label="结束时间">
+                <a-time-picker
+                  v-model="queryData.end_time"
+                  style="width: 100%"
+                  placeholder="结束时间"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-button type="primary" @click="refreshMap(device_id)">查询</a-button>
             </a-col>
           </a-row>
         </a-form>
-      </div>
-
-      <div v-if="table_visible" class="table-operator">
-        <a-button type="primary" icon="plus" @click="handleAdd">添加</a-button>
-        <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
-          <a-menu slot="overlay">
-            <a-menu-item key="1"><a-icon type="delete" />删除</a-menu-item>
-            <!-- lock | unlock -->
-            <a-menu-item key="2"><a-icon type="lock" />锁定</a-menu-item>
-          </a-menu>
-          <a-button style="margin-left: 8px">
-            批量操作 <a-icon type="down" />
-          </a-button>
-        </a-dropdown>
-      </div>
-
-      <s-table
-        v-if="table_visible"
-        ref="table"
-        size="default"
-        rowKey="(record) => record.data.id"
-        :columns="columns"
-        :data="loadData"
-        :alert="true"
-        :rowSelection="rowSelection"
-        showPagination="auto"
-        :scroll="{ x: 1300 }"
+      </a-spin>
+      <el-amap
+        vid="'amapDemo'"
+        :map-style="'fresh'"
+        size="mini"
+        :zoom="zoom"
+        :center="center"
+        v-if="refresh_map"
       >
-        <span slot="serial" slot-scope="text, record, index">
-          {{ index + 1 }}
-        </span>
-        <span slot="status" slot-scope="text">
-          <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
-        </span>
-        <span slot="description" slot-scope="text">
-          <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
-        </span>
-
-        <span slot="device_info" slot-scope="text, record">
-          <template>
-            编号: <span>{{ record.code }}</span>
-            <br />
-            别名: <span>{{ record.alias }}</span>
-            <br />
-            ICCID: <span>{{ record.iccid }}</span>
-          </template>
-        </span>
-
-        <span slot="organization_info" slot-scope="text, record">
-          <template>
-            组织: <span>{{ record.organization_name }}</span>
-            <br />
-            仓库: <span>{{ record.storehouse_name }}</span>
-          </template>
-        </span>
-
-        <span slot="model_info" slot-scope="text, record">
-          <template>
-            电池型号: <span>{{ record.battery_name }}</span>
-            <br />
-            设备型号: <span>{{ record.model_name }}</span>
-            <br />
-            BT码: <span>{{ record.bms_bt }}</span>
-          </template>
-        </span>
-
-        <span slot="version_info" slot-scope="text, record">
-          <template>
-            软件: <span>{{ record.s_ver }}</span>
-            <br />
-            硬件: <span>{{ record.h_ver }}</span>
-          </template>
-        </span>
-
-        <span slot="action" slot-scope="text, record">
-          <template>
-            <a v-if="is_sysadmin" @click="handleEdit(record)">修改</a>
-            <a-divider v-if="is_sysadmin" type="vertical" />
-<!--            <a @click="handleSub(record)">订阅报警</a>-->
-            <a @click="handleBatteryInfo(record)">电池详情</a>
-            <a-divider type="vertical" />
-            <span><a @click="handleMap(record)">历史行程</a></span> <!-- TODO: 避免被分行显示 -->
-            <a-divider type="vertical" />
-            <a @click="handleSendCommand(record)">下发指令</a>
-          </template>
-        </span>
-      </s-table>
-
-      <create-form
-        v-if="table_visible"
-        ref="createModal"
-        :visible="device_create_form_visible"
-        :loading="confirmLoading"
-        :model="device_create_form_data"
-        @cancel="handleCreateFormCancel"
-        @ok="handleCreateFormOk"
-      />
-
-      <send-command-form
-        ref="sendCommandModal"
-        :visible="send_command_form_visible"
-        :loading="confirmLoading"
-        :model="send_command_form_data"
-        :device-id="device_id"
-        @cancel="handleSendCommandFormCancel"
-        @ok="handleSendCommandFormOk"
-      />
-      <step-by-step-modal v-if="table_visible" ref="modal" @ok="handleCreateFormOk"/>
-
-      <battery-info
-        v-if="battery_detail_visible"
-        ref="batteryInfo"
-        :device-id="device_id"
-        @cancel="handleBatteryInfoCancel"
-        @ok="handleBatteryInfoOk"
-      />
-
-      <div
-        v-if="map_visible"
-        style="width: 100%; height: 600px"
-      >
-        <div><a @click="handleMapClose()"><< 返回</a></div>
-        <div><br /></div>
-        <div>设备：{{ device_id }}</div>
-        <div><br /></div>
-        <a-spin :spinning="map_loading">
-          <a-form layout="inline">
-            <a-row :gutter="48">
-              <a-col :md="8" :sm="24">
-                <a-form-item aria-label="起始日期">
-                  <a-date-picker v-model="queryData.start_date" style="width: 100%" placeholder="起始日期"/>
-                </a-form-item>
-              </a-col>
-              <a-col :md="8" :sm="24">
-                <a-form-item aria-label="起始时间">
-                  <a-time-picker v-model="queryData.start_time" style="width: 100%" placeholder="起始时间"/>
-                </a-form-item>
-              </a-col>
-            </a-row>
-            <a-row :gutter="48">
-              <a-col :md="8" :sm="24">
-                <a-form-item aria-label="结束日期">
-                  <a-date-picker
-                    v-model="queryData.end_date"
-                    style="width: 100%"
-                    placeholder="结束日期"
-                  />
-                </a-form-item>
-              </a-col>
-              <a-col :md="8" :sm="24">
-                <a-form-item aria-label="结束时间">
-                  <a-time-picker
-                    v-model="queryData.end_time"
-                    style="width: 100%"
-                    placeholder="结束时间"
-                  />
-                </a-form-item>
-              </a-col>
-              <a-col :md="8" :sm="24">
-                <a-button type="primary" @click="refreshMap(device_id)">查询</a-button>
-              </a-col>
-            </a-row>
-          </a-form>
-        </a-spin>
-        <el-amap
-          vid="'amapDemo'"
-          :map-style="'fresh'"
-          size="mini"
-          :zoom="zoom"
-          :center="center"
-          v-if="refresh_map"
+        <el-amap-polyline
+          :path="polyline.path"
+          :line-join="'round'"
+        ></el-amap-polyline>
+        <el-amap-marker
+          v-for="(marker,i) in polyline.markers"
+          :position="marker"
+          :key="i"
         >
-          <el-amap-polyline
-            :path="polyline.path"
-            :line-join="'round'"
-          ></el-amap-polyline>
-          <el-amap-marker
-            v-for="(marker,i) in polyline.markers"
-            :position="marker"
-            :key="i"
-          >
-          </el-amap-marker>
-        </el-amap>
-      </div>
+        </el-amap-marker>
+      </el-amap>
+    </div>
 
     </a-card>
 <!--  </page-header-wrapper>-->
