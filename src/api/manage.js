@@ -136,6 +136,14 @@ export function getAdminOrgTree (parameter) {
   })
 }
 
+export function getStatusCount (parameter) {
+  return request({
+    url: api.device + '/status/count',
+    method: 'get',
+    params: parameter
+  })
+}
+
 export function getDeviceModelList (arg) {
   return request({
     url: api.device_model,

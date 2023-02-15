@@ -6,6 +6,16 @@
     <div v-if="table_visible" class="table-page-search-wrapper">
       <a-form layout="inline">
         <a-row :gutter="48">
+          <a-col :md="24" :sm="24">
+            <a-form-item :label="$t('device.status')">
+              <a-radio-group>
+                <a-radio-button value="all">{{ $t('device.all') }} ({{ this.countAll }})</a-radio-button>
+                <a-radio-button value="online">{{ $t('device.online') }} ({{ this.countOnline}})</a-radio-button>
+                <a-radio-button value="offline">{{ $t('device.offline') }} ({{ this.countOffline }})</a-radio-button>
+                <a-radio-button value="standby">{{ $t('device.standby' )}} ({{ this.countStandby }})</a-radio-button>
+              </a-radio-group>
+            </a-form-item>
+          </a-col>
           <a-col :md="8" :sm="24">
             <a-form-item label="编号">
               <a-input v-model="queryData.device_id" placeholder=""/>
@@ -61,7 +71,7 @@
 <!--            </template>-->
           <a-col :md="!advanced && 8 || 24" :sm="24">
             <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
-              <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
+              <a-button type="primary" @click="refreshTable(true)">查询</a-button>
 <!--                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>-->
               <a @click="toggleAdvanced" style="margin-left: 8px">
                 {{ advanced ? '收起' : '展开' }}
@@ -270,7 +280,7 @@ import {
   getBatteryInfo,
   getDeviceList,
   getLocation,
-  getRoleList,
+  getRoleList, getStatusCount,
   updateDevice
 } from '@/api/manage'
 
@@ -414,16 +424,16 @@ export default {
       advanced: false,
       // 查询参数
       queryParam: {},
-      queryData: {
-        device_id: null,
-        account: null,
-        name: null,
-        page_no: 1,
-        page_size: 5,
-        start_date: moment(new Date() - 2 * 60 * 60 * 1000),
-        start_time: moment(new Date() - 2 * 60 * 60 * 1000),
-        organization_id: null
-      },
+      // queryData: {
+      //   device_id: null,
+      //   account: null,
+      //   name: null,
+      //   page_no: 1,
+      //   page_size: 5,
+      //   start_date: moment(new Date() - 2 * 60 * 60 * 1000),
+      //   start_time: moment(new Date() - 2 * 60 * 60 * 1000),
+      //   organization_id: null
+      // },
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
         let arg = Object.assign(parameter, this.queryData)
@@ -450,7 +460,11 @@ export default {
       zoom: 14,
       center: [113.94, 22.52],
       amapManager,
-      orgList: []
+      orgList: [],
+      countAll: 0,
+      countOnline: 0,
+      countOffline: 0,
+      countStandby: 0
     }
   },
   filters: {
@@ -473,7 +487,8 @@ export default {
     // console.log('mounted', this.$route)
     if (this.$route.query.device_id) {
       this.queryData.device_id = this.$route.query.device_id
-      this.$refs.table.refresh(true)
+      // this.$refs.table.refresh(true)
+      this.refreshTable(true)
     }
 
     this.getAdminOrgList()
@@ -483,6 +498,18 @@ export default {
       return {
         selectedRowKeys: this.selectedRowKeys,
         onChange: this.onSelectChange
+      }
+    },
+    queryData () {
+      return {
+        device_id: this.$route.query.device_id,
+        account: this.$route.query.account,
+        name: this.$route.query.name,
+        page_no: this.$route.query.page_no,
+        page_size: this.$route.query.page_size,
+        start_date: this.$route.query.start_date,
+        start_time: this.$route.query.start_time,
+        organization_id: this.$route.query.organization_id
       }
     }
   },
@@ -522,7 +549,8 @@ export default {
               // 重置表单数据
               form.resetFields()
               // 刷新表格
-              this.$refs.table.refresh()
+              // this.$refs.table.refresh()
+              this.refreshTable(null)
 
               this.$message.info('修改成功')
             })
@@ -547,7 +575,8 @@ export default {
               // 重置表单数据
               form.resetFields()
               // 刷新表格
-              this.$refs.table.refresh()
+              // this.$refs.table.refresh()
+              this.refreshTable(null)
 
               this.$message.info('新增成功')
             })
@@ -672,6 +701,28 @@ export default {
           console.log('org list', res)
           this.orgList = []
           this.orgList.push(res.data)
+        })
+    },
+    refreshTable (param) {
+      this.$refs.table.refresh(param)
+      // refresh status count
+      this.getStatusCount()
+    },
+    getStatusCount () {
+      console.log('query data', this.queryData)
+      if (this.queryData.device_id === '') {
+        this.queryData.device_id = null
+      }
+      if (this.queryData.organization_id === undefined || this.queryData.organization_id === 0) {
+        this.queryData.organization_id = 0
+      }
+      return getStatusCount({
+        'device_id': this.queryData.device_id,
+        'organization_id': this.queryData.organization_id
+      })
+        .then(res => {
+          console.log('status count', res)
+          this.statusCount = res.data
         })
     }
   }
