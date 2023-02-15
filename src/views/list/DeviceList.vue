@@ -9,10 +9,10 @@
           <a-col :md="24" :sm="24">
             <a-form-item :label="$t('device.status')">
               <a-radio-group>
-                <a-radio-button value="all">{{ $t('device.all') }} ({{ this.countAll }})</a-radio-button>
-                <a-radio-button value="online">{{ $t('device.online') }} ({{ this.countOnline}})</a-radio-button>
-                <a-radio-button value="offline">{{ $t('device.offline') }} ({{ this.countOffline }})</a-radio-button>
-                <a-radio-button value="standby">{{ $t('device.standby' )}} ({{ this.countStandby }})</a-radio-button>
+                <a-radio-button value="total">{{ $t('device.total') }} ({{ this.statusCount.total}})</a-radio-button>
+                <a-radio-button value="online">{{ $t('device.online') }} ({{ this.statusCount.online}})</a-radio-button>
+                <a-radio-button value="offline">{{ $t('device.offline') }} ({{ this.statusCount.offline}})</a-radio-button>
+                <a-radio-button value="standby">{{ $t('device.standby' )}} ({{ this.statusCount.standby }})</a-radio-button>
               </a-radio-group>
             </a-form-item>
           </a-col>
@@ -461,10 +461,7 @@ export default {
       center: [113.94, 22.52],
       amapManager,
       orgList: [],
-      countAll: 0,
-      countOnline: 0,
-      countOffline: 0,
-      countStandby: 0
+      statusCount: {}
     }
   },
   filters: {
@@ -491,6 +488,7 @@ export default {
       this.refreshTable(true)
     }
 
+    this.getStatusCount()
     this.getAdminOrgList()
   },
   computed: {
@@ -713,9 +711,9 @@ export default {
       if (this.queryData.device_id === '') {
         this.queryData.device_id = null
       }
-      if (this.queryData.organization_id === undefined || this.queryData.organization_id === 0) {
-        this.queryData.organization_id = 0
-      }
+      // if (this.queryData.organization_id === undefined || this.queryData.organization_id === 0) {
+      //   this.queryData.organization_id = 0
+      // }
       return getStatusCount({
         'device_id': this.queryData.device_id,
         'organization_id': this.queryData.organization_id
