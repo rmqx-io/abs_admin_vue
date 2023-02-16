@@ -3,12 +3,12 @@
   <a-card
     :bordered="false"
   >
-    <div v-if="table_visible" class="table-page-search-wrapper">
+    <div v-if="table_visible || showMap" class="table-page-search-wrapper">
       <a-form layout="inline">
         <a-row :gutter="48">
-          <a-col :md="24" :sm="24">
+          <a-col :md="8" :sm="24">
             <a-form-item :label="$t('device.status')">
-              <a-radio-group>
+              <a-radio-group v-model="deviceStatus" @change="onDeviceStatusChange">
                 <a-radio-button value="total">{{ $t('device.total') }} ({{ this.statusCount.total}})</a-radio-button>
                 <a-radio-button value="online">{{ $t('device.online') }} ({{ this.statusCount.online}})</a-radio-button>
                 <a-radio-button value="offline">{{ $t('device.offline') }} ({{ this.statusCount.offline}})</a-radio-button>
@@ -73,11 +73,15 @@
             <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
               <a-button type="primary" @click="refreshTable(true)">查询</a-button>
 <!--                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>-->
-              <a @click="toggleAdvanced" style="margin-left: 8px">
-                {{ advanced ? '收起' : '展开' }}
-                <a-icon :type="advanced ? 'up' : 'down'"/>
-              </a>
+<!--              <a @click="toggleAdvanced" style="margin-left: 8px">-->
+<!--                {{ advanced ? '收起' : '展开' }}-->
+<!--                <a-icon :type="advanced ? 'up' : 'down'"/>-->
+<!--              </a>-->
             </span>
+          </a-col>
+          <a-col :md="8" :sm="24">
+            <a-checkbox v-model="showMap" @change="onMapChange">显示地图</a-checkbox>
+            <a-checkbox v-model="showAlarm" @change="onAlarmChange">显示告警</a-checkbox>
           </a-col>
         </a-row>
       </a-form>
@@ -97,6 +101,13 @@
       </a-dropdown>
     </div>
 
+    <div v-if="showMap" class="map-container">
+      <div>show map</div>
+      <div class="map" id="map"></div>
+    </div>
+    <div v-if="showAlarm" class="alarm-container">
+      <div>show alarm</div>
+    </div>
     <s-table
       v-if="table_visible"
       ref="table"
@@ -441,6 +452,9 @@ export default {
         arg.page_size = arg.pageSize
         delete arg.pageNo
         delete arg.pageSize
+        if (this.deviceStatus) {
+          arg.device_status = this.deviceStatus
+        }
         console.log('loadData request arg:', arg)
         return getDeviceList(arg)
           .then(res => {
@@ -461,7 +475,10 @@ export default {
       center: [113.94, 22.52],
       amapManager,
       orgList: [],
-      statusCount: {}
+      statusCount: {},
+      showMap: false,
+      showAlarm: false,
+      deviceStatus: null
     }
   },
   filters: {
@@ -722,6 +739,17 @@ export default {
           console.log('status count', res)
           this.statusCount = res.data
         })
+    },
+    onMapChange () {
+      console.log('map change', this.showMap)
+      this.table_visible = !this.showMap
+    },
+    onAlarmChange () {
+      console.log('alarm change', this.showAlarm)
+    },
+    onDeviceStatusChange () {
+      console.log('device status change', this.deviceStatus)
+      this.refreshTable(true)
     }
   }
 }
