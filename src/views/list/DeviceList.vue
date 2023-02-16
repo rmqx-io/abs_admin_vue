@@ -435,16 +435,16 @@ export default {
       advanced: false,
       // 查询参数
       queryParam: {},
-      // queryData: {
-      //   device_id: null,
-      //   account: null,
-      //   name: null,
-      //   page_no: 1,
-      //   page_size: 5,
-      //   start_date: moment(new Date() - 2 * 60 * 60 * 1000),
-      //   start_time: moment(new Date() - 2 * 60 * 60 * 1000),
-      //   organization_id: null
-      // },
+      queryData: {
+        device_id: null,
+        account: null,
+        name: null,
+        page_no: 1,
+        page_size: 5,
+        start_date: moment(new Date() - 2 * 60 * 60 * 1000),
+        start_time: moment(new Date() - 2 * 60 * 60 * 1000),
+        organization_id: null
+      },
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
         let arg = Object.assign(parameter, this.queryData)
@@ -514,19 +514,19 @@ export default {
         selectedRowKeys: this.selectedRowKeys,
         onChange: this.onSelectChange
       }
-    },
-    queryData () {
-      return {
-        device_id: this.$route.query.device_id,
-        account: this.$route.query.account,
-        name: this.$route.query.name,
-        page_no: this.$route.query.page_no,
-        page_size: this.$route.query.page_size,
-        start_date: this.$route.query.start_date,
-        start_time: this.$route.query.start_time,
-        organization_id: this.$route.query.organization_id
-      }
     }
+    // queryData () {
+    //   return {
+    //     device_id: this.$route.query.device_id,
+    //     account: this.$route.query.account,
+    //     name: this.$route.query.name,
+    //     page_no: this.$route.query.page_no,
+    //     page_size: this.$route.query.page_size,
+    //     start_date: this.$route.query.start_date,
+    //     start_time: this.$route.query.start_time,
+    //     organization_id: this.$route.query.organization_id
+    //   }
+    // }
   },
   methods: {
     handleAdd() {
