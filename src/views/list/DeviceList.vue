@@ -108,7 +108,7 @@
     >
       <amap
         :center="center2"
-        :zoom="13"
+        :zoom="4"
         cache-key="marker-cluster-map"
         async
       >
@@ -120,13 +120,24 @@
         <!-- 点聚合 -->
         <amap-marker-cluster
           v-if="showMarkers"
-          :data="data"
+          :data="deviceMarkers"
           key="custom-cluster"
           :grid-size="options.gridSize"
           :average-center="options.averageCenter"
         >
         </amap-marker-cluster>
       </amap>
+      <div
+        v-if="isGettingDeviceLocation"
+      >
+        <a-progress
+          :percent="getDevicesLocationPageNo/ getDevicesLocationPages * 100"
+          :status="getDevicesLocationPageNo === getDevicesLocationPages ? 'success' : 'active'"
+          :stroke-width="10"
+          :format="percent => `${percent.toFixed(0)}%`"
+        />
+        <span>{{ getDevicesLocationPageNo }}</span> / <span>{{ getDevicesLocationPages }}</span>, <span>{{ markersFound }}</span>
+      </div>
     </div>
     <div v-if="showAlarm" class="alarm-container">
       <div>show alarm</div>
@@ -483,11 +494,16 @@ export default {
         { position: [116.418044, 39.957106], title: "Marker 3" },
         { position: [116.373688, 39.931149], title: "Marker 4" }
       ],
+      deviceMarkers: [],
       // create model
       is_sysadmin: false,
       device_create_form_visible: false,
       table_visible: true,
       showMap: false,
+      isGettingDeviceLocation: false,
+      getDevicesLocationPages: 0,
+      getDevicesLocationPageNo: 0,
+      markersFound: 0,
       showMarkers: false,
       showAlarm: false,
       send_command_form_visible: false,
@@ -549,7 +565,7 @@ export default {
       // amapManager,
       orgList: [],
       statusCount: {},
-      deviceStatus: null
+      deviceStatus: 'online'
     }
   },
   filters: {
@@ -789,10 +805,60 @@ export default {
           this.orgList.push(res.data)
         })
     },
+    getDeviceLocation (arg, page_no) {
+      // get all device location
+      console.log('loadData request arg:', arg)
+      arg.page_no = page_no
+      this.getDevicesLocationPageNo = page_no
+      console.log('getDeviceLocation', arg, 'page_no', page_no)
+      getDeviceList(arg)
+        .then(res => {
+          console.log('device list', res)
+
+          this.getDevicesLocationPages = res.data.pages
+
+          // append device to deviceMarkers
+          res.data.records.forEach((item, index) => {
+            if (item.last_location_lng !== null && item.last_location_lat !== null) {
+              this.markersFound += 1
+              this.deviceMarkers.push({
+                lnglat: [item.last_location_lng, item.last_location_lat],
+                title: item.code
+              })
+            }
+          })
+          if (page_no >= res.data.pages) {
+            this.isGettingDeviceLocation = false
+            console.log('markersFound', this.markersFound)
+          } else {
+            this.getDeviceLocation(arg, page_no + 1)
+          }
+        })
+    },
     refreshTable (param) {
-      this.$refs.table.refresh(param)
+      if (this.$refs.table) {
+        this.$refs.table.refresh(param)
+      }
       // refresh status count
       this.getStatusCount()
+      if (this.showMap) {
+        if (this.isGettingDeviceLocation) {
+          return
+        }
+        this.deviceMarkers = []
+        this.markersFound = 0
+        let arg = Object.assign({}, this.queryData)
+        arg.page_no = arg.pageNo
+        arg.page_size = 2000
+        delete arg.pageNo
+        delete arg.pageSize
+        if (this.deviceStatus) {
+          arg.device_status = this.deviceStatus
+        }
+
+        this.isGettingDeviceLocation = true
+        this.getDeviceLocation(arg, 1)
+      }
     },
     getStatusCount () {
       console.log('query data', this.queryData)
@@ -815,7 +881,10 @@ export default {
       console.log('map change', this.showMap)
       this.table_visible = !this.showMap
       if (this.showMap) {
-          this.showMarkers = true
+        this.showMarkers = true
+        if (this.deviceMarkers.length === 0) {
+          this.refreshTable(true)
+        }
       }
     },
     onAlarmChange () {
