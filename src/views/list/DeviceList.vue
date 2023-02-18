@@ -101,9 +101,32 @@
       </a-dropdown>
     </div>
 
-    <div v-if="showMap" class="map-container">
-      <div>show map</div>
-      <div class="map" id="map"></div>
+    <div
+      v-if="showMap"
+      style="width: 100%; height: 600px"
+      class="map-container"
+    >
+      <amap
+        :center="center2"
+        :zoom="13"
+        cache-key="marker-cluster-map"
+        async
+      >
+<!--        <template>-->
+<!--          <amap-marker-->
+<!--            :position.sync="center2"-->
+<!--          />-->
+<!--        </template>-->
+        <!-- 点聚合 -->
+        <amap-marker-cluster
+          v-if="showMarkers"
+          :data="data"
+          key="custom-cluster"
+          :grid-size="options.gridSize"
+          :average-center="options.averageCenter"
+        >
+        </amap-marker-cluster>
+      </amap>
     </div>
     <div v-if="showAlarm" class="alarm-container">
       <div>show alarm</div>
@@ -112,7 +135,7 @@
       v-if="table_visible"
       ref="table"
       size="default"
-      rowKey="(record) => record.data.id"
+      :rowKey="(record) => record.id"
       :columns="columns"
       :data="loadData"
       :alert="true"
@@ -256,25 +279,22 @@
           </a-row>
         </a-form>
       </a-spin>
-      <el-amap
-        vid="'amapDemo'"
-        :map-style="'fresh'"
-        size="mini"
+      <amap
         :zoom="zoom"
         :center="center"
-        v-if="refresh_map"
       >
-        <el-amap-polyline
+        <amap-polyline
           :path="polyline.path"
           :line-join="'round'"
-        ></el-amap-polyline>
-        <el-amap-marker
+        >
+        </amap-polyline>
+        <amap-marker
           v-for="(marker,i) in polyline.markers"
           :position="marker"
           :key="i"
         >
-        </el-amap-marker>
-      </el-amap>
+        </amap-marker>
+      </amap>
     </div>
 
     </a-card>
@@ -282,7 +302,13 @@
 </template>
 
 <script>
-import VueAMap from 'vue-amap'
+function interpolate(u, begin, end) {
+  if (u < 0) u = 0;
+  if (u > 1) u = 1;
+  u = Math.pow(u, 1 / 10);
+  return u * (end - begin) + begin;
+}
+// import VueAMap from 'vue-amap'
 import moment from 'moment'
 import { STable, Ellipsis } from '@/components'
 import {
@@ -302,7 +328,7 @@ import BatteryInfo from '@/views/list/components/BatteryInfo'
 import storage from 'store'
 import { ACCESS_TOKEN, ROLE } from '@/store/mutation-types'
 
-let amapManager = new VueAMap.AMapManager()
+// let amapManager = new VueAMap.AMapManager()
 
 const columns = [
   // {
@@ -414,10 +440,56 @@ export default {
   data() {
     this.columns = columns
     return {
+      styles: {
+        fill: '#FFFF00',
+        stroke: '#FFFF00'
+      },
+      data: [
+        { lnglat: [113.92, 22.55], weight: 40 },
+        { lnglat: [113.93, 22.54], weight: 40 },
+        { lnglat: [113.92, 22.53], weight: 40 },
+        { lnglat: [113.91, 22.54], weight: 40 },
+        { lnglat: [113.929379, 22.532922], weight: 40 },
+        { lnglat: [113.928178, 22.531258], weight: 40 }
+      ],
+      options: {
+        gridSize: 100,
+        averageCenter: true,
+        zoomOnClick: true
+      },
+      dataList: [
+        {
+          lnglat: [113.951955, 22.530825],
+          lng: 113.951955,
+          lat: 22.530825,
+          id: 1,
+          content: 'aaa'
+        }
+      ],
+      center2: [113.94, 22.52],
+      zoom2: 13,
+      markers2: [
+        { lnglat: [116.397428, 39.90923], label: 'Marker 1' },
+        { lnglat: [116.397888, 39.900168], label: 'Marker 2' },
+        { lnglat: [116.410332, 39.89734], label: 'Marker 3' }
+      ],
+      position1: [116.473571, 39.993083],
+      points: [
+        { lnglat: [116.939621, 39.343147] }
+      ],
+      markers: [
+        { position: [116.402144, 39.910012], title: "Marker 1" },
+        { position: [116.391095, 39.904684], title: "Marker 2" },
+        { position: [116.418044, 39.957106], title: "Marker 3" },
+        { position: [116.373688, 39.931149], title: "Marker 4" }
+      ],
       // create model
       is_sysadmin: false,
       device_create_form_visible: false,
       table_visible: true,
+      showMap: false,
+      showMarkers: false,
+      showAlarm: false,
       send_command_form_visible: false,
       battery_detail_visible: false,
       map_visible: false,
@@ -427,6 +499,7 @@ export default {
       device_id: null,
       map_loading: false,
       refresh_map: true,
+      refresh_device_map: true,
       polyline: {
         path: [],
         markers: []
@@ -473,11 +546,9 @@ export default {
       // 地图
       zoom: 14,
       center: [113.94, 22.52],
-      amapManager,
+      // amapManager,
       orgList: [],
       statusCount: {},
-      showMap: false,
-      showAlarm: false,
       deviceStatus: null
     }
   },
@@ -743,6 +814,9 @@ export default {
     onMapChange () {
       console.log('map change', this.showMap)
       this.table_visible = !this.showMap
+      if (this.showMap) {
+          this.showMarkers = true
+      }
     },
     onAlarmChange () {
       console.log('alarm change', this.showAlarm)
@@ -750,6 +824,46 @@ export default {
     onDeviceStatusChange () {
       console.log('device status change', this.deviceStatus)
       this.refreshTable(true)
+    },
+    getClusterStyle(context) {
+      const u = context.count / this.data.length;
+      const hue = ~~interpolate(u, 90, 0);
+      const size = ~~interpolate(u, 30, 50);
+      return {
+        backgroundColor: `hsla(${hue}, 100%, 50%, 0.7)`,
+        width: `${size}px`,
+        height: `${size}px`,
+        lineHeight: `${size}px`,
+        borderRadius: `${size / 2}px`,
+        border: `1px solid hsla(${hue}, 100%, 40%, 1)`,
+        boxShadow: `0 0 1px hsla(${hue}, 100%, 50%, 1)`,
+        color: `hsla(${hue}, 100%, 20%, 1)`,
+        fontSize: "14px",
+        textAlign: "center",
+      }
+    },
+    getMarkerOptions (point) {
+      return {
+        offset: [-16, -37],
+        url: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png'
+      }
+      // return {
+      //   position: point.lnglat,
+      //   offset: [-15, -15],
+      //   content: 'abc'
+      // }
+    },
+    getClusterOptions (context) {
+      return {
+        gridSize: 80,
+        minClusterSize: 2
+      }
+      // const size = Math.round(
+      //   30 + Math.pow(context.count / this.data.length, 1 / 5) * 20
+      // )
+      // return {
+      //   offset: [-size / 2, -size / 2]
+      // }
     }
   }
 }

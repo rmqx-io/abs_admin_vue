@@ -11,6 +11,8 @@
     "lint:nofix": "vue-cli-service lint --no-fix"
   },
   "dependencies": {
+    "@amap/amap-jsapi-loader": "^1.0.1",
+    "@amap/amap-vue": "^2.0.13",
     "@ant-design-vue/pro-layout": "^1.0.8",
     "@antv/data-set": "^0.10.2",
     "ant-design-vue": "^1.7.3",
@@ -31,7 +33,6 @@
     "store": "^2.0.12",
     "viser-vue": "^2.4.6",
     "vue": "^2.6.10",
-    "vue-amap": "^0.5.10",
     "vue-clipboard2": "^0.2.1",
     "vue-cropper": "0.4.9",
     "vue-i18n": "^8.17.4",

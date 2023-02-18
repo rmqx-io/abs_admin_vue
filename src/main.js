@@ -21,13 +21,13 @@ import './permission' // permission control
 import './utils/filter' // global filter
 import './assets/global.less' // global style
 
-import VueAMap from 'vue-amap'
-
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/display.css'
 
 import '@/styles/variables.scss'
 import '@/styles/element-variables.scss'
+
+import AmapVue from '@amap/amap-vue'
 
 Vue.config.productionTip = false
 Vue.use(ElementUI, {
@@ -42,23 +42,24 @@ Vue.component('page-container', PageHeaderWrapper)
 Vue.component('page-header-wrapper', PageHeaderWrapper)
 
 // 初始化vue-amap
-Vue.use(VueAMap)
-VueAMap.initAMapApiLoader({
-  key: '5817d32d7eb114d90df69cbf22cf1c87',
-  plugin: [
-    'AMap.Autocomplete',
-    'AMap.Geocoder',
-    'AMap.PlaceSearch',
-    'AMap.Scale',
-    'AMap.OverView',
-    'AMap.ToolBar',
-    'AMap.MapType',
-    'AMap.AMapManager',
-    'AMap.Geolocation',
-  ],
-  v: '1.4.4',
-  uiVersion: '1.0.11',
-})
+AmapVue.config.version = '2.0' // 默认2.0，这里可以不修改
+AmapVue.config.key = '5817d32d7eb114d90df69cbf22cf1c87'
+AmapVue.config.plugins = [
+  'AMap.Autocomplete',
+  'AMap.PlaceSearch',
+  'AMap.Scale',
+  'AMap.OverView',
+  'AMap.ToolBar',
+  'AMap.MapType',
+  'AMap.PolyEditor',
+  'AMap.PolyLine',
+  'AMap.CircleEditor',
+  'AMap.Geocoder',
+  'AMap.MarkerClusterer',
+  'AMap.Polygon'
+  // 在此配置你需要预加载的插件，如果不配置，在使用到的时候会自动异步加载
+]
+Vue.use(AmapVue)
 
 window.umi_plugin_ant_themeVar = themePluginConfig.theme
 
