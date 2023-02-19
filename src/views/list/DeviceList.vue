@@ -1,7 +1,7 @@
 <template>
 <!--  <page-header-wrapper>-->
   <a-card :bordered="false" :bodyStyle="{ padding: '16px 16px', height: '100%' }" :style="{ height: '100%' }">
-    <div v-if="table_visible || showMap" class="table-page-search-wrapper">
+    <div class="table-page-search-wrapper">
       <a-form layout="inline">
         <a-row :gutter="48">
           <a-col :md="8" :sm="24">
@@ -77,13 +77,37 @@
 <!--              </a>-->
             </span>
           </a-col>
-          <a-col :md="8" :sm="24">
-            <a-checkbox v-model="showMap" @change="onMapChange">显示地图</a-checkbox>
-            <a-checkbox v-model="showAlarm" @change="onAlarmChange">显示告警</a-checkbox>
-          </a-col>
+<!--          <a-col :md="8" :sm="24">-->
+<!--            <a-checkbox v-model="showMap" @change="onMapChange">显示地图</a-checkbox>-->
+<!--            <a-checkbox v-model="showAlarm" @change="onAlarmChange">显示告警</a-checkbox>-->
+<!--          </a-col>-->
         </a-row>
       </a-form>
     </div>
+
+    <a-tabs
+      v-model="activeTab"
+      @change="onTabChange"
+    >
+      <a-tab-pane key="table">
+        <template #tab>
+          <a-icon type="table" />
+          <span>表格</span>
+        </template>
+      </a-tab-pane>
+      <a-tab-pane key="map">
+        <template #tab>
+          <a-icon type="environment" />
+          <span>地图</span>
+        </template>
+      </a-tab-pane>
+      <a-tab-pane key="alarm">
+        <template #tab>
+          <a-icon type="warning" />
+          <span>告警</span>
+        </template>
+      </a-tab-pane>
+    </a-tabs>
 
     <div v-if="table_visible" class="table-operator">
       <a-button type="primary" icon="plus" @click="handleAdd">添加</a-button>
@@ -311,22 +335,15 @@
 </template>
 
 <script>
-function interpolate(u, begin, end) {
-  if (u < 0) u = 0;
-  if (u > 1) u = 1;
-  u = Math.pow(u, 1 / 10);
-  return u * (end - begin) + begin;
-}
 // import VueAMap from 'vue-amap'
 import moment from 'moment'
 import { STable, Ellipsis } from '@/components'
 import {
   addDevice,
   getAdminOrgTree,
-  getBatteryInfo,
   getDeviceList,
   getLocation,
-  getRoleList, getStatusCount,
+  getStatusCount,
   updateDevice
 } from '@/api/manage'
 
@@ -337,6 +354,12 @@ import BatteryInfo from '@/views/list/components/BatteryInfo'
 import storage from 'store'
 import { ACCESS_TOKEN, ROLE } from '@/store/mutation-types'
 
+function interpolate(u, begin, end) {
+  if (u < 0) u = 0;
+  if (u > 1) u = 1;
+  u = Math.pow(u, 1 / 10);
+  return u * (end - begin) + begin;
+}
 // let amapManager = new VueAMap.AMapManager()
 
 const columns = [
@@ -449,6 +472,7 @@ export default {
   data() {
     this.columns = columns
     return {
+      activeTab: 'table',
       styles: {
         fill: '#FFFF00',
         stroke: '#FFFF00'
@@ -891,6 +915,31 @@ export default {
     onDeviceStatusChange () {
       console.log('device status change', this.deviceStatus)
       this.refreshTable(true)
+    },
+    onTabChange (tab) {
+      console.log('tab change', tab)
+      if (tab === 'map') {
+        console.log('show map')
+        this.table_visible = false
+        this.showAlarm = false
+        this.showMap = true
+        this.showMarkers = true
+        if (this.deviceMarkers.length === 0) {
+          this.refreshTable(true)
+        }
+      } else if (tab === 'alarm') {
+        console.log('show alarm')
+        this.showMap = false
+        this.showMarkers = false
+        this.table_visible = false
+        this.showAlarm = true
+      } else {
+        console.log('show table')
+        this.showMap = false
+        this.showMarkers = false
+        this.showAlarm = false
+        this.table_visible = true
+      }
     },
     getClusterStyle(context) {
       const u = context.count / this.data.length;
