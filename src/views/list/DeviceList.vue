@@ -1,8 +1,6 @@
 <template>
 <!--  <page-header-wrapper>-->
-  <a-card
-    :bordered="false"
-  >
+  <a-card :bordered="false" :bodyStyle="{ padding: '16px 16px', height: '100%' }" :style="{ height: '100%' }">
     <div v-if="table_visible || showMap" class="table-page-search-wrapper">
       <a-form layout="inline">
         <a-row :gutter="48">
@@ -103,7 +101,7 @@
 
     <div
       v-if="showMap"
-      style="width: 100%; height: 600px"
+      style="width: 100%; height: 70vh"
       class="map-container"
     >
       <amap
@@ -245,7 +243,7 @@
 
     <div
       v-if="map_visible"
-      style="width: 100%; height: 600px"
+      style="width: 100%; height: 70vh"
     >
       <div><a @click="handleMapClose()"><< 返回</a></div>
       <div><br /></div>
