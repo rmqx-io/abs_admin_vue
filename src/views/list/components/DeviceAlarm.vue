@@ -10,12 +10,10 @@
       </div>
       <div v-if='showMoreParam'>
         <a-row :gutter='48'>
-          <a-col :md='8' :sm='12'>
+          <a-col :md='8' :sm='24'>
             <a class="ant-dropdown-link" @click='showMoreParam = false'>收起参数<a-icon type="up"/></a>
           </a-col>
-        </a-row>
-        <a-row :gutter="48">
-          <a-col :md="8" :sm="12">
+          <a-col :md="8" :sm="24">
             <a-form-item label="来源类型">
               <a-select v-model='bms_type'>
                 <a-select-option value="0">全部</a-select-option>
@@ -24,7 +22,7 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :md='8' :sm='12'>
+          <a-col :md='8' :sm='24'>
             <a-form-item label="告警">
               <div><span>{{ selectedItems.join(", ") }}</span></div>
               <a-dropdown @visible-change="onVisibleChange">
@@ -49,12 +47,12 @@
               </a-dropdown>
             </a-form-item>
           </a-col>
-          <a-col :md="8" :sm="12">
+          <a-col :md="8" :sm="24">
             <a-form-item label='开始时间'>
               <a-date-picker v-model="queryData.start_date" show-time format="YYYY-MM-DD HH:mm:ss" placeholder="起始时间"/>
             </a-form-item>
           </a-col>
-          <a-col :md="8" :sm="12">
+          <a-col :md="8" :sm="24">
             <a-form-item label='结束时间'>
               <a-date-picker v-model="queryData.end_date" show-time format="YYYY-MM-DD HH:mm:ss" placeholder="结束时间"/>
             </a-form-item>
@@ -62,7 +60,7 @@
         </a-row>
       </div>
       <a-row :gutter='48'>
-        <a-col :md="8" :sm="12">
+        <a-col :md="8" :sm="24">
           <a-button type="primary" @click="$refs.alarmtable.refresh(true)">查询</a-button>
         </a-col>
       </a-row>
