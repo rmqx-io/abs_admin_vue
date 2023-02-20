@@ -29,6 +29,8 @@ const api = {
   role: '/admin/role',
   service: '/service',
   device: '/admin/device',
+  device_alarm: '/admin/device/alarm',
+  device_alarm_types: '/admin/device/alarm/type',
   add_device: '/admin/device/add',
   update_device: '/admin/device/update',
 
@@ -85,6 +87,21 @@ export function getDeviceList (arg) {
     url: api.device,
     method: 'post',
     data: arg
+  })
+}
+
+export function getDeviceAlarm (arg) {
+  return request({
+    url: api.device_alarm,
+    method: 'post',
+    data: arg
+  })
+}
+
+export function getDeviceAlarmTypes (deviceType) {
+return request({
+    url: api.device_alarm_types + '/' + deviceType,
+    method: 'get'
   })
 }
 

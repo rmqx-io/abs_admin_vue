@@ -162,7 +162,13 @@
       </div>
     </div>
     <div v-if="showAlarm" class="alarm-container">
-      <div>show alarm</div>
+      <device-alarm
+        ref='alarm'
+        :device-id="queryData.device_id"
+        :device-status="deviceStatus"
+        :organization-id="queryData.organization_id"
+      >
+      </device-alarm>
     </div>
     <s-table
       v-if="table_visible"
@@ -224,14 +230,23 @@
 
       <span slot="action" slot-scope="text, record">
         <template>
-          <a v-if="is_sysadmin" @click="handleEdit(record)">修改</a>
-          <a-divider v-if="is_sysadmin" type="vertical" />
-<!--            <a @click="handleSub(record)">订阅报警</a>-->
           <a @click="handleBatteryInfo(record)">电池详情</a>
           <a-divider type="vertical" />
-          <span><a @click="handleMap(record)">历史行程</a></span> <!-- TODO: 避免被分行显示 -->
-          <a-divider type="vertical" />
-          <a @click="handleSendCommand(record)">下发指令</a>
+          <a-dropdown>
+            <a class="ant-dropdown-link">更多<a-icon type="down"/>
+            </a>
+            <a-menu slot="overlay">
+              <a-menu-item v-if='is_sysadmin'>
+                <a v-if="is_sysadmin" @click="handleEdit(record)">修改</a>
+              </a-menu-item>
+              <a-menu-item>
+                <a @click="handleMap(record)">历史行程</a>
+              </a-menu-item>
+              <a-menu-item>
+                <a @click="handleSendCommand(record)">下发指令</a>
+              </a-menu-item>
+            </a-menu>
+          </a-dropdown>
         </template>
       </span>
     </s-table>
@@ -353,6 +368,7 @@ import SendCommandForm from '@/views/list/modules/SendCommandForm'
 import BatteryInfo from '@/views/list/components/BatteryInfo'
 import storage from 'store'
 import { ACCESS_TOKEN, ROLE } from '@/store/mutation-types'
+import DeviceAlarm from '@/views/list/components/DeviceAlarm'
 
 function interpolate(u, begin, end) {
   if (u < 0) u = 0;
@@ -434,7 +450,6 @@ const columns = [
   {
     title: '操作',
     dataIndex: 'action23',
-    width: '160px',
     scopedSlots: { customRender: 'action' },
     fixed: 'right'
   }
@@ -462,6 +477,7 @@ const statusMap = {
 export default {
   name: 'TableList',
   components: {
+    DeviceAlarm,
     STable,
     Ellipsis,
     CreateForm,
@@ -880,6 +896,9 @@ export default {
 
         this.isGettingDeviceLocation = true
         this.getDeviceLocation(arg, 1)
+      }
+      if (this.$refs.alarm) {
+        this.$refs.alarm.query()
       }
     },
     getStatusCount () {
