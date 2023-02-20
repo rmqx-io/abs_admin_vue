@@ -2,6 +2,30 @@
 <!--  <page-header-wrapper>-->
   <a-card :bordered="false" :bodyStyle="{ padding: '16px 16px', height: '100%' }" :style="{ height: '100%' }">
     <div class="table-page-search-wrapper">
+      <a-tabs
+        v-model="activeTab"
+        @change="onTabChange"
+      >
+        <a-tab-pane key="table">
+          <template #tab>
+            <a-icon type="table" />
+            <span>表格</span>
+          </template>
+        </a-tab-pane>
+        <a-tab-pane key="map">
+          <template #tab>
+            <a-icon type="environment" />
+            <span>地图</span>
+          </template>
+        </a-tab-pane>
+        <a-tab-pane key="alarm">
+          <template #tab>
+            <a-icon type="warning" />
+            <span>告警</span>
+          </template>
+        </a-tab-pane>
+      </a-tabs>
+
       <a-form layout="inline">
         <a-row :gutter="48">
           <a-col :md="8" :sm="24">
@@ -67,7 +91,7 @@
 <!--                </a-form-item>-->
 <!--              </a-col>-->
 <!--            </template>-->
-          <a-col :md="!advanced && 8 || 24" :sm="24">
+          <a-col v-if="!showAlarm" :md="!advanced && 8 || 24" :sm="24">
             <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
               <a-button type="primary" @click="refreshTable(true)">查询</a-button>
 <!--                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>-->
@@ -85,29 +109,6 @@
       </a-form>
     </div>
 
-    <a-tabs
-      v-model="activeTab"
-      @change="onTabChange"
-    >
-      <a-tab-pane key="table">
-        <template #tab>
-          <a-icon type="table" />
-          <span>表格</span>
-        </template>
-      </a-tab-pane>
-      <a-tab-pane key="map">
-        <template #tab>
-          <a-icon type="environment" />
-          <span>地图</span>
-        </template>
-      </a-tab-pane>
-      <a-tab-pane key="alarm">
-        <template #tab>
-          <a-icon type="warning" />
-          <span>告警</span>
-        </template>
-      </a-tab-pane>
-    </a-tabs>
 
     <div v-if="table_visible" class="table-operator">
       <a-button type="primary" icon="plus" @click="handleAdd">添加</a-button>
