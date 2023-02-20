@@ -25,7 +25,7 @@ const api = {
   sys_user_remove: '/admin/sys_user_remove',
   sys_role_layer_top: '/admin/sys_role_layer_top',
 
-  user: '/admin/user',
+  user: '/admin/sys_user_page',
   role: '/admin/role',
   service: '/service',
   device: '/admin/device',

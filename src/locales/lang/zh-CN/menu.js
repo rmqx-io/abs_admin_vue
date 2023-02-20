@@ -38,6 +38,7 @@ export default {
     'menu.account.trigger': '触发报错',
     'menu.account.logout': '退出登录',
   'menu.org': '组织管理',
+  'menu.user': '用户管理',
   'menu.model': '类型管理',
   'menu.device-model': '设备类型',
   'menu.battery-model': '电池类型'
