@@ -2,8 +2,8 @@
   <div>
     <a-form>
       <a-row :gutter="48">
-        <a-col :md="8" :sm="24">
-          <a-form-item label="类型">
+        <a-col :md="8" :sm="12">
+          <a-form-item label="来源类型">
             <a-select v-model='bms_type'>
               <a-select-option value="0">全部</a-select-option>
               <a-select-option value="1">808</a-select-option>
@@ -11,7 +11,7 @@
             </a-select>
           </a-form-item>
         </a-col>
-        <a-col :md='8' :sm='24'>
+        <a-col :md='8' :sm='12'>
           <a-form-item label="告警">
             <div><span>{{ selectedItems.join(", ") }}</span></div>
             <a-dropdown @visible-change="onVisibleChange">
@@ -36,12 +36,17 @@
             </a-dropdown>
           </a-form-item>
         </a-col>
-        <a-col :md="8" :sm="24">
+        <a-col :md="8" :sm="12">
           <a-form-item label='开始时间'>
             <a-date-picker v-model="queryData.start_date" show-time format="YYYY-MM-DD HH:mm:ss" placeholder="起始时间"/>
           </a-form-item>
         </a-col>
-        <a-col :md="8" :sm="24">
+        <a-col :md="8" :sm="12">
+          <a-form-item label='结束时间'>
+            <a-date-picker v-model="queryData.end_date" show-time format="YYYY-MM-DD HH:mm:ss" placeholder="结束时间"/>
+          </a-form-item>
+        </a-col>
+        <a-col :md="8" :sm="12">
           <a-button type="primary" @click="$refs.alarmtable.refresh(true)">查询</a-button>
         </a-col>
       </a-row>
@@ -131,6 +136,7 @@ export default {
         page_no: 1,
         page_size: 10,
         start_date: moment(new Date() - 2 * 60 * 60 * 1000),
+        end_date: null,
         organization_id: null
       }
     }
@@ -166,6 +172,20 @@ export default {
       }
       if (this.organizationId) {
         arg.organization_id = this.organizationId
+      }
+      if (this.selectedItems.length > 0) {
+        arg.alarm_types_index = ''
+        this.selectedItems.forEach((item, index) => {
+          this.alarm_types.forEach((alarm, i) => {
+            if (item === alarm) {
+              if (index === 0) {
+                arg.alarm_types_index += i + '-' + item
+              } else {
+                arg.alarm_types_index += ',' + i + '-' + item
+              }
+            }
+          })
+        })
       }
       return getDeviceAlarm(arg)
         .then(res => {
