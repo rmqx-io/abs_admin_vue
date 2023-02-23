@@ -13,14 +13,36 @@
       </div>
       <div v-if='deviceIdSet != null'>
         <div v-if='reload'>
-          <span>设备 {{ deviceIdSet }}</span>
+<!--          <span>设备 {{ deviceIdSet }}</span>-->
           <div v-if='deviceIdSet.list && deviceIdSet.list.length > 0'>
             <span>设备ID列表: </span>
-            <li v-for='item in deviceIdSet.list' :key='item'>* {{ item }} <a @click='handleRemoveDeviceId(item)'>x</a></li>
+            <ul>
+              <li v-for='item in deviceIdSet.list' :key='item'>
+                <a-row>
+                  <a-col :span="20">
+                    {{ item }}
+                  </a-col>
+                  <a-col :span="4">
+                    <a @click='handleRemoveDeviceId(item)'>删除</a>
+                  </a-col>
+                </a-row>
+              </li>
+            </ul>
           </div>
           <div v-if='deviceIdSet.rangeList && deviceIdSet.rangeList.length > 0'>
             <span>设备ID范围: </span>
-            <li v-for='item in deviceIdSet.rangeList' :key='item.join()'>* {{ item }} <a @click='handleRemoveDeviceIdRange(item)'>x</a></li>
+            <ul>
+              <li v-for='item in deviceIdSet.rangeList' :key='item.join()'>
+                <a-row>
+                  <a-col :span="20">
+                    {{ item[0] }} ~ {{ item[1] }}
+                  </a-col>
+                  <a-col :span="4">
+                    <a @click='handleRemoveDeviceIdRange(item)'>删除</a>
+                  </a-col>
+                </a-row>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
