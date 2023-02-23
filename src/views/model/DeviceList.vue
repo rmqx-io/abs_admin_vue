@@ -1,49 +1,48 @@
 <template>
-<!--  <page-header-wrapper>-->
-    <a-card :bordered="false">
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline">
-          <a-row :gutter="48">
-            <a-col :md="8" :sm="24">
-              <a-form-item label="编号">
-                <a-input v-model="queryParam.id" placeholder=""/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="!advanced && 8 || 24" :sm="24">
-              <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
-                <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
-                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
-              </span>
-            </a-col>
-          </a-row>
-        </a-form>
-      </div>
+  <a-card :bordered="false">
+    <div class="table-page-search-wrapper">
+      <a-form>
+        <a-row :gutter="48">
+          <a-col :md="8" :sm="24">
+            <a-form-item label="编号">
+              <a-input v-model="queryParam.id" placeholder=""/>
+            </a-form-item>
+          </a-col>
+          <a-col :md="!advanced && 8 || 24" :sm="24">
+            <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
+              <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
+              <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
+            </span>
+          </a-col>
+        </a-row>
+      </a-form>
+    </div>
 
-      <div class="table-operator">
-        <a-button type="primary" icon="plus" @click="handleAdd">添加</a-button>
-      </div>
+    <div class="table-operator">
+      <a-button type="primary" icon="plus" @click="handleAdd">添加</a-button>
+    </div>
 
-      <s-table
-        ref="table"
-        size="default"
-        rowKey="(record) => record.data.id"
-        :columns="columns"
-        :data="loadData"
-        :alert="true"
-        :rowSelection="rowSelection"
-        showPagination="auto"
-      >
-      </s-table>
+    <s-table
+      ref="table"
+      size="default"
+      rowKey="(record) => record.data.id"
+      :columns="columns"
+      :data="loadData"
+      :alert="true"
+      :rowSelection="rowSelection"
+      showPagination="auto"
+    >
+    </s-table>
 
-      <create-device-model-form
-        ref="createModal"
-        :visible="visible"
-        :loading="confirmLoading"
-        :model="mdl"
-        @cancel="handleCancel"
-        @ok="handleOk"
-      />
-    </a-card>
+    <create-device-model-form
+      ref="createModal"
+      :visible="visible"
+      :loading="confirmLoading"
+      :model="mdl"
+      @cancel="handleCancel"
+      @ok="handleOk"
+    />
+  </a-card>
 <!--  </page-header-wrapper>-->
 </template>
 

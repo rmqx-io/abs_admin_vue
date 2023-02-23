@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-form layout='inline'>
+    <a-form>
       <div v-if='!showMoreParam' style='margin-bottom: 10px'>
         <a-row :gutter='48'>
           <a-col :md='8' :sm='24'>

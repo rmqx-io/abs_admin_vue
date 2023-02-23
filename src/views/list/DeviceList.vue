@@ -26,7 +26,7 @@
         </a-tab-pane>
       </a-tabs>
 
-      <a-form layout="inline">
+      <a-form>
         <a-row :gutter="48">
           <a-col :md="8" :sm="24">
             <a-form-item :label="$t('device.status')">
@@ -108,7 +108,6 @@
         </a-row>
       </a-form>
     </div>
-
 
     <div v-if="table_visible" class="table-operator">
       <a-button type="primary" icon="plus" @click="handleAdd">添加</a-button>
@@ -290,7 +289,7 @@
       <div>设备：{{ device_id }}</div>
       <div><br /></div>
       <a-spin :spinning="map_loading">
-        <a-form layout="inline">
+        <a-form>
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
               <a-form-item aria-label="起始日期">
