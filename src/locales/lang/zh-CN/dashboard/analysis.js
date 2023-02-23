@@ -1,4 +1,10 @@
 export default {
+  'dashboard.device.device': '设备',
+  'dashboard.device.total': '设备总数',
+  'dashboard.device.online': '在线设备',
+  'dashboard.device.offline': '离线设备',
+  'dashboard.device.standby': '待机设备',
+  'dashboard.alarm.total': '报警总数',
   'dashboard.analysis.test': '工专路 {no} 号店',
   'dashboard.analysis.introduce': '指标说明',
   'dashboard.analysis.total-sales': '总销售额',
