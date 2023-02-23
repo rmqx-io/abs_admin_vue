@@ -13,27 +13,27 @@ export const asyncRouterMap = [
     name: 'index',
     component: BasicLayout,
     meta: { title: 'menu.home' },
-    redirect: '/dashboard/analysis',
+    redirect: '/dashboard/dashboard',
     children: [
       // dashboard
       {
         path: '/dashboard',
         name: 'dashboard',
-        redirect: '/dashboard/analysis',
+        redirect: '/dashboard/dashboard',
         component: RouteView,
         meta: { title: 'menu.dashboard', keepAlive: true, icon: bxAnaalyse, permission: ['dashboard'] },
         children: [
-          {
-            path: '/dashboard/analysis/:pageNo([1-9]\\d*)?',
-            name: 'Analysis',
-            component: () => import('@/views/dashboard/Analysis'),
-            meta: { title: 'menu.dashboard.analysis', keepAlive: false, permission: ['dashboard'] }
-          },
+          // {
+          //   path: '/dashboard/analysis/:pageNo([1-9]\\d*)?',
+          //   name: 'Analysis',
+          //   component: () => import('@/views/dashboard/Analysis'),
+          //   meta: { title: 'menu.dashboard.analysis', keepAlive: false, permission: ['dashboard'] }
+          // },
           {
             path: '/dashboard/dashboard',
             name: 'Dashboard',
             component: () => import('@/views/dashboard/Dashboard'),
-            meta: { title: 'menu.dashboard.monitor', keepAlive: true, permission: ['dashboard'] }
+            meta: { title: 'menu.dashboard.analysis', keepAlive: true, permission: ['dashboard'] }
           }
         ]
       },
