@@ -54,6 +54,14 @@ export const asyncRouterMap = [
             children: [
             ]
           },
+          // {
+          //   path: '/list/device-list/map',
+          //   name: 'DeviceMap',
+          //   hideChildrenInMenu: true,
+          //   component: () => import('@/views/list/components/DeviceMap'),
+          //   meta: { title: '设备地图', keepAlive: true, permission: ['table'] },
+          //   children: []
+          // },
           {
             path: '/list/device-list/info/:device_id([1-9]\\d*)?',
             // hideChildrenInMenu: true,
