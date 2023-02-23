@@ -7,6 +7,52 @@
     @ok="() => { handleOk(); $emit('ok') }"
     @cancel="() => { handleCancel(); $emit('cancel') }"
   >
+    <div>
+      <div v-if='deviceId != null && deviceIdSet == null' style='margin-bottom: 5px'>
+        <span>设备ID: {{ deviceId }}</span>
+      </div>
+      <div v-if='deviceIdSet != null'>
+        <div v-if='reload'>
+          <span>设备 {{ deviceIdSet }}</span>
+          <div v-if='deviceIdSet.list && deviceIdSet.list.length > 0'>
+            <span>设备ID列表: </span>
+            <li v-for='item in deviceIdSet.list' :key='item'>* {{ item }} <a @click='handleRemoveDeviceId(item)'>x</a></li>
+          </div>
+          <div v-if='deviceIdSet.rangeList && deviceIdSet.rangeList.length > 0'>
+            <span>设备ID范围: </span>
+            <li v-for='item in deviceIdSet.rangeList' :key='item.join()'>* {{ item }} <a @click='handleRemoveDeviceIdRange(item)'>x</a></li>
+          </div>
+        </div>
+      </div>
+      <div>
+        <a-button type="primary" @click="handleAddDevice">
+          添加设备
+          <a-icon v-if='!showAddDevice' type="down" />
+          <a-icon v-if='showAddDevice' type="up" />
+        </a-button>
+      </div>
+      <div v-if='showAddDevice'>
+        <a-tabs
+          v-model='activeTab'
+        >
+          <a-tab-pane key='singleDeviceId'><template #tab><span>单个设备</span></template></a-tab-pane>
+          <a-tab-pane key='deviceIdRange'><template #tab><span>设备 ID 范围</span></template></a-tab-pane>
+        </a-tabs>
+        <div v-if="activeTab === 'singleDeviceId'">
+          <a-form-item :label="`设备ID`">
+            <a-input v-model='deviceIdNew' placeholder="输入设备ID"></a-input>
+          </a-form-item>
+          <a-button type="primary" @click="handleAddDeviceId">添加</a-button>
+        </div>
+        <div v-if="activeTab === 'deviceIdRange'">
+          <a-form-item :label="`设备ID范围`">
+            <a-input v-model='deviceIdRangeBegin' placeholder="第一个设备ID"></a-input>
+            <a-input v-model='deviceIdRangeEnd' placeholder="最后一个设备ID"></a-input>
+          </a-form-item>
+          <a-button type="primary" @click="handleAddDeviceIdRange">添加</a-button>
+        </div>
+      </div>
+    </div>
     <a-table
       :dataSource="sendCommandList"
       :columns="columns"
@@ -26,7 +72,7 @@
 </template>
 
 <script>
-import { getSendCommandList, sendCommand } from '@/api/manage'
+import { batchSendCommand, getSendCommandList, sendCommand } from '@/api/manage'
 
 export default {
   props: {
@@ -45,7 +91,7 @@ export default {
     deviceId: {
       type: String,
       default: () => null
-    }
+    },
   },
   data () {
     return {
@@ -73,7 +119,14 @@ export default {
         }
       ],
       currentRow: null,
-      param: null
+      param: null,
+      showAddDevice: false,
+      activeTab: 'singleDeviceId',
+      deviceIdNew: null,
+      deviceIdRangeBegin: null,
+      deviceIdRangeEnd: null,
+      deviceIdSet: null,
+      reload: true
     }
   },
   created () {
@@ -105,10 +158,94 @@ export default {
         sub_command: this.currentRow.sub_command,
         param: this.param
       }
-      sendCommand(this.deviceId, arg)
+      if (this.deviceIdSet) {
+        //
+        // send the device id set (array of device id and/or device id range) to the backend.
+        // The backend will send the command to each device in the set one by one in background.
+        //
+        // The backend will store the command in a database table and return the batch command id.
+        //
+        // The frontend can use this id to query the status of the batch command.
+        //
+        // The backend will (should?) also send a notification to the frontend when the batch command is finished.
+        //
+        arg.deviceIdSet = this.deviceIdSet
+        batchSendCommand(arg)
+      } else if (this.deviceId) {
+        sendCommand(this.deviceId, arg)
+      }
     },
     handleCancel () {
       console.log('handleCancel')
+      this.deviceIdSet = null
+      this.showAddDevice = false
+    },
+    handleAddDevice () {
+      console.log('handleAddDevice')
+      this.showAddDevice = !this.showAddDevice
+    },
+    initDeviceSet () {
+      if (this.deviceIdSet == null) {
+        this.deviceIdSet = {
+          list: []
+        }
+        if (this.deviceId) {
+          this.deviceIdSet.list.push(this.deviceId)
+        }
+      }
+      if (this.deviceIdSet.list == null) {
+        this.deviceIdSet.list = []
+      }
+      if (this.deviceIdSet.rangeList == null) {
+        this.deviceIdSet.rangeList = []
+      }
+    },
+    reloadDeviceSet () {
+      this.reload = false
+      this.reload = true
+    },
+    handleAddDeviceId () {
+      console.log('handleAddDeviceId', this.deviceIdNew)
+      this.initDeviceSet()
+      this.deviceIdSet.list.push(this.deviceIdNew)
+      this.deviceIdNew = null
+      this.reloadDeviceSet()
+    },
+    handleAddDeviceIdRange () {
+      console.log('handleAddDeviceIdRange', this.deviceIdRangeBegin, this.deviceIdRangeEnd)
+      this.initDeviceSet()
+      this.deviceIdSet.rangeList.push([this.deviceIdRangeBegin, this.deviceIdRangeEnd])
+      this.deviceIdRangeBegin = null
+      this.deviceIdRangeEnd = null
+      this.reloadDeviceSet()
+    },
+    handleRemoveDeviceId (id) {
+      console.log('handleRemoveDeviceId', id)
+      if (this.deviceIdSet && this.deviceIdSet.list) {
+        const index = this.deviceIdSet.list.indexOf(id)
+        if (index >= 0) {
+          this.deviceIdSet.list.splice(index, 1)
+        }
+      }
+      this.reloadDeviceSet()
+    },
+    handleRemoveDeviceIdRange (idRange) {
+      console.log('handleRemoveDeviceIdRange', idRange)
+      if (this.deviceIdSet && this.deviceIdSet.rangeList) {
+        let foundIndex = -1
+        this.deviceIdSet.rangeList.forEach((range, index) => {
+          console.log('range', range, 'index', index)
+          if (range[0] === idRange[0] && range[1] === idRange[1]) {
+            foundIndex = index
+          }
+        })
+        if (foundIndex >= 0) {
+          console.log('remove range', foundIndex)
+          this.deviceIdSet.rangeList.splice(foundIndex, 1)
+          console.log('rangeList', this.deviceIdSet.rangeList)
+        }
+      }
+      this.reloadDeviceSet()
     }
   }
 }
