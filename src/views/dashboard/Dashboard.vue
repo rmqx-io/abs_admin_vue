@@ -51,7 +51,7 @@ import {
 } from '@/components'
 import { Bar, Pie } from 'vue-chartjs'
 import PageView from '@/layouts/PageView'
-import { getStatusCount } from '@/api/manage'
+import { getBmsAlarmCount, getDeviceAlarmTypes, getStatusCount } from '@/api/manage'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
 
@@ -66,6 +66,7 @@ export default {
   data () {
     return {
       loadingDevice: false,
+      loadingAlarm: false,
       deviceChartData: {
         labels: ['在线', '离线', '待机'],
         datasets: [
@@ -90,6 +91,7 @@ export default {
         maintainAspectRatio: false
       },
       alarmChartData: {
+        // will be overwritten by data from server
         labels: [
           '低容量报警',
           'MOS管超温报警',
@@ -119,6 +121,7 @@ export default {
             // backgroundColor: ['#41B883', '#E46651', '#00D8FF', '#DD1B16'],
             // backgroundColor: ['#58ADF8', '#8A62DC', '#55C171', '#FACC56'],
             backgroundColor: ['#0074D9', '#FF4136', '#2ECC40', '#FF851B', '#7FDBFF', '#B10DC9', '#FFDC00', '#001f3f', '#39CCCC', '#01FF70', '#85144b', '#F012BE', '#3D9970', '#111111', '#AAAAAA'],
+            // will be overwritten by data from server
             data: [40, 20, 80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] // array size: 16
           }
         ]
@@ -131,7 +134,9 @@ export default {
   },
   mounted () {
     console.log('mounted')
+    this.get_alarm_name()
     this.getStatusCount()
+    this.getBmsAlarmCount()
   },
   methods: {
     getStatusCount () {
@@ -143,6 +148,23 @@ export default {
         this.deviceChartData.datasets[0].data[2] = res.data.standby
         this.loadingDevice = false
       })
+    },
+    getBmsAlarmCount () {
+      this.loadingAlarm = true
+      getBmsAlarmCount({}).then(res => {
+        console.log('alarm count', res)
+        this.alarmChartData.datasets[0].data = res.data
+        this.loadingAlarm = false
+      })
+    },
+    get_alarm_name () {
+      getDeviceAlarmTypes(227)
+        .then(res => {
+          console.log('alarm type', res)
+          if (res.data && res.data.cn) {
+            this.alarmChartData.labels = res.data.cn
+          }
+        })
     }
   }
 }

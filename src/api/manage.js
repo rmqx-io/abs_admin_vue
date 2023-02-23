@@ -30,6 +30,7 @@ const api = {
   service: '/service',
   device: '/admin/device',
   device_alarm: '/admin/device/alarm',
+  bms_alarm_count: '/admin/device/alarm/bms/count',
   device_alarm_types: '/admin/device/alarm/type',
   add_device: '/admin/device/add',
   update_device: '/admin/device/update',
@@ -95,6 +96,14 @@ export function getDeviceAlarm (arg) {
     url: api.device_alarm,
     method: 'post',
     data: arg
+  })
+}
+
+export function getBmsAlarmCount (parameters) {
+  return request({
+    url: api.bms_alarm_count,
+    method: 'get',
+    params: parameters
   })
 }
 
