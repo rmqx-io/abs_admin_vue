@@ -177,7 +177,7 @@ export default {
         id: (new Date()).getTime(), // current timestamp in milliseconds
         name: this.currentRow.name,
         command: this.currentRow.command,
-        sub_command: this.currentRow.sub_command,
+        subCommand: this.currentRow.sub_command,
         param: this.param
       }
       if (this.deviceIdSet) {
@@ -191,6 +191,7 @@ export default {
         //
         // The backend will (should?) also send a notification to the frontend when the batch command is finished.
         //
+        // arg.deviceIdSet = this.deviceIdSet
         arg.deviceIdSet = this.deviceIdSet
         batchSendCommand(arg)
       } else if (this.deviceId) {
