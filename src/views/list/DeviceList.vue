@@ -111,6 +111,7 @@
 
     <div v-if="table_visible" class="table-operator">
       <a-button type="primary" icon="plus" @click="handleAdd">添加</a-button>
+      <a-button type="primary" @click='handleBatchCommandManager'>下发指令管理</a-button>
       <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
           <a-menu-item key='send-command' @click='handleSendCommandBatch'>
@@ -268,6 +269,14 @@
       @cancel="handleSendCommandFormCancel"
       @ok="handleSendCommandFormOk"
     />
+
+    <send-command-manager
+      ref='sendCommandManager'
+      :visible="showBatchCommandManager"
+      :loading="false"
+      @cancel="handleSendCommandManagerCancel"
+      @ok="handleSendCommandManagerOk"
+    />
     <step-by-step-modal v-if="table_visible" ref="modal" @ok="handleCreateFormOk"/>
 
     <battery-info
@@ -363,6 +372,7 @@ import {
 import StepByStepModal from './modules/StepByStepModal'
 import CreateForm from './modules/CreateForm'
 import SendCommandForm from '@/views/list/modules/SendCommandForm'
+import SendCommandManager from '@/views/list/modules/SendCommandManager'
 import BatteryInfo from '@/views/list/components/BatteryInfo'
 import storage from 'store'
 import { ACCESS_TOKEN, ROLE } from '@/store/mutation-types'
@@ -475,6 +485,7 @@ const statusMap = {
 export default {
   name: 'TableList',
   components: {
+    SendCommandManager,
     DeviceAlarm,
     STable,
     Ellipsis,
@@ -602,7 +613,8 @@ export default {
       // amapManager,
       orgList: [],
       statusCount: {},
-      deviceStatus: 'online'
+      deviceStatus: 'online',
+      showBatchCommandManager: false
     }
   },
   filters: {
@@ -657,6 +669,13 @@ export default {
       console.log('handle add')
       this.device_create_form_data = null
       this.device_create_form_visible = true
+    },
+    handleBatchCommandManager () {
+      this.showBatchCommandManager = true
+      // after 1s refresh
+      setTimeout(() => {
+        this.$refs.sendCommandManager.refresh()
+      }, 100)
     },
     handleEdit(record) {
       console.log('handleEdit', record)
@@ -741,6 +760,12 @@ export default {
     },
     handleSendCommandFormOk () {
 
+    },
+    handleSendCommandManagerCancel () {
+      this.showBatchCommandManager = false
+    },
+    handleSendCommandManagerOk () {
+      this.showBatchCommandManager = false
     },
     handleBatteryInfoOk() {
       this.battery_detail_visible = false

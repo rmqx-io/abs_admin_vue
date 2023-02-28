@@ -52,6 +52,8 @@ const api = {
   send_command_list: '/admin/device/config/commands',
   send_command: '/admin/device/control/send/command',
   send_batch_command: '/admin/device/control/send_batch/command',
+  send_batch_command_list: '/admin/device/control/send_batch/command/list',
+  send_batch_command_devices: '/admin/device/control/send_batch/command/devices',
 
   permission: '/permission',
   permissionNoPager: '/permission/no-pager',
@@ -245,6 +247,22 @@ export function getSendCommandList (provider) {
   return request({
     url: api.send_command_list + '/' + provider,
     method: 'get'
+  })
+}
+
+export function getBatchSendCommandList (arg) {
+  return request({
+    url: api.send_batch_command_list,
+    method: 'post',
+    data: arg
+  })
+}
+
+export function getBatchSendCommandDevices (arg) {
+  return request({
+    url: api.send_batch_command_devices,
+    method: 'post',
+    data: arg
   })
 }
 
