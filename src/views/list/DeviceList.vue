@@ -113,11 +113,11 @@
       <a-button type="primary" icon="plus" @click="handleAdd">添加</a-button>
       <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
-          <a-menu-item key='send-command'><a-icon type='batch' />下发指令</a-menu-item>
+          <a-menu-item key='send-command' @click='handleSendCommandBatch'>
+            <a-icon type='batch' />下发指令
+          </a-menu-item>
         </a-menu>
-        <a-button style="margin-left: 8px">
-          批量操作 <a-icon type="down" />
-        </a-button>
+        <a-button style="margin-left: 8px">批量操作<a-icon type="down" /></a-button>
       </a-dropdown>
     </div>
 
@@ -264,7 +264,7 @@
       :visible="send_command_form_visible"
       :loading="confirmLoading"
       :model="send_command_form_data"
-      :device-id="device_id"
+      :device-ids="device_ids"
       @cancel="handleSendCommandFormCancel"
       @ok="handleSendCommandFormOk"
     />
@@ -549,6 +549,7 @@ export default {
       device_create_form_data: null,
       send_command_form_data: null,
       device_id: null,
+      device_ids: [],
       map_loading: false,
       refresh_map: true,
       refresh_device_map: true,
@@ -790,7 +791,15 @@ export default {
     },
     handleSendCommand (record) {
       this.device_id = record.code
+      this.device_ids = [{ 'deviceId': record.code }]
       console.log('send command')
+      this.send_command_form_visible = true
+    },
+    handleSendCommandBatch () {
+      this.device_ids = this.selectedRows.map(item => {
+        return { 'deviceId': item.code }
+      })
+      console.log('send command batch')
       this.send_command_form_visible = true
     },
     refreshMap (deviceId) {

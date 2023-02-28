@@ -8,9 +8,6 @@
     @cancel="() => { handleCancel(); $emit('cancel') }"
   >
     <div>
-      <div v-if='deviceId != null && deviceIdSet == null' style='margin-bottom: 5px'>
-        <span>设备ID: {{ deviceId }}</span>
-      </div>
       <div v-if='deviceIdSet != null'>
         <div v-if='reload'>
 <!--          <span>设备 {{ deviceIdSet }}</span>-->
@@ -29,7 +26,7 @@
               </li>
             </ul>
           </div>
-          <div v-if='deviceIdSet.rangeList && deviceIdSet.rangeList.length > 0'>
+          <div v-if='enableDeviceIdRange && (deviceIdSet.rangeList && deviceIdSet.rangeList.length) > 0'>
             <span>设备ID范围: </span>
             <ul>
               <li v-for='item in deviceIdSet.rangeList' :key='item.join()'>
@@ -46,7 +43,7 @@
           </div>
         </div>
       </div>
-      <div>
+      <div v-if='false'>
         <a-button type="primary" @click="handleAddDevice">
           添加设备
           <a-icon v-if='!showAddDevice' type="down" />
@@ -55,6 +52,7 @@
       </div>
       <div v-if='showAddDevice'>
         <a-tabs
+          v-if='enableDeviceIdRange'
           v-model='activeTab'
         >
           <a-tab-pane key='singleDeviceId'><template #tab><span>单个设备</span></template></a-tab-pane>
@@ -74,6 +72,19 @@
           <a-button type="primary" @click="handleAddDeviceIdRange">添加</a-button>
         </div>
       </div>
+      <div>
+        <a-table
+          :dataSource='deviceIds'
+          :columns='columnsDeviceIds'
+          rowKey='deviceId'
+        >
+          <span slot="action" slot-scope="text, record">
+            <template>
+              <a @click="handleDeviceIdsRemove(record)">删除</a>
+            </template>
+          </span>
+        </a-table>
+      </div>
     </div>
     <a-table
       :dataSource="sendCommandList"
@@ -90,6 +101,7 @@
         placeholder="输入参数"
       ></a-input>
     </a-form-item>
+    <div v-if='formErrorMessage' class='error'>{{ this.formErrorMessage}}</div>
   </a-modal>
 </template>
 
@@ -110,13 +122,14 @@ export default {
       type: Object,
       default: () => null
     },
-    deviceId: {
-      type: String,
-      default: () => null
-    },
+    deviceIds: {
+      type: Array,
+      default: () => []
+    }
   },
   data () {
     return {
+      enableDeviceIdRange: false,
       sendCommandList: [],
       columns: [
         {
@@ -140,6 +153,19 @@ export default {
           key: 'sub_command'
         }
       ],
+      columnsDeviceIds: [
+        {
+          title: '设备ID',
+          dataIndex: 'deviceId',
+          key: 'deviceId'
+        },
+        {
+          title: '操作',
+          dataIndex: 'action',
+          scopedSlots: { customRender: 'action' },
+          fixed: 'right'
+        }
+      ],
       currentRow: null,
       param: null,
       showAddDevice: false,
@@ -148,7 +174,8 @@ export default {
       deviceIdRangeBegin: null,
       deviceIdRangeEnd: null,
       deviceIdSet: null,
-      reload: true
+      reload: true,
+      formErrorMessage: null
     }
   },
   created () {
@@ -172,15 +199,24 @@ export default {
       }
     },
     handleOk () {
-      console.log('handleOk', this.currentRow, this.param)
-      const arg = {
+      this.formErrorMessage = null
+      if (this.currentRow === null) {
+        this.formErrorMessage = '请选择指令'
+        return
+      }
+      console.log('deviceIds', this.deviceIds)
+      if (this.deviceIds.length === 0) {
+        this.formErrorMessage = '请添加设备'
+        return
+      }
+      // console.log('handleOk', this.currentRow, this.param)
+      let arg = {
         id: (new Date()).getTime(), // current timestamp in milliseconds
         name: this.currentRow.name,
         command: this.currentRow.command,
         subCommand: this.currentRow.sub_command,
         param: this.param
       }
-      if (this.deviceIdSet) {
         //
         // send the device id set (array of device id and/or device id range) to the backend.
         // The backend will send the command to each device in the set one by one in background.
@@ -192,11 +228,8 @@ export default {
         // The backend will (should?) also send a notification to the frontend when the batch command is finished.
         //
         // arg.deviceIdSet = this.deviceIdSet
-        arg.deviceIdSet = this.deviceIdSet
-        batchSendCommand(arg)
-      } else if (this.deviceId) {
-        sendCommand(this.deviceId, arg)
-      }
+      arg.deviceIds = this.deviceIds.map(item => item.deviceId)
+      batchSendCommand(arg)
     },
     handleCancel () {
       console.log('handleCancel')
@@ -269,11 +302,34 @@ export default {
         }
       }
       this.reloadDeviceSet()
+    },
+    handleDeviceIdsRemove (id) {
+      console.log('handleDeviceIdsRemove', id)
+      const index = this.deviceIds.indexOf(id)
+      if (index >= 0) {
+        this.deviceIds.splice(index, 1)
+      }
     }
   }
 }
 </script>
 
 <style scoped>
-
+.info, .success, .warning, .error, .validation {
+  border: 1px solid;
+  margin: 10px 0px;
+  padding: 15px 10px 15px 50px;
+  background-repeat: no-repeat;
+  background-position: 10px center;
+}
+.error{
+  color: #D8000C;
+  background-color: #FFBABA;
+  background-image: url('~@/assets/icons/error.png');
+}
+.success {
+  color: #4F8A10;
+  background-color: #DFF2BF;
+  background-image: url('~@/assets/icons/success.png');
+}
 </style>
