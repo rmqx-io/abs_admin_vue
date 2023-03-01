@@ -111,15 +111,14 @@
 
     <div v-if="table_visible" class="table-operator">
       <a-button type="primary" icon="plus" @click="handleAdd">添加</a-button>
+      <a-button type="primary" @click='handleBatchCommandManager'>下发指令管理</a-button>
       <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
-          <a-menu-item key="1"><a-icon type="delete" />删除</a-menu-item>
-          <!-- lock | unlock -->
-          <a-menu-item key="2"><a-icon type="lock" />锁定</a-menu-item>
+          <a-menu-item key='send-command' @click='handleSendCommandBatch'>
+            <a-icon type='batch' />下发指令
+          </a-menu-item>
         </a-menu>
-        <a-button style="margin-left: 8px">
-          批量操作 <a-icon type="down" />
-        </a-button>
+        <a-button style="margin-left: 8px">批量操作<a-icon type="down" /></a-button>
       </a-dropdown>
     </div>
 
@@ -266,9 +265,17 @@
       :visible="send_command_form_visible"
       :loading="confirmLoading"
       :model="send_command_form_data"
-      :device-id="device_id"
+      :device-ids="device_ids"
       @cancel="handleSendCommandFormCancel"
       @ok="handleSendCommandFormOk"
+    />
+
+    <send-command-manager
+      ref='sendCommandManager'
+      :visible="showBatchCommandManager"
+      :loading="false"
+      @cancel="handleSendCommandManagerCancel"
+      @ok="handleSendCommandManagerOk"
     />
     <step-by-step-modal v-if="table_visible" ref="modal" @ok="handleCreateFormOk"/>
 
@@ -365,6 +372,7 @@ import {
 import StepByStepModal from './modules/StepByStepModal'
 import CreateForm from './modules/CreateForm'
 import SendCommandForm from '@/views/list/modules/SendCommandForm'
+import SendCommandManager from '@/views/list/modules/SendCommandManager'
 import BatteryInfo from '@/views/list/components/BatteryInfo'
 import storage from 'store'
 import { ACCESS_TOKEN, ROLE } from '@/store/mutation-types'
@@ -477,6 +485,7 @@ const statusMap = {
 export default {
   name: 'TableList',
   components: {
+    SendCommandManager,
     DeviceAlarm,
     STable,
     Ellipsis,
@@ -551,6 +560,7 @@ export default {
       device_create_form_data: null,
       send_command_form_data: null,
       device_id: null,
+      device_ids: [],
       map_loading: false,
       refresh_map: true,
       refresh_device_map: true,
@@ -603,7 +613,8 @@ export default {
       // amapManager,
       orgList: [],
       statusCount: {},
-      deviceStatus: 'online'
+      deviceStatus: 'online',
+      showBatchCommandManager: false
     }
   },
   filters: {
@@ -658,6 +669,13 @@ export default {
       console.log('handle add')
       this.device_create_form_data = null
       this.device_create_form_visible = true
+    },
+    handleBatchCommandManager () {
+      this.showBatchCommandManager = true
+      // after 1s refresh
+      setTimeout(() => {
+        this.$refs.sendCommandManager.refresh()
+      }, 100)
     },
     handleEdit(record) {
       console.log('handleEdit', record)
@@ -743,6 +761,12 @@ export default {
     handleSendCommandFormOk () {
 
     },
+    handleSendCommandManagerCancel () {
+      this.showBatchCommandManager = false
+    },
+    handleSendCommandManagerOk () {
+      this.showBatchCommandManager = false
+    },
     handleBatteryInfoOk() {
       this.battery_detail_visible = false
       this.table_visible = true
@@ -792,7 +816,15 @@ export default {
     },
     handleSendCommand (record) {
       this.device_id = record.code
+      this.device_ids = [{ 'deviceId': record.code }]
       console.log('send command')
+      this.send_command_form_visible = true
+    },
+    handleSendCommandBatch () {
+      this.device_ids = this.selectedRows.map(item => {
+        return { 'deviceId': item.code }
+      })
+      console.log('send command batch')
       this.send_command_form_visible = true
     },
     refreshMap (deviceId) {
