@@ -17,7 +17,7 @@
         <a-row>
           <a-col :md="4" :sm="24">
             <a-form-item label="来源类型">
-              <a-select v-model='bms_type'>
+              <a-select v-model='bms_type' style='width: 80%'>
                 <a-select-option value="0">全部</a-select-option>
                 <a-select-option value="1">808</a-select-option>
                 <a-select-option value="227">弗铭</a-select-option>
