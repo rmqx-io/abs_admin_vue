@@ -38,12 +38,12 @@
               </a-radio-group>
             </a-form-item>
           </a-col>
-          <a-col :md="8" :sm="12">
+          <a-col :md="4" :sm="12">
             <a-form-item label="编号">
               <a-input v-model="queryData.device_id" placeholder=""/>
             </a-form-item>
           </a-col>
-          <a-col :md="8" :sm="12">
+          <a-col :md="4" :sm="12">
             <a-form-item label="运营单位">
               <a-tree-select
                 show-search
