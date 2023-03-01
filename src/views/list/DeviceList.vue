@@ -38,10 +38,12 @@
               </a-radio-group>
             </a-form-item>
           </a-col>
-          <a-col :md="8" :sm="24">
+          <a-col :md="8" :sm="12">
             <a-form-item label="编号">
               <a-input v-model="queryData.device_id" placeholder=""/>
             </a-form-item>
+          </a-col>
+          <a-col :md="8" :sm="12">
             <a-form-item label="运营单位">
               <a-tree-select
                 show-search
@@ -91,7 +93,9 @@
 <!--                </a-form-item>-->
 <!--              </a-col>-->
 <!--            </template>-->
-          <a-col v-if="!showAlarm" :md="!advanced && 8 || 24" :sm="24">
+        </a-row>
+        <a-row>
+          <a-col v-if="!showAlarm" :md="!advanced && 8 || 12" :sm="12">
             <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
               <a-button type="primary" @click="refreshTable(true)">查询</a-button>
 <!--                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>-->
