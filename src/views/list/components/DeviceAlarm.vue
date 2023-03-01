@@ -123,7 +123,7 @@ export default {
       prevSelectedItems: [],
       columns: [
         {
-          title: 'id',
+          title: '编号',
           dataIndex: 'id'
         },
         {
