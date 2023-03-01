@@ -8,42 +8,18 @@
     @cancel="() => { handleCancel(); $emit('cancel') }"
   >
     <div>
-      <div v-if='deviceIdSet != null'>
-        <div v-if='reload'>
-<!--          <span>设备 {{ deviceIdSet }}</span>-->
-          <div v-if='deviceIdSet.list && deviceIdSet.list.length > 0'>
-            <span>设备ID列表: </span>
-            <ul>
-              <li v-for='item in deviceIdSet.list' :key='item'>
-                <a-row>
-                  <a-col :span="20">
-                    {{ item }}
-                  </a-col>
-                  <a-col :span="4">
-                    <a @click='handleRemoveDeviceId(item)'>删除</a>
-                  </a-col>
-                </a-row>
-              </li>
-            </ul>
-          </div>
-          <div v-if='enableDeviceIdRange && (deviceIdSet.rangeList && deviceIdSet.rangeList.length) > 0'>
-            <span>设备ID范围: </span>
-            <ul>
-              <li v-for='item in deviceIdSet.rangeList' :key='item.join()'>
-                <a-row>
-                  <a-col :span="20">
-                    {{ item[0] }} ~ {{ item[1] }}
-                  </a-col>
-                  <a-col :span="4">
-                    <a @click='handleRemoveDeviceIdRange(item)'>删除</a>
-                  </a-col>
-                </a-row>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div v-if='false'>
+      <a-table
+        :dataSource='deviceIds'
+        :columns='columnsDeviceIds'
+        rowKey='deviceId'
+      >
+        <span slot="action" slot-scope="text, record">
+          <template>
+            <a @click="handleDeviceIdsRemove(record)">删除</a>
+          </template>
+        </span>
+      </a-table>
+      <div>
         <a-button type="primary" @click="handleAddDevice">
           添加设备
           <a-icon v-if='!showAddDevice' type="down" />
@@ -51,39 +27,21 @@
         </a-button>
       </div>
       <div v-if='showAddDevice'>
-        <a-tabs
-          v-if='enableDeviceIdRange'
-          v-model='activeTab'
+        <a-form-item
+          :label="`设备编号`"
         >
-          <a-tab-pane key='singleDeviceId'><template #tab><span>单个设备</span></template></a-tab-pane>
-          <a-tab-pane key='deviceIdRange'><template #tab><span>设备 ID 范围</span></template></a-tab-pane>
-        </a-tabs>
-        <div v-if="activeTab === 'singleDeviceId'">
-          <a-form-item :label="`设备ID`">
-            <a-input v-model='deviceIdNew' placeholder="输入设备ID"></a-input>
-          </a-form-item>
-          <a-button type="primary" @click="handleAddDeviceId">添加</a-button>
-        </div>
-        <div v-if="activeTab === 'deviceIdRange'">
-          <a-form-item :label="`设备ID范围`">
-            <a-input v-model='deviceIdRangeBegin' placeholder="第一个设备ID"></a-input>
-            <a-input v-model='deviceIdRangeEnd' placeholder="最后一个设备ID"></a-input>
-          </a-form-item>
-          <a-button type="primary" @click="handleAddDeviceIdRange">添加</a-button>
-        </div>
-      </div>
-      <div>
-        <a-table
-          :dataSource='deviceIds'
-          :columns='columnsDeviceIds'
-          rowKey='deviceId'
-        >
-          <span slot="action" slot-scope="text, record">
-            <template>
-              <a @click="handleDeviceIdsRemove(record)">删除</a>
-            </template>
-          </span>
-        </a-table>
+          <a-textarea
+            v-decorator="['newDeviceIds', {rules: [{required: true, message: '设备编号'}]}]"
+            :rows="4"
+            v-model='newDeviceIds'
+            placeholder='输入设备编号
+一行一个设备'
+          />
+        </a-form-item>
+        <div v-if='formErrorMessage' class='error'>{{ this.formErrorMessage}}</div>
+        <a-button type="primary" @click="handleAddDeviceIds">
+          添加
+        </a-button>
       </div>
     </div>
     <a-table
@@ -175,7 +133,8 @@ export default {
       deviceIdRangeEnd: null,
       deviceIdSet: null,
       reload: true,
-      formErrorMessage: null
+      formErrorMessage: null,
+      newDeviceIds: null
     }
   },
   created () {
@@ -309,6 +268,15 @@ export default {
       if (index >= 0) {
         this.deviceIds.splice(index, 1)
       }
+    },
+    handleAddDeviceIds () {
+      console.log('handleAddDeviceIds', this.newDeviceIds)
+      this.newDeviceIds.split('\n').forEach(id => {
+        const index = this.deviceIds.findIndex(item => item.deviceId === id)
+        if (index < 0) {
+          this.deviceIds.push({ deviceId: id })
+        }
+      })
     }
   }
 }
