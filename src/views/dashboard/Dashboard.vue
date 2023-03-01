@@ -3,31 +3,30 @@
     <a-row :gutter="24">
       <a-col :sm="24" :md="12" :xl="12" :style="{ marginBottom: '24px' }">
         <a-card>
-          <div>
-            <h4>设备统计</h4>
-          </div>
-          <div>
-            <Pie
-              ref='deviceChart'
-              v-if='!loadingDevice'
-              :chart-options='deviceChartOptions'
-              :chart-data='deviceChartData'
-              :height='600'
-            />
-          </div>
+          <v-chart :force-fit="true" :height="400" :data="deviceChartPieData" :scale="pieScale">
+            <v-tooltip :showTitle="false" dataKey="item*percent" />
+            <v-axis />
+            <!-- position="right" :offsetX="-140" -->
+            <v-legend dataKey="item"/>
+            <v-pie position="percent" color="item" :vStyle="pieStyle" :tooltip='tooltip'/>
+            <v-coord type="theta" :radius="0.75" :innerRadius="0.6" />
+          </v-chart>
         </a-card>
       </a-col>
-      <a-col :sm="24" :md="12" :xl="12" :style="{ marginBottom: '24px' }">
+      <a-col :sm="24" :md="24" :xl="24" :style="{ marginBottom: '24px' }">
         <a-card>
           <div>
-            <h4>告警统计</h4>
-          </div>
-          <div>
-            <Pie
-              :chart-options='alarmChartOptions'
-              :chart-data='alarmChartData'
-              :height='600'
-            />
+            <a-card>
+              <v-chart
+                :forceFit="true"
+                :height="400"
+                :data="alarmBarData"
+              >
+                <v-tooltip />
+                <v-axis />
+                <v-bar position="x*y" />
+              </v-chart>
+            </a-card>
           </div>
         </a-card>
       </a-col>
@@ -37,31 +36,39 @@
 
 <script>
 import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-  BarElement,
-  CategoryScale,
-  LinearScale
-} from 'chart.js'
-import {
   ChartCard
 } from '@/components'
-import { Bar, Pie } from 'vue-chartjs'
-import PageView from '@/layouts/PageView'
 import { getBmsAlarmCount, getDeviceAlarmTypes, getStatusCount } from '@/api/manage'
+const DataSet = require('@antv/data-set')
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
+const sourceData = [
+  { item: '1', count: 32.2 },
+  { item: '2', count: 21 },
+  { item: '3', count: 17 },
+  { item: '4', count: 13 },
+  { item: '5', count: 9 },
+  { item: '6', count: 7.8 }
+]
+
+const pieScale = [{
+  dataKey: 'percent',
+  min: 0,
+  formatter: '.0%'
+}]
+
+const dv = new DataSet.View().source(sourceData)
+dv.transform({
+  type: 'percent',
+  field: 'count',
+  dimension: 'item',
+  as: 'percent'
+})
+const pieData = dv.rows
 
 export default {
   name: 'Dashboard',
   components: {
     ChartCard,
-    PageView,
-    Bar,
-    Pie
   },
   data () {
     return {
@@ -129,7 +136,20 @@ export default {
       alarmChartOptions: {
         responsive: true,
         maintainAspectRatio: false
-      }
+      },
+      pieScale,
+      pieData,
+      deviceChartPieData: pieData,
+      alarmChartPieData: pieData,
+      alarmBarData: [],
+      sourceData,
+      pieStyle: {
+        stroke: '#fff',
+        lineWidth: 1
+      },
+      tooltip: ['item*percent*count', (item, percent, count) => {
+        return { name: item, value: ['' + count] }
+      }]
     }
   },
   mounted () {
@@ -147,6 +167,7 @@ export default {
         this.deviceChartData.datasets[0].data[1] = res.data.offline
         this.deviceChartData.datasets[0].data[2] = res.data.standby
         this.loadingDevice = false
+        this.deviceChartPieData = this.labelAndDataToPieData(this.deviceChartData.labels, this.deviceChartData.datasets[0].data)
       })
     },
     getBmsAlarmCount () {
@@ -155,6 +176,8 @@ export default {
         console.log('alarm count', res)
         this.alarmChartData.datasets[0].data = res.data
         this.loadingAlarm = false
+        this.alarmChartPieData = this.labelAndDataToPieData(this.alarmChartData.labels, this.alarmChartData.datasets[0].data)
+        this.alarmBarData = this.labelAndDataToBarData(this.alarmChartData.labels, this.alarmChartData.datasets[0].data)
       })
     },
     get_alarm_name () {
@@ -165,6 +188,28 @@ export default {
             this.alarmChartData.labels = res.data.cn
           }
         })
+    },
+    labelAndDataToPieData (label, data) {
+      const sourceData = []
+      for (let i = 0; i < label.length; i++) {
+        sourceData.push({ item: label[i], count: data[i] })
+      }
+      const dv = new DataSet.View().source(sourceData)
+      dv.transform({
+        type: 'percent',
+        field: 'count',
+        dimension: 'item',
+        as: 'percent'
+      })
+      const pieData = dv.rows
+      return pieData
+    },
+    labelAndDataToBarData (label, data) {
+      const barData = []
+      for (let i = 0; i < label.length; i++) {
+        barData.push({ x: label[i], y: data[i] })
+      }
+      return barData
     }
   }
 }
