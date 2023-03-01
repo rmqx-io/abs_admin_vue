@@ -131,6 +131,17 @@
       style="width: 100%; height: 70vh"
       class="map-container"
     >
+      <div
+        v-if="isGettingDeviceLocation"
+      >
+        <a-progress
+          :percent="getDevicesLocationPageNo/ getDevicesLocationPages * 100"
+          :status="getDevicesLocationPageNo === getDevicesLocationPages ? 'success' : 'active'"
+          :stroke-width="10"
+          :format="percent => `${percent.toFixed(0)}%`"
+        />
+        <span>{{ getDevicesLocationPageNo }}</span> / <span>{{ getDevicesLocationPages }}</span>, <span>{{ markersFound }}</span>
+      </div>
       <amap
         :center="center2"
         :zoom="4"
@@ -152,17 +163,6 @@
         >
         </amap-marker-cluster>
       </amap>
-      <div
-        v-if="isGettingDeviceLocation"
-      >
-        <a-progress
-          :percent="getDevicesLocationPageNo/ getDevicesLocationPages * 100"
-          :status="getDevicesLocationPageNo === getDevicesLocationPages ? 'success' : 'active'"
-          :stroke-width="10"
-          :format="percent => `${percent.toFixed(0)}%`"
-        />
-        <span>{{ getDevicesLocationPageNo }}</span> / <span>{{ getDevicesLocationPages }}</span>, <span>{{ markersFound }}</span>
-      </div>
     </div>
     <div v-if="showAlarm" class="alarm-container">
       <device-alarm
