@@ -20,6 +20,7 @@
     <div v-if='mode === "basic"'>
       <bms-info-charts
         :device-id='deviceId'
+        :bms-bt='bmsBt'
       >
       </bms-info-charts>
 
@@ -169,6 +170,10 @@ export default {
       default: () => false
     },
     deviceId: {
+      type: String,
+      default: () => null
+    },
+    bmsBt: {
       type: String,
       default: () => null
     },

@@ -18,7 +18,7 @@
               line-height: 200%;
             "
           >
-            电池编码：{{ this.batteryName }}
+            电池编码：{{ this.bmsBt }}
             <br />
             更新时间：{{ this.time_tracking }}
             <el-tag
@@ -429,6 +429,10 @@ export default {
   },
   props: {
     deviceId: {
+      type: String,
+      default: () => null
+    },
+    bmsBt: {
       type: String,
       default: () => null
     }

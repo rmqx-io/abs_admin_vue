@@ -287,6 +287,7 @@
       v-if="battery_detail_visible"
       ref="batteryInfo"
       :device-id="device_id"
+      :bms-bt="bms_bt"
       @cancel="handleBatteryInfoCancel"
       @ok="handleBatteryInfoOk"
     />
@@ -564,6 +565,7 @@ export default {
       device_create_form_data: null,
       send_command_form_data: null,
       device_id: null,
+      bms_bt: null,
       device_ids: [],
       map_loading: false,
       refresh_map: true,
@@ -785,6 +787,7 @@ export default {
     handleBatteryInfo(record) {
       // this.$router.push({ path: '/list/table-list/info/1' })
       this.device_id = record.code
+      this.bms_bt = record.bms_bt
       this.battery_detail_visible = true
       this.table_visible = false
       console.log(this.$refs)
