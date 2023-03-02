@@ -3,18 +3,28 @@
     <a-row :gutter="24">
       <a-col :sm="24" :md="12" :xl="12" :style="{ marginBottom: '24px' }">
         <a-card>
-          <v-chart :force-fit="true" :height="400" :data="deviceChartPieData" :scale="pieScale">
-            <v-tooltip :showTitle="false" dataKey="item*percent" />
-            <v-axis />
-            <!-- position="right" :offsetX="-140" -->
-            <v-legend dataKey="item"/>
-            <v-pie position="percent" color="item" :vStyle="pieStyle" :tooltip='tooltip'/>
-            <v-coord type="theta" :radius="0.75" :innerRadius="0.6" />
-          </v-chart>
+          <div>
+            <h4>设备统计</h4>
+          </div>
+          <div>
+            <a-card>
+              <v-chart :force-fit="true" :height="400" :data="deviceChartPieData" :scale="pieScale">
+                <v-tooltip :showTitle="false" dataKey="item*percent" />
+                <v-axis />
+                <!-- position="right" :offsetX="-140" -->
+                <v-legend dataKey="item"/>
+                <v-pie position="percent" color="item" :vStyle="pieStyle" :tooltip='tooltip'/>
+                <v-coord type="theta" :radius="0.75" :innerRadius="0.6" />
+              </v-chart>
+            </a-card>
+          </div>
         </a-card>
       </a-col>
       <a-col :sm="24" :md="24" :xl="24" :style="{ marginBottom: '24px' }">
         <a-card>
+          <div>
+            <h4>告警统计</h4>
+          </div>
           <div>
             <a-card>
               <v-chart
