@@ -983,7 +983,6 @@ export default {
       if (tab === 'map') {
         console.log('show map')
         this.showTableTab = false
-        this.table_visible = false
         this.showAlarm = false
         this.showMap = true
         this.showMarkers = true
@@ -995,7 +994,6 @@ export default {
         this.showTableTab = false
         this.showMap = false
         this.showMarkers = false
-        this.table_visible = false
         this.showAlarm = true
       } else {
         console.log('show table')
@@ -1003,7 +1001,6 @@ export default {
         this.showMap = false
         this.showMarkers = false
         this.showAlarm = false
-        this.table_visible = true
       }
     },
     getClusterStyle(context) {
