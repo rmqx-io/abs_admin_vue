@@ -113,17 +113,204 @@
       </a-form>
     </div>
 
-    <div v-if="table_visible" class="table-operator">
-      <a-button type="primary" icon="plus" @click="handleAdd">添加</a-button>
-      <a-button type="primary" @click='handleBatchCommandManager'>下发指令管理</a-button>
-      <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
-        <a-menu slot="overlay">
-          <a-menu-item key='send-command' @click='handleSendCommandBatch'>
-            <a-icon type='batch' />下发指令
-          </a-menu-item>
-        </a-menu>
-        <a-button style="margin-left: 8px">批量操作<a-icon type="down" /></a-button>
-      </a-dropdown>
+
+    <div v-if='showTableTab'>
+      <div v-if="table_visible" class="table-operator">
+                                                        <a-button type="primary" icon="plus" @click="handleAdd">添加</a-button>
+                                                        <a-button type="primary" @click='handleBatchCommandManager'>下发指令管理</a-button>
+                                                        <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
+                                                        <a-menu slot="overlay">
+                                                        <a-menu-item key='send-command' @click='handleSendCommandBatch'>
+                                                        <a-icon type='batch' />下发指令
+                                                        </a-menu-item>
+                                                        </a-menu>
+                                                        <a-button style="margin-left: 8px">批量操作<a-icon type="down" /></a-button>
+                                                        </a-dropdown>
+                                                        </div>
+
+      <s-table
+        v-if="table_visible"
+        ref="table"
+        size="default"
+        :rowKey="(record) => record.id"
+        :columns="columns"
+        :data="loadData"
+        :alert="true"
+        :rowSelection="rowSelection"
+        showPagination="auto"
+        :scroll="{ x: 1300 }"
+      >
+        <span slot="serial" slot-scope="text, record, index">
+          {{ index + 1 }}
+        </span>
+        <span slot="status" slot-scope="text">
+          <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
+        </span>
+        <span slot="description" slot-scope="text">
+          <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
+        </span>
+
+        <span slot="device_info" slot-scope="text, record">
+          <template>
+            编号: <span>{{ record.code }}</span>
+            <br />
+            别名: <span>{{ record.alias }}</span>
+            <br />
+            ICCID: <span>{{ record.iccid }}</span>
+          </template>
+        </span>
+
+        <span slot="organization_info" slot-scope="text, record">
+          <template>
+            组织: <span>{{ record.organization_name }}</span>
+            <br />
+            仓库: <span>{{ record.storehouse_name }}</span>
+          </template>
+        </span>
+
+        <span slot="model_info" slot-scope="text, record">
+          <template>
+            电池型号: <span>{{ record.battery_name }}</span>
+            <br />
+            设备型号: <span>{{ record.model_name }}</span>
+            <br />
+            BT码: <span>{{ record.bms_bt }}</span>
+          </template>
+        </span>
+
+        <span slot="version_info" slot-scope="text, record">
+          <template>
+            软件: <span>{{ record.s_ver }}</span>
+            <br />
+            硬件: <span>{{ record.h_ver }}</span>
+          </template>
+        </span>
+
+        <span slot="action" slot-scope="text, record">
+          <template>
+            <a @click="handleBatteryInfo(record)">电池详情</a>
+            <a-divider type="vertical" />
+            <a-dropdown>
+              <a class="ant-dropdown-link">更多<a-icon type="down"/>
+              </a>
+              <a-menu slot="overlay">
+                <a-menu-item v-if='is_sysadmin'>
+                  <a v-if="is_sysadmin" @click="handleEdit(record)">修改</a>
+                </a-menu-item>
+                <a-menu-item>
+                  <a @click="handleMap(record)">历史行程</a>
+                </a-menu-item>
+                <a-menu-item>
+                  <a @click="handleSendCommand(record)">下发指令</a>
+                </a-menu-item>
+              </a-menu>
+            </a-dropdown>
+          </template>
+        </span>
+      </s-table>
+
+      <create-form
+        v-if="table_visible"
+        ref="createModal"
+        :visible="device_create_form_visible"
+        :loading="confirmLoading"
+        :model="device_create_form_data"
+        @cancel="handleCreateFormCancel"
+        @ok="handleCreateFormOk"
+      />
+
+      <send-command-form
+        ref="sendCommandModal"
+        :visible="send_command_form_visible"
+        :loading="confirmLoading"
+        :model="send_command_form_data"
+        :device-ids="device_ids"
+        @cancel="handleSendCommandFormCancel"
+        @ok="handleSendCommandFormOk"
+      />
+
+      <send-command-manager
+        ref='sendCommandManager'
+        :visible="showBatchCommandManager"
+        :loading="false"
+        @cancel="handleSendCommandManagerCancel"
+        @ok="handleSendCommandManagerOk"
+      />
+      <step-by-step-modal v-if="table_visible" ref="modal" @ok="handleCreateFormOk"/>
+
+      <battery-info
+        v-if="battery_detail_visible"
+        ref="batteryInfo"
+        :device-id="device_id"
+        :bms-bt="bms_bt"
+        @cancel="handleBatteryInfoCancel"
+        @ok="handleBatteryInfoOk"
+      />
+
+      <div
+        v-if="map_visible"
+        style="width: 100%; height: 70vh"
+      >
+        <div><a @click="handleMapClose()"><< 返回</a></div>
+        <div><br /></div>
+        <div>设备：{{ device_id }}</div>
+        <div><br /></div>
+        <a-spin :spinning="map_loading">
+          <a-form>
+            <a-row :gutter="48">
+              <a-col :md="8" :sm="24">
+                <a-form-item aria-label="起始日期">
+                  <a-date-picker v-model="queryData.start_date" style="width: 100%" placeholder="起始日期"/>
+                </a-form-item>
+              </a-col>
+              <a-col :md="8" :sm="24">
+                <a-form-item aria-label="起始时间">
+                  <a-time-picker v-model="queryData.start_time" style="width: 100%" placeholder="起始时间"/>
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="48">
+              <a-col :md="8" :sm="24">
+                <a-form-item aria-label="结束日期">
+                  <a-date-picker
+                    v-model="queryData.end_date"
+                    style="width: 100%"
+                    placeholder="结束日期"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :md="8" :sm="24">
+                <a-form-item aria-label="结束时间">
+                  <a-time-picker
+                    v-model="queryData.end_time"
+                    style="width: 100%"
+                    placeholder="结束时间"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :md="8" :sm="24">
+                <a-button type="primary" @click="refreshMap(device_id)">查询</a-button>
+              </a-col>
+            </a-row>
+          </a-form>
+        </a-spin>
+        <amap
+          :zoom="zoom"
+          :center="center"
+        >
+          <amap-polyline
+            :path="polyline.path"
+            :line-join="'round'"
+          >
+          </amap-polyline>
+          <amap-marker
+            v-for="(marker,i) in polyline.markers"
+            :position="marker"
+            :key="i"
+          >
+          </amap-marker>
+        </amap>
+      </div>
     </div>
 
     <div
@@ -148,11 +335,11 @@
         cache-key="marker-cluster-map"
         async
       >
-<!--        <template>-->
-<!--          <amap-marker-->
-<!--            :position.sync="center2"-->
-<!--          />-->
-<!--        </template>-->
+        <!--        <template>-->
+        <!--          <amap-marker-->
+        <!--            :position.sync="center2"-->
+        <!--          />-->
+        <!--        </template>-->
         <!-- 点聚合 -->
         <amap-marker-cluster
           v-if="showMarkers"
@@ -173,190 +360,6 @@
       >
       </device-alarm>
     </div>
-    <s-table
-      v-if="table_visible"
-      ref="table"
-      size="default"
-      :rowKey="(record) => record.id"
-      :columns="columns"
-      :data="loadData"
-      :alert="true"
-      :rowSelection="rowSelection"
-      showPagination="auto"
-      :scroll="{ x: 1300 }"
-    >
-      <span slot="serial" slot-scope="text, record, index">
-        {{ index + 1 }}
-      </span>
-      <span slot="status" slot-scope="text">
-        <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
-      </span>
-      <span slot="description" slot-scope="text">
-        <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
-      </span>
-
-      <span slot="device_info" slot-scope="text, record">
-        <template>
-          编号: <span>{{ record.code }}</span>
-          <br />
-          别名: <span>{{ record.alias }}</span>
-          <br />
-          ICCID: <span>{{ record.iccid }}</span>
-        </template>
-      </span>
-
-      <span slot="organization_info" slot-scope="text, record">
-        <template>
-          组织: <span>{{ record.organization_name }}</span>
-          <br />
-          仓库: <span>{{ record.storehouse_name }}</span>
-        </template>
-      </span>
-
-      <span slot="model_info" slot-scope="text, record">
-        <template>
-          电池型号: <span>{{ record.battery_name }}</span>
-          <br />
-          设备型号: <span>{{ record.model_name }}</span>
-          <br />
-          BT码: <span>{{ record.bms_bt }}</span>
-        </template>
-      </span>
-
-      <span slot="version_info" slot-scope="text, record">
-        <template>
-          软件: <span>{{ record.s_ver }}</span>
-          <br />
-          硬件: <span>{{ record.h_ver }}</span>
-        </template>
-      </span>
-
-      <span slot="action" slot-scope="text, record">
-        <template>
-          <a @click="handleBatteryInfo(record)">电池详情</a>
-          <a-divider type="vertical" />
-          <a-dropdown>
-            <a class="ant-dropdown-link">更多<a-icon type="down"/>
-            </a>
-            <a-menu slot="overlay">
-              <a-menu-item v-if='is_sysadmin'>
-                <a v-if="is_sysadmin" @click="handleEdit(record)">修改</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a @click="handleMap(record)">历史行程</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a @click="handleSendCommand(record)">下发指令</a>
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
-        </template>
-      </span>
-    </s-table>
-
-    <create-form
-      v-if="table_visible"
-      ref="createModal"
-      :visible="device_create_form_visible"
-      :loading="confirmLoading"
-      :model="device_create_form_data"
-      @cancel="handleCreateFormCancel"
-      @ok="handleCreateFormOk"
-    />
-
-    <send-command-form
-      ref="sendCommandModal"
-      :visible="send_command_form_visible"
-      :loading="confirmLoading"
-      :model="send_command_form_data"
-      :device-ids="device_ids"
-      @cancel="handleSendCommandFormCancel"
-      @ok="handleSendCommandFormOk"
-    />
-
-    <send-command-manager
-      ref='sendCommandManager'
-      :visible="showBatchCommandManager"
-      :loading="false"
-      @cancel="handleSendCommandManagerCancel"
-      @ok="handleSendCommandManagerOk"
-    />
-    <step-by-step-modal v-if="table_visible" ref="modal" @ok="handleCreateFormOk"/>
-
-    <battery-info
-      v-if="battery_detail_visible"
-      ref="batteryInfo"
-      :device-id="device_id"
-      :bms-bt="bms_bt"
-      @cancel="handleBatteryInfoCancel"
-      @ok="handleBatteryInfoOk"
-    />
-
-    <div
-      v-if="map_visible"
-      style="width: 100%; height: 70vh"
-    >
-      <div><a @click="handleMapClose()"><< 返回</a></div>
-      <div><br /></div>
-      <div>设备：{{ device_id }}</div>
-      <div><br /></div>
-      <a-spin :spinning="map_loading">
-        <a-form>
-          <a-row :gutter="48">
-            <a-col :md="8" :sm="24">
-              <a-form-item aria-label="起始日期">
-                <a-date-picker v-model="queryData.start_date" style="width: 100%" placeholder="起始日期"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="8" :sm="24">
-              <a-form-item aria-label="起始时间">
-                <a-time-picker v-model="queryData.start_time" style="width: 100%" placeholder="起始时间"/>
-              </a-form-item>
-            </a-col>
-          </a-row>
-          <a-row :gutter="48">
-            <a-col :md="8" :sm="24">
-              <a-form-item aria-label="结束日期">
-                <a-date-picker
-                  v-model="queryData.end_date"
-                  style="width: 100%"
-                  placeholder="结束日期"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col :md="8" :sm="24">
-              <a-form-item aria-label="结束时间">
-                <a-time-picker
-                  v-model="queryData.end_time"
-                  style="width: 100%"
-                  placeholder="结束时间"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col :md="8" :sm="24">
-              <a-button type="primary" @click="refreshMap(device_id)">查询</a-button>
-            </a-col>
-          </a-row>
-        </a-form>
-      </a-spin>
-      <amap
-        :zoom="zoom"
-        :center="center"
-      >
-        <amap-polyline
-          :path="polyline.path"
-          :line-join="'round'"
-        >
-        </amap-polyline>
-        <amap-marker
-          v-for="(marker,i) in polyline.markers"
-          :position="marker"
-          :key="i"
-        >
-        </amap-marker>
-      </amap>
-    </div>
-
     </a-card>
 <!--  </page-header-wrapper>-->
 </template>
@@ -557,6 +560,7 @@ export default {
       getDevicesLocationPageNo: 0,
       markersFound: 0,
       showMarkers: false,
+      showTableTab: true,
       showAlarm: false,
       send_command_form_visible: false,
       battery_detail_visible: false,
@@ -978,6 +982,7 @@ export default {
       console.log('tab change', tab)
       if (tab === 'map') {
         console.log('show map')
+        this.showTableTab = false
         this.table_visible = false
         this.showAlarm = false
         this.showMap = true
@@ -987,12 +992,14 @@ export default {
         }
       } else if (tab === 'alarm') {
         console.log('show alarm')
+        this.showTableTab = false
         this.showMap = false
         this.showMarkers = false
         this.table_visible = false
         this.showAlarm = true
       } else {
         console.log('show table')
+        this.showTableTab = true
         this.showMap = false
         this.showMarkers = false
         this.showAlarm = false
