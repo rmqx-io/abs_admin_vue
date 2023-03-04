@@ -55,6 +55,8 @@ const api = {
   send_batch_command_list: '/admin/device/control/send_batch/command/list',
   send_batch_command_devices: '/admin/device/control/send_batch/command/devices',
 
+  refresh_online_status: '/admin/device/refresh/online/status',
+
   permission: '/permission',
   permissionNoPager: '/permission/no-pager',
   orgTree: '/org/tree'
@@ -232,6 +234,13 @@ export function getLocation (deviceId, arg) {
     url: api.location + '/' + deviceId,
     method: 'post',
     data: arg
+  })
+}
+
+export function refreshOnlineStatus (deviceId) {
+  return request({
+    url: api.refresh_online_status + '/' + deviceId,
+    method: 'get'
   })
 }
 

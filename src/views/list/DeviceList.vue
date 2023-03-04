@@ -1,5 +1,5 @@
 <template>
-<!--  <page-header-wrapper>-->
+  <!--  <page-header-wrapper>-->
   <a-card :bordered="false" :bodyStyle="{ padding: '16px 16px', height: '100%' }" :style="{ height: '100%' }">
     <div class="table-page-search-wrapper">
       <a-tabs
@@ -31,10 +31,10 @@
           <a-col :md="8" :sm="24">
             <a-form-item :label="$t('device.status')">
               <a-radio-group v-model="deviceStatus" @change="onDeviceStatusChange">
-                <a-radio-button value="total">{{ $t('device.total') }} ({{ this.statusCount.total}})</a-radio-button>
-                <a-radio-button value="online">{{ $t('device.online') }} ({{ this.statusCount.online}})</a-radio-button>
-                <a-radio-button value="offline">{{ $t('device.offline') }} ({{ this.statusCount.offline}})</a-radio-button>
-                <a-radio-button value="standby">{{ $t('device.standby' )}} ({{ this.statusCount.standby }})</a-radio-button>
+                <a-radio-button value="total">{{ $t('device.total') }} ({{ this.statusCount.total }})</a-radio-button>
+                <a-radio-button value="online">{{ $t('device.online') }} ({{ this.statusCount.online }})</a-radio-button>
+                <a-radio-button value="offline">{{ $t('device.offline') }} ({{ this.statusCount.offline }})</a-radio-button>
+                <a-radio-button value="standby">{{ $t('device.standby' ) }} ({{ this.statusCount.standby }})</a-radio-button>
               </a-radio-group>
             </a-form-item>
           </a-col>
@@ -54,79 +54,81 @@
               ></a-tree-select>
             </a-form-item>
           </a-col>
-<!--            <a-col :md="8" :sm="24">-->
-<!--              <a-form-item label="使用状态">-->
-<!--                <a-select v-model="queryParam.status" placeholder="请选择" default-value="0">-->
-<!--                  <a-select-option value="0">全部</a-select-option>-->
-<!--                  <a-select-option value="1">关闭</a-select-option>-->
-<!--                  <a-select-option value="2">运行中</a-select-option>-->
-<!--                </a-select>-->
-<!--              </a-form-item>-->
-<!--            </a-col>-->
-<!--            <template v-if="advanced">-->
-<!--              <a-col :md="8" :sm="24">-->
-<!--                <a-form-item label="调用次数">-->
-<!--                  <a-input-number v-model="queryParam.callNo" style="width: 100%"/>-->
-<!--                </a-form-item>-->
-<!--              </a-col>-->
-<!--              <a-col :md="8" :sm="24">-->
-<!--                <a-form-item label="更新日期">-->
-<!--                  <a-date-picker v-model="queryParam.date" style="width: 100%" placeholder="请输入更新日期"/>-->
-<!--                </a-form-item>-->
-<!--              </a-col>-->
-<!--              <a-col :md="8" :sm="24">-->
-<!--                <a-form-item label="使用状态">-->
-<!--                  <a-select v-model="queryParam.useStatus" placeholder="请选择" default-value="0">-->
-<!--                    <a-select-option value="0">全部</a-select-option>-->
-<!--                    <a-select-option value="1">关闭</a-select-option>-->
-<!--                    <a-select-option value="2">运行中</a-select-option>-->
-<!--                  </a-select>-->
-<!--                </a-form-item>-->
-<!--              </a-col>-->
-<!--              <a-col :md="8" :sm="24">-->
-<!--                <a-form-item label="使用状态">-->
-<!--                  <a-select placeholder="请选择" default-value="0">-->
-<!--                    <a-select-option value="0">全部</a-select-option>-->
-<!--                    <a-select-option value="1">关闭</a-select-option>-->
-<!--                    <a-select-option value="2">运行中</a-select-option>-->
-<!--                  </a-select>-->
-<!--                </a-form-item>-->
-<!--              </a-col>-->
-<!--            </template>-->
+          <!--            <a-col :md="8" :sm="24">-->
+          <!--              <a-form-item label="使用状态">-->
+          <!--                <a-select v-model="queryParam.status" placeholder="请选择" default-value="0">-->
+          <!--                  <a-select-option value="0">全部</a-select-option>-->
+          <!--                  <a-select-option value="1">关闭</a-select-option>-->
+          <!--                  <a-select-option value="2">运行中</a-select-option>-->
+          <!--                </a-select>-->
+          <!--              </a-form-item>-->
+          <!--            </a-col>-->
+          <!--            <template v-if="advanced">-->
+          <!--              <a-col :md="8" :sm="24">-->
+          <!--                <a-form-item label="调用次数">-->
+          <!--                  <a-input-number v-model="queryParam.callNo" style="width: 100%"/>-->
+          <!--                </a-form-item>-->
+          <!--              </a-col>-->
+          <!--              <a-col :md="8" :sm="24">-->
+          <!--                <a-form-item label="更新日期">-->
+          <!--                  <a-date-picker v-model="queryParam.date" style="width: 100%" placeholder="请输入更新日期"/>-->
+          <!--                </a-form-item>-->
+          <!--              </a-col>-->
+          <!--              <a-col :md="8" :sm="24">-->
+          <!--                <a-form-item label="使用状态">-->
+          <!--                  <a-select v-model="queryParam.useStatus" placeholder="请选择" default-value="0">-->
+          <!--                    <a-select-option value="0">全部</a-select-option>-->
+          <!--                    <a-select-option value="1">关闭</a-select-option>-->
+          <!--                    <a-select-option value="2">运行中</a-select-option>-->
+          <!--                  </a-select>-->
+          <!--                </a-form-item>-->
+          <!--              </a-col>-->
+          <!--              <a-col :md="8" :sm="24">-->
+          <!--                <a-form-item label="使用状态">-->
+          <!--                  <a-select placeholder="请选择" default-value="0">-->
+          <!--                    <a-select-option value="0">全部</a-select-option>-->
+          <!--                    <a-select-option value="1">关闭</a-select-option>-->
+          <!--                    <a-select-option value="2">运行中</a-select-option>-->
+          <!--                  </a-select>-->
+          <!--                </a-form-item>-->
+          <!--              </a-col>-->
+          <!--            </template>-->
         </a-row>
         <a-row>
           <a-col v-if="!showAlarm" :md="!advanced && 8 || 12" :sm="12">
             <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
               <a-button type="primary" @click="refreshTable(true)">查询</a-button>
-<!--                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>-->
-<!--              <a @click="toggleAdvanced" style="margin-left: 8px">-->
-<!--                {{ advanced ? '收起' : '展开' }}-->
-<!--                <a-icon :type="advanced ? 'up' : 'down'"/>-->
-<!--              </a>-->
+              <!--                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>-->
+              <!--              <a @click="toggleAdvanced" style="margin-left: 8px">-->
+              <!--                {{ advanced ? '收起' : '展开' }}-->
+              <!--                <a-icon :type="advanced ? 'up' : 'down'"/>-->
+              <!--              </a>-->
             </span>
           </a-col>
-<!--          <a-col :md="8" :sm="24">-->
-<!--            <a-checkbox v-model="showMap" @change="onMapChange">显示地图</a-checkbox>-->
-<!--            <a-checkbox v-model="showAlarm" @change="onAlarmChange">显示告警</a-checkbox>-->
-<!--          </a-col>-->
+          <!--          <a-col :md="8" :sm="24">-->
+          <!--            <a-checkbox v-model="showMap" @change="onMapChange">显示地图</a-checkbox>-->
+          <!--            <a-checkbox v-model="showAlarm" @change="onAlarmChange">显示告警</a-checkbox>-->
+          <!--          </a-col>-->
         </a-row>
       </a-form>
     </div>
 
-
     <div v-if='showTableTab'>
       <div v-if="table_visible" class="table-operator">
-                                                        <a-button type="primary" icon="plus" @click="handleAdd">添加</a-button>
-                                                        <a-button type="primary" @click='handleBatchCommandManager'>下发指令管理</a-button>
-                                                        <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
-                                                        <a-menu slot="overlay">
-                                                        <a-menu-item key='send-command' @click='handleSendCommandBatch'>
-                                                        <a-icon type='batch' />下发指令
-                                                        </a-menu-item>
-                                                        </a-menu>
-                                                        <a-button style="margin-left: 8px">批量操作<a-icon type="down" /></a-button>
-                                                        </a-dropdown>
-                                                        </div>
+        <a-button type='primary' icon='plus' @click='handleAdd'>添加</a-button>
+        <a-button type='primary' @click='handleBatchCommandManager'>下发指令管理</a-button>
+        <a-dropdown v-action:edit v-if='selectedRowKeys.length > 0'>
+          <a-menu slot='overlay'>
+            <a-menu-item key='send-command' @click='handleSendCommandBatch'>
+              <a-icon type='batch' />
+              下发指令
+            </a-menu-item>
+          </a-menu>
+          <a-button style='margin-left: 8px'>批量操作
+            <a-icon type='down' />
+          </a-button>
+        </a-dropdown>
+      </div>
 
       <s-table
         v-if="table_visible"
@@ -202,6 +204,9 @@
                 </a-menu-item>
                 <a-menu-item>
                   <a @click="handleSendCommand(record)">下发指令</a>
+                </a-menu-item>
+                <a-menu-item>
+                  <a @click='handleRefreshOnlineStatus(record)'>刷新在线状态</a>
                 </a-menu-item>
               </a-menu>
             </a-dropdown>
@@ -360,7 +365,7 @@
       >
       </device-alarm>
     </div>
-    </a-card>
+  </a-card>
 <!--  </page-header-wrapper>-->
 </template>
 
@@ -373,7 +378,7 @@ import {
   getAdminOrgTree,
   getDeviceList,
   getLocation,
-  getStatusCount,
+  getStatusCount, refreshOnlineStatus,
   updateDevice
 } from '@/api/manage'
 
@@ -383,14 +388,14 @@ import SendCommandForm from '@/views/list/modules/SendCommandForm'
 import SendCommandManager from '@/views/list/modules/SendCommandManager'
 import BatteryInfo from '@/views/list/components/BatteryInfo'
 import storage from 'store'
-import { ACCESS_TOKEN, ROLE } from '@/store/mutation-types'
+import { ROLE } from '@/store/mutation-types'
 import DeviceAlarm from '@/views/list/components/DeviceAlarm'
 
-function interpolate(u, begin, end) {
-  if (u < 0) u = 0;
-  if (u > 1) u = 1;
-  u = Math.pow(u, 1 / 10);
-  return u * (end - begin) + begin;
+function interpolate (u, begin, end) {
+  if (u < 0) u = 0
+  if (u > 1) u = 1
+  u = Math.pow(u, 1 / 10)
+  return u * (end - begin) + begin
 }
 // let amapManager = new VueAMap.AMapManager()
 
@@ -438,8 +443,7 @@ const columns = [
     title: '第一次基站定位时间',
     dataIndex: 'first_cell_location_time',
     width: '136px'
-  }
-  // ,
+  }, // ,
   // {
   //   title: '描述',
   //   dataIndex: 'description',
@@ -462,7 +466,7 @@ const columns = [
   //   dataIndex: 'updatedAt',
   //   sorter: true
   // },
-  ,
+
   {
     title: '操作',
     dataIndex: 'action23',
@@ -502,7 +506,7 @@ export default {
     StepByStepModal,
     BatteryInfo
   },
-  data() {
+  data () {
     this.columns = columns
     return {
       activeTab: 'table',
@@ -544,10 +548,10 @@ export default {
         { lnglat: [116.939621, 39.343147] }
       ],
       markers: [
-        { position: [116.402144, 39.910012], title: "Marker 1" },
-        { position: [116.391095, 39.904684], title: "Marker 2" },
-        { position: [116.418044, 39.957106], title: "Marker 3" },
-        { position: [116.373688, 39.931149], title: "Marker 4" }
+        { position: [116.402144, 39.910012], title: 'Marker 1' },
+        { position: [116.391095, 39.904684], title: 'Marker 2' },
+        { position: [116.418044, 39.957106], title: 'Marker 3' },
+        { position: [116.373688, 39.931149], title: 'Marker 4' }
       ],
       deviceMarkers: [],
       // create model
@@ -594,7 +598,7 @@ export default {
       },
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        let arg = Object.assign(parameter, this.queryData)
+        const arg = Object.assign(parameter, this.queryData)
         arg.page_no = arg.pageNo
         arg.page_size = arg.pageSize
         delete arg.pageNo
@@ -628,10 +632,10 @@ export default {
     }
   },
   filters: {
-    statusFilter(type) {
+    statusFilter (type) {
       return statusMap[type].text
     },
-    statusTypeFilter(type) {
+    statusTypeFilter (type) {
       return statusMap[type].status
     }
   },
@@ -655,7 +659,7 @@ export default {
     this.getAdminOrgList()
   },
   computed: {
-    rowSelection() {
+    rowSelection () {
       return {
         selectedRowKeys: this.selectedRowKeys,
         onChange: this.onSelectChange
@@ -675,7 +679,7 @@ export default {
     // }
   },
   methods: {
-    handleAdd() {
+    handleAdd () {
       console.log('handle add')
       this.device_create_form_data = null
       this.device_create_form_visible = true
@@ -687,12 +691,12 @@ export default {
         this.$refs.sendCommandManager.refresh()
       }, 100)
     },
-    handleEdit(record) {
+    handleEdit (record) {
       console.log('handleEdit', record)
       this.device_create_form_visible = true
       this.device_create_form_data = { ...record }
     },
-    handleCreateFormOk() {
+    handleCreateFormOk () {
       const form = this.$refs.createModal.form
       this.confirmLoading = true
       form.validateFields((errors, values) => {
@@ -754,14 +758,14 @@ export default {
         }
       })
     },
-    handleCreateFormCancel() {
+    handleCreateFormCancel () {
       console.log('handle cancel')
       this.device_create_form_visible = false
 
       const form = this.$refs.createModal.form
       form.resetFields() // 清理表单数据（可不做）
     },
-    handleBatteryInfoCancel() {
+    handleBatteryInfoCancel () {
       this.battery_detail_visible = false
       this.table_visible = true
     },
@@ -777,18 +781,18 @@ export default {
     handleSendCommandManagerOk () {
       this.showBatchCommandManager = false
     },
-    handleBatteryInfoOk() {
+    handleBatteryInfoOk () {
       this.battery_detail_visible = false
       this.table_visible = true
     },
-    handleSub(record) {
+    handleSub (record) {
       if (record.status !== 0) {
         this.$message.info(`${record.no} 订阅成功`)
       } else {
         this.$message.error(`${record.no} 订阅失败，规则已关闭`)
       }
     },
-    handleBatteryInfo(record) {
+    handleBatteryInfo (record) {
       // this.$router.push({ path: '/list/table-list/info/1' })
       this.device_id = record.code
       this.bms_bt = record.bms_bt
@@ -803,23 +807,23 @@ export default {
       })
       // this.$refs.batteryInfo.getBatteryInfo(record.code)
     },
-    onSelectChange(selectedRowKeys, selectedRows) {
+    onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
     },
-    toggleAdvanced() {
+    toggleAdvanced () {
       this.advanced = !this.advanced
     },
-    resetSearchForm() {
+    resetSearchForm () {
       this.queryParam = {
         date: moment(new Date())
       }
     },
-    handleMapClose() {
+    handleMapClose () {
       this.map_visible = false
       this.table_visible = true
     },
-    handleMap(record) {
+    handleMap (record) {
       this.device_id = record.code
       this.map_visible = true
       this.table_visible = false
@@ -831,6 +835,23 @@ export default {
       console.log('send command')
       this.send_command_form_visible = true
     },
+    handleRefreshOnlineStatus (record) {
+      console.log('refresh online status')
+      refreshOnlineStatus(record.code)
+        .then(res => {
+          console.log(res)
+          let status = '设备状态:'
+          if (res.data) {
+            status += '在线'
+          } else {
+            status += '离线'
+          }
+          this.$message.info(`${record.code} 刷新成功. ${status}`)
+        }).catch(err => {
+        console.log('refresh online status', err)
+        this.$message.error(err.data.message)
+      })
+    },
     handleSendCommandBatch () {
       this.device_ids = this.selectedRows.map(item => {
         return { 'deviceId': item.code }
@@ -840,7 +861,7 @@ export default {
     },
     refreshMap (deviceId) {
       this.map_loading = true
-      let arg = this.queryData
+      const arg = this.queryData
       console.log('loadData request arg:', arg)
       return getLocation(deviceId, arg)
         .then(res => {
@@ -928,7 +949,7 @@ export default {
         }
         this.deviceMarkers = []
         this.markersFound = 0
-        let arg = Object.assign({}, this.queryData)
+        const arg = Object.assign({}, this.queryData)
         arg.page_no = arg.pageNo
         arg.page_size = 2000
         delete arg.pageNo
@@ -1003,10 +1024,10 @@ export default {
         this.showAlarm = false
       }
     },
-    getClusterStyle(context) {
-      const u = context.count / this.data.length;
-      const hue = ~~interpolate(u, 90, 0);
-      const size = ~~interpolate(u, 30, 50);
+    getClusterStyle (context) {
+      const u = context.count / this.data.length
+      const hue = ~~interpolate(u, 90, 0)
+      const size = ~~interpolate(u, 30, 50)
       return {
         backgroundColor: `hsla(${hue}, 100%, 50%, 0.7)`,
         width: `${size}px`,
@@ -1016,8 +1037,8 @@ export default {
         border: `1px solid hsla(${hue}, 100%, 40%, 1)`,
         boxShadow: `0 0 1px hsla(${hue}, 100%, 50%, 1)`,
         color: `hsla(${hue}, 100%, 20%, 1)`,
-        fontSize: "14px",
-        textAlign: "center",
+        fontSize: '14px',
+        textAlign: 'center'
       }
     },
     getMarkerOptions (point) {
