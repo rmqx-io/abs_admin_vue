@@ -188,6 +188,18 @@
           </template>
         </span>
 
+        <span slot="other_time" slot-scope="text, record">
+          <template>
+            第一次 GPS 定位: <span>{{ record.first_gps_location_time }}</span>
+            <br />
+            第一次基站定位: <span>{{ record.first_cell_location_time }}</span>
+            <br />
+            上次基站定位: <span>{{ record.last_cell_location_time }}</span>
+            <br />
+            上次网络通讯: <span>{{ record.last_communication_time }}</span>
+          </template>
+        </span>
+
         <span slot="action" slot-scope="text, record">
           <template>
             <a @click="handleBatteryInfo(record)">电池详情</a>
@@ -425,7 +437,11 @@ const columns = [
     scopedSlots: { customRender: 'version_info' }
   },
   {
-    title: '上线时间',
+    'title': 'GPS 定位时间',
+    'dataIndex': 'location_time'
+  },
+  {
+    title: '注册时间',
     dataIndex: 'register_time',
     width: '136px'
   },
@@ -435,15 +451,20 @@ const columns = [
     width: '136px'
   },
   {
-    title: '第一次 GPS 定位时间',
-    dataIndex: 'first_gps_location_time',
-    width: '136px'
+    title: '其他时间',
+    dataIndex: 'other_time',
+    scopedSlots: { customRender: 'other_time' }
   },
-  {
-    title: '第一次基站定位时间',
-    dataIndex: 'first_cell_location_time',
-    width: '136px'
-  }, // ,
+  // {
+  //   title: '第一次 GPS 定位时间',
+  //   dataIndex: 'first_gps_location_time',
+  //   width: '136px'
+  // },
+  // {
+  //   title: '第一次基站定位时间',
+  //   dataIndex: 'first_cell_location_time',
+  //   width: '136px'
+  // },
   // {
   //   title: '描述',
   //   dataIndex: 'description',
@@ -601,6 +622,7 @@ export default {
         const arg = Object.assign(parameter, this.queryData)
         arg.page_no = arg.pageNo
         arg.page_size = arg.pageSize
+        arg.location_only = false
         delete arg.pageNo
         delete arg.pageSize
         if (this.deviceStatus) {
@@ -911,6 +933,7 @@ export default {
       // get all device location
       console.log('loadData request arg:', arg)
       arg.page_no = page_no
+      arg.location_only = true
       this.getDevicesLocationPageNo = page_no
       console.log('getDeviceLocation', arg, 'page_no', page_no)
       getDeviceList(arg)
