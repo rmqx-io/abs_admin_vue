@@ -281,19 +281,19 @@
         <a-spin :spinning="map_loading">
           <a-form>
             <a-row :gutter="48">
-              <a-col :md="8" :sm="24">
+              <a-col :md="4" :sm="24">
                 <a-form-item aria-label="起始日期">
                   <a-date-picker v-model="queryData.start_date" style="width: 100%" placeholder="起始日期"/>
                 </a-form-item>
               </a-col>
-              <a-col :md="8" :sm="24">
+              <a-col :md="4" :sm="24">
                 <a-form-item aria-label="起始时间">
                   <a-time-picker v-model="queryData.start_time" style="width: 100%" placeholder="起始时间"/>
                 </a-form-item>
               </a-col>
             </a-row>
             <a-row :gutter="48">
-              <a-col :md="8" :sm="24">
+              <a-col :md="4" :sm="24">
                 <a-form-item aria-label="结束日期">
                   <a-date-picker
                     v-model="queryData.end_date"
@@ -302,7 +302,7 @@
                   />
                 </a-form-item>
               </a-col>
-              <a-col :md="8" :sm="24">
+              <a-col :md="4" :sm="24">
                 <a-form-item aria-label="结束时间">
                   <a-time-picker
                     v-model="queryData.end_time"
@@ -311,7 +311,7 @@
                   />
                 </a-form-item>
               </a-col>
-              <a-col :md="8" :sm="24">
+              <a-col :md="4" :sm="24">
                 <a-button type="primary" @click="refreshMap(device_id)">查询</a-button>
               </a-col>
             </a-row>
