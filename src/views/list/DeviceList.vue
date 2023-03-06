@@ -190,8 +190,6 @@
 
         <span slot='location_time' slot-scope='text, record'>
           <template>
-<!--            {{ record.location_time }}-->
-<!--            <br />-->
             {{ record.location_time ? localTime(record.location_time) : '' }}
           </template>
         </span>
@@ -328,12 +326,13 @@
             :line-join="'round'"
           >
           </amap-polyline>
-          <amap-marker
+          <amap-circle-marker
             v-for="(marker,i) in polyline.markers"
-            :position="marker"
+            :center="marker"
             :key="i"
+            :radius="5"
           >
-          </amap-marker>
+          </amap-circle-marker>
         </amap>
       </div>
     </div>
