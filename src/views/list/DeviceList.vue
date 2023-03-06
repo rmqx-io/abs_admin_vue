@@ -272,7 +272,7 @@
 
       <div
         v-if="map_visible"
-        style="width: 100%; height: 70vh"
+        style="width: 100%"
       >
         <div><a @click="handleMapClose()"><< 返回</a></div>
         <div><br /></div>
@@ -320,6 +320,7 @@
         <amap
           :zoom="zoom"
           :center="center"
+          style='height: 70vh'
         >
           <amap-polyline
             :path="polyline.path"
