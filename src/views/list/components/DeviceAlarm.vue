@@ -86,6 +86,11 @@
           <span>{{ alarm_name(record.bms_alarm) }}</span>
         </template>
       </span>
+      <span slot='bms_alarm_timestamp' slot-scope="text, record">
+        <template>
+          <span>{{ localTime(record.bms_alarm_timestamp) }}</span>
+        </template>
+      </span>
     </s-table>
   </div>
 </template>
@@ -142,7 +147,8 @@ export default {
         },
         {
           title: '时间',
-          dataIndex: 'bms_alarm_timestamp'
+          dataIndex: 'bms_alarm_timestamp',
+          scopedSlots: { customRender: 'bms_alarm_timestamp' }
         }
       ],
       loading: false,
@@ -261,6 +267,9 @@ export default {
     },
     cancelSelectedItems () {
       this.selectedItems = []
+    },
+    localTime (time) {
+      return moment.utc(time).local().format('YYYY-MM-DD HH:mm:ss')
     }
   },
   created () {
