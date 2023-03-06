@@ -188,15 +188,23 @@
           </template>
         </span>
 
+        <span slot='location_time' slot-scope='text, record'>
+          <template>
+<!--            {{ record.location_time }}-->
+<!--            <br />-->
+            {{ record.location_time ? localTime(record.location_time) : '' }}
+          </template>
+        </span>
+
         <span slot="other_time" slot-scope="text, record">
           <template>
-            第一次 GPS 定位: <span>{{ record.first_gps_location_time }}</span>
+            上次基站定位: <span>{{ record.last_cell_location_time ? localTime(record.last_cell_location_time) : '' }}</span>
             <br />
-            第一次基站定位: <span>{{ record.first_cell_location_time }}</span>
+            上次网络通讯: <span>{{ record.last_communication_time ? localTime(record.last_communication_time) : '' }}</span>
             <br />
-            上次基站定位: <span>{{ record.last_cell_location_time }}</span>
+            第一次 GPS 定位: <span>{{ record.first_gps_location_time ? localTime(record.first_gps_location_time) : '' }}</span>
             <br />
-            上次网络通讯: <span>{{ record.last_communication_time }}</span>
+            第一次基站定位: <span>{{ record.first_cell_location_time ? localTime(record.first_cell_location_time) : '' }}</span>
           </template>
         </span>
 
@@ -437,17 +445,21 @@ const columns = [
     scopedSlots: { customRender: 'version_info' }
   },
   {
-    'title': 'GPS 定位时间',
-    'dataIndex': 'location_time'
+    title: 'GPS 定位时间',
+    dataIndex: 'location_time',
+    scopedSlots: { customRender: 'location_time' },
+    width: '136px'
   },
   {
     title: '注册时间',
     dataIndex: 'register_time',
+    scopedSlots: { customRender: 'register_time' },
     width: '136px'
   },
   {
     title: '创建时间',
     dataIndex: 'create_date',
+    scopedSlots: { customRender: 'create_date' },
     width: '136px'
   },
   {
@@ -1086,6 +1098,9 @@ export default {
       // return {
       //   offset: [-size / 2, -size / 2]
       // }
+    },
+    localTime (time) {
+      return moment.utc(time).local().format('YYYY-MM-DD HH:mm:ss')
     }
   }
 }
