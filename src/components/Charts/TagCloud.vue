@@ -7,7 +7,6 @@
 </template>
 
 <script>
-import { registerShape } from 'viser-vue'
 const DataSet = require('@antv/data-set')
 
 const imgUrl = 'https://gw.alipayobjects.com/zos/rmsportal/gWyeGLCdFFRavBGIDzWk.png'
@@ -16,26 +15,6 @@ const scale = [
   { dataKey: 'x', nice: false },
   { dataKey: 'y', nice: false }
 ]
-
-registerShape('point', 'cloud', {
-  draw (cfg, container) {
-    return container.addShape('text', {
-      attrs: {
-        fillOpacity: cfg.opacity,
-        fontSize: cfg.origin._origin.size,
-        rotate: cfg.origin._origin.rotate,
-        text: cfg.origin._origin.text,
-        textAlign: 'center',
-        fontFamily: cfg.origin._origin.font,
-        fill: cfg.color,
-        textBaseline: 'Alphabetic',
-        ...cfg.style,
-        x: cfg.x,
-        y: cfg.y
-      }
-    })
-  }
-})
 
 export default {
   name: 'TagCloud',
