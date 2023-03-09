@@ -1,26 +1,26 @@
 <template>
-  <div id="map">
-    <div>设备地图</div>
-    <div id="map1">
-      <amap
-        cache-key="marker-cluster-map"
-        :zoom="13"
-        async
-        map-style="amap://styles/darkblue"
-        :center="center"
+  <div
+    id="map"
+    style="width: 100%; height: 97%"
+  >
+    <h4>设备地图</h4>
+    <amap
+      cache-key="marker-cluster-map"
+      :zoom="4"
+      async
+      :center="center"
+    >
+      <!-- 点聚合 -->
+      <amap-marker-cluster
+        :data="data"
+        key="custom-cluster"
+        :grid-size="options.gridSize"
+        :average-center="options.averageCenter"
       >
-        <!-- 点聚合 -->
-        <amap-marker-cluster
-          :data="data"
-          key="custom-cluster"
-          :grid-size="options.gridSize"
-          :average-center="options.averageCenter"
-        >
-          <!-- :marker-options="getMarkerOptions"
+        <!-- :marker-options="getMarkerOptions"
           :cluster-options="getClusterOptions" -->
-        </amap-marker-cluster>
-      </amap>
-    </div>
+      </amap-marker-cluster>
+    </amap>
   </div>
 </template>
 
