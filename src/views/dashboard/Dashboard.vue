@@ -5,16 +5,17 @@
         <a-card>
           <div>
             <h4>设备统计</h4>
-            <Pie
-              ref='deviceChart'
-              v-if='!loadingDevice'
-              :chart-options='deviceChartOptions'
-              :chart-data='deviceChartData'
-              :height='600'
-            />
           </div>
           <div>
             <a-card>
+              <v-chart :force-fit="true" :height="400" :data="deviceChartPieData" :scale="pieScale">
+                <v-tooltip :showTitle="false" dataKey="item*percent" />
+                <v-axis />
+                <!-- position="right" :offsetX="-140" -->
+                <v-legend dataKey="item"/>
+                <v-pie position="percent" color="item" :vStyle="pieStyle" :tooltip='tooltip'/>
+                <v-coord type="theta" :radius="0.75" :innerRadius="0.6" />
+              </v-chart>
             </a-card>
           </div>
         </a-card>
@@ -26,6 +27,15 @@
           </div>
           <div>
             <a-card>
+              <v-chart
+                :forceFit="true"
+                :height="400"
+                :data="alarmBarData"
+              >
+                <v-tooltip />
+                <v-axis />
+                <v-bar position="x*y" />
+              </v-chart>
             </a-card>
           </div>
         </a-card>
@@ -38,21 +48,8 @@
 import {
   ChartCard
 } from '@/components'
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-  BarElement,
-  CategoryScale,
-  LinearScale
-} from 'chart.js'
-import { Bar, Pie } from 'vue-chartjs'
 import { getBmsAlarmCount, getDeviceAlarmTypes, getStatusCount } from '@/api/manage'
 const DataSet = require('@antv/data-set')
-
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement)
 
 const sourceData = [
   { item: '1', count: 32.2 },
@@ -82,7 +79,6 @@ export default {
   name: 'Dashboard',
   components: {
     ChartCard,
-    Pie
   },
   data () {
     return {
