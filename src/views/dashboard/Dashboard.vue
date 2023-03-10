@@ -12,6 +12,7 @@
                 :chart-options="chartOptions"
                 :chart-data="deviceChartData"
                 :height="350"
+                v-if='!loadingDevice'
               />
             </div>
           </div>
@@ -25,6 +26,7 @@
               :chart-options="chartOptions"
               :chart-data="alarmChartData"
               :height="350"
+              v-if='!loadingAlarm'
             />
           </div>
         </a-card>
@@ -200,7 +202,7 @@ export default {
         this.deviceChartData.datasets[0].data[1] = res.data.offline
         this.deviceChartData.datasets[0].data[2] = res.data.standby
         this.loadingDevice = false
-        this.deviceChartPieData = this.labelAndDataToPieData(this.deviceChartData.labels, this.deviceChartData.datasets[0].data)
+        // this.deviceChartPieData = this.labelAndDataToPieData(this.deviceChartData.labels, this.deviceChartData.datasets[0].data)
       })
     },
     getBmsAlarmCount () {
@@ -209,7 +211,7 @@ export default {
         console.log('alarm count', res)
         this.alarmChartData.datasets[0].data = res.data
         this.loadingAlarm = false
-        this.alarmChartPieData = this.labelAndDataToPieData(this.alarmChartData.labels, this.alarmChartData.datasets[0].data)
+        // this.alarmChartPieData = this.labelAndDataToPieData(this.alarmChartData.labels, this.alarmChartData.datasets[0].data)
         this.alarmBarData = this.labelAndDataToBarData(this.alarmChartData.labels, this.alarmChartData.datasets[0].data)
       })
     },
