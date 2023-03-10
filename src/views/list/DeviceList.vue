@@ -593,7 +593,7 @@ export default {
       table_visible: true,
       showMap: false,
       isGettingDeviceLocation: false,
-      getDevicesLocationPages: 0,
+      getDevicesLocationPages: 1,
       getDevicesLocationPageNo: 0,
       markersFound: 0,
       showMarkers: false,
@@ -946,12 +946,12 @@ export default {
       console.log('loadData request arg:', arg)
       arg.page_no = page_no
       arg.location_only = true
-      this.getDevicesLocationPageNo = page_no
       console.log('getDeviceLocation', arg, 'page_no', page_no)
       getDeviceList(arg)
         .then(res => {
           console.log('device list', res)
 
+          this.getDevicesLocationPageNo = page_no
           this.getDevicesLocationPages = res.data.pages
 
           // append device to deviceMarkers
@@ -966,6 +966,8 @@ export default {
           })
           if (page_no >= res.data.pages) {
             this.isGettingDeviceLocation = false
+            this.getDevicesLocationPages = 1
+            this.getDevicesLocationPageNo = 0
             console.log('markersFound', this.markersFound)
           } else {
             this.getDeviceLocation(arg, page_no + 1)
