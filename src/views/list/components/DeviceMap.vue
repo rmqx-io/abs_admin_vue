@@ -1,9 +1,20 @@
 <template>
   <div
     id="map"
-    style="width: 100%; height: 97%"
+    style="width: 100%; height: 100%"
   >
-    <h4>设备地图</h4>
+    <div
+      v-if="isGettingDeviceLocation"
+      class='popup'
+    >
+      <a-progress
+        :percent="getDevicesLocationPageNo/ getDevicesLocationPages * 100"
+        :status="getDevicesLocationPageNo === getDevicesLocationPages ? 'success' : 'active'"
+        :stroke-width="10"
+        :format="percent => `${percent.toFixed(0)}%`"
+      />
+      <span>{{ getDevicesLocationPageNo }}</span> / <span>{{ getDevicesLocationPages }}</span>, <span>{{ markersFound }}</span>
+    </div>
     <amap
       cache-key="marker-cluster-map"
       :zoom="4"
@@ -12,7 +23,7 @@
     >
       <!-- 点聚合 -->
       <amap-marker-cluster
-        :data="data"
+        :data="deviceMarkers"
         key="custom-cluster"
         :grid-size="options.gridSize"
         :average-center="options.averageCenter"
@@ -25,10 +36,18 @@
 </template>
 
 <script>
+import { getDeviceList } from '@/api/manage'
+
 export default {
   name: 'DeviceMap',
   data () {
     return {
+      isGettingDeviceLocation: false,
+      getDevicesLocationPages: 1,
+      getDevicesLocationPageNo: 0,
+      markersFound: 0,
+      showMarkers: false,
+      deviceMarkers: [],
       center: [118.848765, 28.979693],
       styles: {
         fill: '#FFFF00',
@@ -53,6 +72,55 @@ export default {
         zoomOnClick: true
       }
     }
+  },
+  mounted () {
+    this.refreshMap()
+  },
+  methods: {
+    refreshMap () {
+      if (this.isGettingDeviceLocation) {
+        return
+      }
+      this.isGettingDeviceLocation = true
+      const arg = {}
+      arg.page_no = 1
+      arg.page_size = 2000
+      arg.device_status = 'total'
+      this.getDeviceLocation(arg, 1)
+    },
+    getDeviceLocation (arg, page_no) {
+      // get all device location
+      console.log('loadData request arg:', arg)
+      arg.page_no = page_no
+      arg.location_only = true
+      console.log('getDeviceLocation', arg, 'page_no', page_no)
+      getDeviceList(arg)
+        .then(res => {
+          console.log('device list', res)
+
+          this.getDevicesLocationPageNo = page_no
+          this.getDevicesLocationPages = res.data.pages
+
+          // append device to deviceMarkers
+          res.data.records.forEach((item, index) => {
+            if (item.last_location_lng !== null && item.last_location_lat !== null) {
+              this.markersFound += 1
+              this.deviceMarkers.push({
+                lnglat: [item.last_location_lng, item.last_location_lat],
+                title: item.code
+              })
+            }
+          })
+          if (page_no >= res.data.pages) {
+            this.isGettingDeviceLocation = false
+            this.getDevicesLocationPages = 1
+            this.getDevicesLocationPageNo = 0
+            console.log('markersFound', this.markersFound)
+          } else {
+            this.getDeviceLocation(arg, page_no + 1)
+          }
+        })
+    }
   }
 }
 </script>
@@ -76,4 +144,10 @@ export default {
   height: 600px;
 }
 
+.popup {
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  backgroud-color: #fff;
+}
 </style>

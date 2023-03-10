@@ -31,7 +31,8 @@
       </a-col>
       <a-col :sm="24" :md="24" :xl="17" :style="{ marginBottom: '24px' }">
         <a-card>
-          <div style='height: 805px; width: 100%'>
+          <div style='height: 786px; width: 100%; margin-bottom: 20px'>
+            <h4>设备地图</h4>
             <device-map />
           </div>
         </a-card>
