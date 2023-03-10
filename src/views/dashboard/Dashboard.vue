@@ -1,13 +1,13 @@
 <template>
   <div>
     <a-row :gutter="24">
-      <a-col :sm="24" :md="7" :xl="7" :style="{ marginBottom: '24px' }">
+      <a-col :sm="24" :md="24" :xl="7" :style="{ marginBottom: '24px' }">
         <a-card>
           <div>
             <div>
               <h4>设备统计</h4>
             </div>
-            <div style='width: 350px'>
+            <div>
               <Pie
                 :chart-options="chartOptions"
                 :chart-data="deviceChartData"
@@ -20,7 +20,7 @@
           <div>
             <h4>告警统计</h4>
           </div>
-          <div style='width: 350px'>
+          <div>
             <Pie
               :chart-options="chartOptions"
               :chart-data="alarmChartData"
@@ -29,7 +29,7 @@
           </div>
         </a-card>
       </a-col>
-      <a-col :sm="24" :md="17" :xl="17" :style="{ marginBottom: '24px' }">
+      <a-col :sm="24" :md="24" :xl="17" :style="{ marginBottom: '24px' }">
         <a-card>
           <div style='height: 805px; width: 100%'>
             <device-map />
