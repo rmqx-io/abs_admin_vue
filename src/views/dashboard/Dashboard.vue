@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-row :gutter="24">
-      <a-col :sm="24" :md="6" :xl="6" :style="{ marginBottom: '24px' }">
+      <a-col :sm="24" :md="7" :xl="7" :style="{ marginBottom: '24px' }">
         <a-card>
           <div>
             <div>
@@ -29,7 +29,7 @@
           </div>
         </a-card>
       </a-col>
-      <a-col :sm="24" :md="12" :xl="12" :style="{ marginBottom: '24px' }">
+      <a-col :sm="24" :md="17" :xl="17" :style="{ marginBottom: '24px' }">
         <a-card>
           <div style='height: 805px; width: 100%'>
             <device-map />
