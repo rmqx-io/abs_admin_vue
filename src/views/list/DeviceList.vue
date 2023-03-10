@@ -345,6 +345,7 @@
     >
       <div
         v-if="isGettingDeviceLocation"
+        class='popup'
       >
         <a-progress
           :percent="getDevicesLocationPageNo/ getDevicesLocationPages * 100"
@@ -354,6 +355,7 @@
         />
         <span>{{ getDevicesLocationPageNo }}</span> / <span>{{ getDevicesLocationPages }}</span>, <span>{{ markersFound }}</span>
       </div>
+      <!-- TODO: use device map component -->
       <amap
         :center="center2"
         :zoom="4"
@@ -1107,3 +1109,12 @@ export default {
   }
 }
 </script>
+
+<style lang='scss' scoped>
+.popup {
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  backgroud-color: #fff;
+}
+</style>
