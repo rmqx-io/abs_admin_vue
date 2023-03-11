@@ -20,6 +20,7 @@
       :zoom="4"
       async
       :center="center"
+      v-if="refresh_map"
     >
       <!-- 点聚合 -->
       <amap-marker-cluster
@@ -47,6 +48,7 @@ export default {
       getDevicesLocationPageNo: 0,
       markersFound: 0,
       showMarkers: false,
+      refresh_map: true,
       deviceMarkers: [],
       center: [118.848765, 28.979693],
       styles: {
@@ -116,6 +118,12 @@ export default {
             this.getDevicesLocationPages = 1
             this.getDevicesLocationPageNo = 0
             console.log('markersFound', this.markersFound)
+            // refresh map to make sure it is displayed, by hide and show
+            this.refresh_map = false
+            this.$nextTick(() => {
+                this.refresh_map = true
+              }
+            )
           } else {
             this.getDeviceLocation(arg, page_no + 1)
           }

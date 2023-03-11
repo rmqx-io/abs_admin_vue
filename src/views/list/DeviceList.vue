@@ -361,6 +361,7 @@
         :zoom="4"
         cache-key="marker-cluster-map"
         async
+        v-if="refresh_map"
       >
         <!--        <template>-->
         <!--          <amap-marker-->
@@ -1049,6 +1050,12 @@ export default {
         if (this.deviceMarkers.length === 0) {
           this.refreshTable(true)
         }
+        // fresh map to make sure it is displayed, by hide and show
+        this.refresh_map = false
+        this.$nextTick(() => {
+            this.refresh_map = true
+          }
+        )
       } else if (tab === 'alarm') {
         console.log('show alarm')
         this.showTableTab = false
