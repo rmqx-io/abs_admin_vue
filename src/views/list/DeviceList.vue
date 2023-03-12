@@ -1121,7 +1121,7 @@ export default {
 .popup {
   position: absolute;
   z-index: 1;
-  width: 100%;
-  backgroud-color: #fff;
+  width: 90%;
+  margin: 10px;
 }
 </style>
