@@ -375,7 +375,20 @@
           key="custom-cluster"
           :grid-size="options.gridSize"
           :average-center="options.averageCenter"
+          :marker-options="getMarkerOptions"
         >
+          <template slot-scope="record" slot="marker">
+            <a-tooltip>
+              <template #title>
+                <div>
+                  <p>设备编号：{{ record.device.code }}</p>
+                  <p>电池编号：{{ record.device.bms_bt }}</p>
+                  <p>定位时间：{{ record.device.location_time }}</p>
+                </div>
+              </template>
+              <div class="custom-marker" />
+            </a-tooltip>
+          </template>
         </amap-marker-cluster>
       </amap>
     </div>
@@ -963,7 +976,7 @@ export default {
               this.markersFound += 1
               this.deviceMarkers.push({
                 lnglat: [item.last_location_lng, item.last_location_lat],
-                title: item.code
+                device: item
               })
             }
           })
@@ -1050,7 +1063,7 @@ export default {
         if (this.deviceMarkers.length === 0) {
           this.refreshTable(true)
         }
-        // fresh map to make sure it is displayed, by hide and show
+        // refresh map to make sure it is displayed, by hide and show
         this.refresh_map = false
         this.$nextTick(() => {
             this.refresh_map = true
@@ -1088,10 +1101,16 @@ export default {
       }
     },
     getMarkerOptions (point) {
+      console.log('getMarkerOptions', point)
       return {
-        offset: [-16, -37],
-        url: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png'
+        // position: point.lnglat,
+        offset: [-15, -15]
+        // content: '<div class="custom-marker" />',
       }
+      // return {
+      //   offset: [-16, -37],
+      //   url: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png'
+      // }
       // return {
       //   position: point.lnglat,
       //   offset: [-15, -15],
@@ -1121,7 +1140,14 @@ export default {
 .popup {
   position: absolute;
   z-index: 1;
-  width: 90%;
-  margin: 10px;
+}
+.custom-marker {
+  background-color: hsla(180, 100%, 50%, 0.7);
+  height: 24px;
+  width: 24px;
+  border: 1px solid hsl(180, 100%, 40%);
+  border-radius: 12px;
+  box-shadow: hsl(180, 100%, 50%) 0px 0px 1px;
+  text-align: center;
 }
 </style>
