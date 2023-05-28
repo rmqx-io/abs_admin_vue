@@ -41,5 +41,6 @@ export default {
   'menu.user': '用户管理',
   'menu.model': '类型管理',
   'menu.device-model': '设备类型',
-  'menu.battery-model': '电池类型'
+  'menu.battery-model': '电池类型',
+  'menu.ota': 'OTA管理'
 }

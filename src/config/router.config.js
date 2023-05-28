@@ -74,6 +74,23 @@ export const asyncRouterMap = [
           }
         ]
       },
+      // OTA
+      {
+        path: '/ota',
+        name: 'ota',
+        component: RouteView,
+        redirect: '/ota/ota-list',
+        meta: { title: 'menu.ota', icon: 'cloud-download', permission: ['table'] },
+        children: [
+          {
+            path: '/ota/ota-list/:page_no([1-9]\\d*)?',
+            name: 'OtaList',
+            hideChildrenInMenu: true,
+            component: () => import('@/views/ota/OtaList'),
+            meta: { title: 'menu.ota', keepAlive: true, permission: ['table'] }
+          }
+        ]
+      },
       {
         path: '/org',
         name: 'org',
@@ -93,6 +110,12 @@ export const asyncRouterMap = [
             name: 'setting_user',
             component: () => import('@/views/setting/User'),
             meta: { title: '账号管理', keepAlive: true, permission: ['table'] }
+          },
+          {
+            path: '/setting/app_user',
+            name: 'app_user',
+            component: () => import('@/views/setting/AppUser'),
+            meta: { title: 'App 账号管理', keepAlive: true, permission: ['table'] }
           }
         ]
       },

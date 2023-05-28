@@ -1,20 +1,25 @@
 import antd from 'ant-design-vue/es/locale-provider/zh_CN'
 import momentCN from 'moment/locale/zh-cn'
-import global from './zh-CN/global'
+import global from './global'
 
-import menu from './zh-CN/menu'
-import setting from './zh-CN/setting'
-import user from './zh-CN/user'
-import dashboard from './zh-CN/dashboard'
-import form from './zh-CN/form'
-import result from './zh-CN/result'
-import account from './zh-CN/account'
-import device from './zh-CN/device'
+import menu from './menu'
+import setting from './setting'
+import user from './user'
+import dashboard from './dashboard'
+import form from './form'
+import result from './result'
+import account from './account'
+import device from './device'
 
 const components = {
   antLocale: antd,
-  momentName: 'zh-cn',
-  momentLocale: momentCN
+  momentName: 'zh-CN',
+  momentLocale: momentCN,
+  'total': '全部',
+  'status': '状态',
+  'online': '在线',
+  'offline': '离线',
+  'standby': '待机'
 }
 
 export default {

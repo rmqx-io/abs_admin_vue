@@ -1,6 +1,6 @@
 export default {
   'dashboard.device.device': '设备',
-  'dashboard.device.total': '设备总数',
+  'device.total': '设备总数',
   'dashboard.device.online': '在线设备',
   'dashboard.device.offline': '离线设备',
   'dashboard.device.standby': '待机设备',
