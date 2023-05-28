@@ -43,7 +43,10 @@ Vue.component('page-header-wrapper', PageHeaderWrapper)
 
 // 初始化vue-amap
 AmapVue.config.version = '2.0' // 默认2.0，这里可以不修改
-AmapVue.config.key = '5817d32d7eb114d90df69cbf22cf1c87'
+// AmapVue.config.key = '5817d32d7eb114d90df69cbf22cf1c87'
+// AmapVue.config.key = '5817d32d7eb114d90df69cbf22cf1c87'
+// AmapVue.config.key = 'c5329a28ee7609e3832c02bb6317aff8'
+AmapVue.config.key = 'e13456422e8fe93451cf2201f4db84bd'
 AmapVue.config.plugins = [
   'AMap.Autocomplete',
   'AMap.PlaceSearch',
