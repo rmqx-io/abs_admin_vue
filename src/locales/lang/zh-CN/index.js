@@ -15,11 +15,11 @@ const components = {
   antLocale: antd,
   momentName: 'zh-CN',
   momentLocale: momentCN,
-  'total': '全部',
-  'status': '状态',
-  'online': '在线',
-  'offline': '离线',
-  'standby': '待机'
+  'Total': '全部',
+  'Status': '状态',
+  'Online': '在线',
+  'Offline': '离线',
+  'Standby': '待机'
 }
 
 export default {

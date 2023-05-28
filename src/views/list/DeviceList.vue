@@ -29,12 +29,12 @@
       <a-form>
         <a-row :gutter="48">
           <a-col :md="8" :sm="24">
-            <a-form-item :label="$t('status')">
+            <a-form-item :label="$t('Status')">
               <a-radio-group v-model="deviceStatus" @change="onDeviceStatusChange">
-                <a-radio-button value="total">{{ $t('total') }} ({{ this.statusCount.total }})</a-radio-button>
-                <a-radio-button value="online">{{ $t('online') }} ({{ this.statusCount.online }})</a-radio-button>
-                <a-radio-button value="offline">{{ $t('offline') }} ({{ this.statusCount.offline }})</a-radio-button>
-                <a-radio-button value="standby">{{ $t('standby' ) }} ({{ this.statusCount.standby }})</a-radio-button>
+                <a-radio-button value="total">{{ $t('Total') }} ({{ this.statusCount.total }})</a-radio-button>
+                <a-radio-button value="online">{{ $t('Online') }} ({{ this.statusCount.online }})</a-radio-button>
+                <a-radio-button value="offline">{{ $t('Offline') }} ({{ this.statusCount.offline }})</a-radio-button>
+                <a-radio-button value="standby">{{ $t('Standby' ) }} ({{ this.statusCount.standby }})</a-radio-button>
               </a-radio-group>
             </a-form-item>
           </a-col>
