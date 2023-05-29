@@ -7,22 +7,13 @@
         @change="onTabChange"
       >
         <a-tab-pane key="table">
-          <template #tab>
-            <a-icon type="table" />
-            <span>表格</span>
-          </template>
+          <template #tab><a-icon type="table" /><span>表格</span></template>
         </a-tab-pane>
         <a-tab-pane key="map">
-          <template #tab>
-            <a-icon type="environment" />
-            <span>地图</span>
-          </template>
+          <template #tab><a-icon type="environment" /><span>地图</span></template>
         </a-tab-pane>
         <a-tab-pane key="alarm">
-          <template #tab>
-            <a-icon type="warning" />
-            <span>告警</span>
-          </template>
+          <template #tab><a-icon type="warning" /><span>告警</span></template>
         </a-tab-pane>
       </a-tabs>
 
@@ -38,13 +29,9 @@
               </a-radio-group>
             </a-form-item>
           </a-col>
+          <a-col :md="4" :sm="12"><a-form-item :label="$t('No')"><a-input v-model="queryData.device_id" placeholder=""/></a-form-item></a-col>
           <a-col :md="4" :sm="12">
-            <a-form-item label="编号">
-              <a-input v-model="queryData.device_id" placeholder=""/>
-            </a-form-item>
-          </a-col>
-          <a-col :md="4" :sm="12">
-            <a-form-item label="运营单位">
+            <a-form-item :label="$t('Organization')">
               <a-tree-select
                 show-search
                 tree-default-expand-all
@@ -54,45 +41,26 @@
               ></a-tree-select>
             </a-form-item>
           </a-col>
-          <!--            <a-col :md="8" :sm="24">-->
-          <!--              <a-form-item label="使用状态">-->
-          <!--                <a-select v-model="queryParam.status" placeholder="请选择" default-value="0">-->
-          <!--                  <a-select-option value="0">全部</a-select-option>-->
-          <!--                  <a-select-option value="1">关闭</a-select-option>-->
-          <!--                  <a-select-option value="2">运行中</a-select-option>-->
-          <!--                </a-select>-->
-          <!--              </a-form-item>-->
-          <!--            </a-col>-->
-          <!--            <template v-if="advanced">-->
-          <!--              <a-col :md="8" :sm="24">-->
-          <!--                <a-form-item label="调用次数">-->
-          <!--                  <a-input-number v-model="queryParam.callNo" style="width: 100%"/>-->
-          <!--                </a-form-item>-->
-          <!--              </a-col>-->
-          <!--              <a-col :md="8" :sm="24">-->
-          <!--                <a-form-item label="更新日期">-->
-          <!--                  <a-date-picker v-model="queryParam.date" style="width: 100%" placeholder="请输入更新日期"/>-->
-          <!--                </a-form-item>-->
-          <!--              </a-col>-->
-          <!--              <a-col :md="8" :sm="24">-->
-          <!--                <a-form-item label="使用状态">-->
-          <!--                  <a-select v-model="queryParam.useStatus" placeholder="请选择" default-value="0">-->
-          <!--                    <a-select-option value="0">全部</a-select-option>-->
-          <!--                    <a-select-option value="1">关闭</a-select-option>-->
-          <!--                    <a-select-option value="2">运行中</a-select-option>-->
-          <!--                  </a-select>-->
-          <!--                </a-form-item>-->
-          <!--              </a-col>-->
-          <!--              <a-col :md="8" :sm="24">-->
-          <!--                <a-form-item label="使用状态">-->
-          <!--                  <a-select placeholder="请选择" default-value="0">-->
-          <!--                    <a-select-option value="0">全部</a-select-option>-->
-          <!--                    <a-select-option value="1">关闭</a-select-option>-->
-          <!--                    <a-select-option value="2">运行中</a-select-option>-->
-          <!--                  </a-select>-->
-          <!--                </a-form-item>-->
-          <!--              </a-col>-->
-          <!--            </template>-->
+          <a-col :md='4' :sm='12'>
+            <div v-if='!showMoreParam' style='margin-bottom: 10px'>
+              <a class="ant-dropdown-link" @click='showMoreParam = true'>更多参数<a-icon type="down"/></a>
+            </div>
+            <div v-if='showMoreParam'>
+              <a
+                class="ant-dropdown-link"
+                @click='() => { showMoreParam = false; queryData.bt_code = ""; queryData.iccid = ""; queryData.soh = ""; queryData.soc = ""; queryData.alarm = "" }'
+              >收起参数<a-icon type="up"/></a>
+            </div>
+          </a-col>
+        </a-row>
+        <a-row :gutter='48'>
+          <div v-if='showMoreParam'>
+            <a-col :md='4' :sm='12'><a-form-item :label="$t('BT Code')"><a-input v-model="queryData.bt_code" placeholder=""/></a-form-item></a-col>
+            <a-col :md='4' :sm='12'><a-form-item :label="$t('ICCID')"><a-input v-model="queryData.iccid" placeholder=""/></a-form-item></a-col>
+            <a-col :md='4' :sm='12'><a-form-item :label="$t('SOH')"><a-input v-model="queryData.soh" placeholder=""/></a-form-item></a-col>
+            <a-col :md='4' :sm='12'><a-form-item :label="$t('SOC')"><a-input v-model="queryData.soc" placeholder=""/></a-form-item></a-col>
+<!--            <a-col :md='4' :sm='12'><a-form-item :label="$t('Alarm')"><a-input v-model="queryData.alarm" placeholder=""/></a-form-item></a-col>-->
+          </div>
         </a-row>
         <a-row>
           <a-col v-if="!showAlarm" :md="!advanced && 8 || 12" :sm="12">
@@ -405,7 +373,8 @@
 <!--  </page-header-wrapper>-->
 </template>
 
-<script>
+<script>var showMoreParam
+
 // import VueAMap from 'vue-amap'
 import moment from 'moment'
 import { STable, Ellipsis } from '@/components'
@@ -427,12 +396,13 @@ import storage from 'store'
 import { ROLE } from '@/store/mutation-types'
 import DeviceAlarm from '@/views/list/components/DeviceAlarm'
 
-function interpolate (u, begin, end) {
+function interpolate(u, begin, end) {
   if (u < 0) u = 0
   if (u > 1) u = 1
   u = Math.pow(u, 1 / 10)
   return u * (end - begin) + begin
 }
+
 // let amapManager = new VueAMap.AMapManager()
 
 const columns = [
@@ -555,7 +525,7 @@ export default {
     StepByStepModal,
     BatteryInfo
   },
-  data () {
+  data() {
     this.columns = columns
     return {
       activeTab: 'table',
@@ -643,8 +613,14 @@ export default {
         page_size: 5,
         start_date: moment(new Date() - 2 * 60 * 60 * 1000),
         start_time: moment(new Date() - 2 * 60 * 60 * 1000),
-        organization_id: null
+        organization_id: null,
+        bt_code: null,
+        iccid: null,
+        soh: null,
+        soc: null,
+        alarm: null
       },
+      showMoreParam: false,
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
         const arg = Object.assign(parameter, this.queryData)
@@ -682,14 +658,14 @@ export default {
     }
   },
   filters: {
-    statusFilter (type) {
+    statusFilter(type) {
       return statusMap[type].text
     },
-    statusTypeFilter (type) {
+    statusTypeFilter(type) {
       return statusMap[type].status
     }
   },
-  created () {
+  created() {
     // getRoleList({ t: new Date() })
     const role = storage.get(ROLE)
     console.log('role', role)
@@ -697,7 +673,7 @@ export default {
       this.is_sysadmin = true
     }
   },
-  mounted () {
+  mounted() {
     // console.log('mounted', this.$route)
     if (this.$route.query.device_id) {
       this.queryData.device_id = this.$route.query.device_id
@@ -709,7 +685,7 @@ export default {
     this.getAdminOrgList()
   },
   computed: {
-    rowSelection () {
+    rowSelection() {
       return {
         selectedRowKeys: this.selectedRowKeys,
         onChange: this.onSelectChange
@@ -729,24 +705,24 @@ export default {
     // }
   },
   methods: {
-    handleAdd () {
+    handleAdd() {
       console.log('handle add')
       this.device_create_form_data = null
       this.device_create_form_visible = true
     },
-    handleBatchCommandManager () {
+    handleBatchCommandManager() {
       this.showBatchCommandManager = true
       // after 1s refresh
       setTimeout(() => {
         this.$refs.sendCommandManager.refresh()
       }, 100)
     },
-    handleEdit (record) {
+    handleEdit(record) {
       console.log('handleEdit', record)
       this.device_create_form_visible = true
       this.device_create_form_data = { ...record }
     },
-    handleCreateFormOk () {
+    handleCreateFormOk() {
       const form = this.$refs.createModal.form
       this.confirmLoading = true
       form.validateFields((errors, values) => {
@@ -808,41 +784,41 @@ export default {
         }
       })
     },
-    handleCreateFormCancel () {
+    handleCreateFormCancel() {
       console.log('handle cancel')
       this.device_create_form_visible = false
 
       const form = this.$refs.createModal.form
       form.resetFields() // 清理表单数据（可不做）
     },
-    handleBatteryInfoCancel () {
+    handleBatteryInfoCancel() {
       this.battery_detail_visible = false
       this.table_visible = true
     },
-    handleSendCommandFormCancel () {
+    handleSendCommandFormCancel() {
       this.send_command_form_visible = false
     },
-    handleSendCommandFormOk () {
+    handleSendCommandFormOk() {
 
     },
-    handleSendCommandManagerCancel () {
+    handleSendCommandManagerCancel() {
       this.showBatchCommandManager = false
     },
-    handleSendCommandManagerOk () {
+    handleSendCommandManagerOk() {
       this.showBatchCommandManager = false
     },
-    handleBatteryInfoOk () {
+    handleBatteryInfoOk() {
       this.battery_detail_visible = false
       this.table_visible = true
     },
-    handleSub (record) {
+    handleSub(record) {
       if (record.status !== 0) {
         this.$message.info(`${record.no} 订阅成功`)
       } else {
         this.$message.error(`${record.no} 订阅失败，规则已关闭`)
       }
     },
-    handleBatteryInfo (record) {
+    handleBatteryInfo(record) {
       // this.$router.push({ path: '/list/table-list/info/1' })
       this.device_id = record.code
       this.bms_bt = record.bms_bt
@@ -857,35 +833,35 @@ export default {
       })
       // this.$refs.batteryInfo.getBatteryInfo(record.code)
     },
-    onSelectChange (selectedRowKeys, selectedRows) {
+    onSelectChange(selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
     },
-    toggleAdvanced () {
+    toggleAdvanced() {
       this.advanced = !this.advanced
     },
-    resetSearchForm () {
+    resetSearchForm() {
       this.queryParam = {
         date: moment(new Date())
       }
     },
-    handleMapClose () {
+    handleMapClose() {
       this.map_visible = false
       this.table_visible = true
     },
-    handleMap (record) {
+    handleMap(record) {
       this.device_id = record.code
       this.map_visible = true
       this.table_visible = false
       this.refreshMap(record.code)
     },
-    handleSendCommand (record) {
+    handleSendCommand(record) {
       this.device_id = record.code
       this.device_ids = [{ 'deviceId': record.code }]
       console.log('send command')
       this.send_command_form_visible = true
     },
-    handleRefreshOnlineStatus (record) {
+    handleRefreshOnlineStatus(record) {
       console.log('refresh online status')
       refreshOnlineStatus(record.code)
         .then(res => {
@@ -902,14 +878,14 @@ export default {
         this.$message.error(err.data.message)
       })
     },
-    handleSendCommandBatch () {
+    handleSendCommandBatch() {
       this.device_ids = this.selectedRows.map(item => {
         return { 'deviceId': item.code }
       })
       console.log('send command batch')
       this.send_command_form_visible = true
     },
-    refreshMap (deviceId) {
+    refreshMap(deviceId) {
       this.map_loading = true
       const arg = this.queryData
       console.log('loadData request arg:', arg)
@@ -944,12 +920,12 @@ export default {
           )
         })
     },
-    filterTreeNode (input, option) {
+    filterTreeNode(input, option) {
       return (
         option.data.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0
       )
     },
-    getAdminOrgList () {
+    getAdminOrgList() {
       return getAdminOrgTree(this.queryParam)
         .then(res => {
           console.log('org list', res)
@@ -957,7 +933,7 @@ export default {
           this.orgList.push(res.data)
         })
     },
-    getDeviceLocation (arg, page_no) {
+    getDeviceLocation(arg, page_no) {
       // get all device location
       console.log('loadData request arg:', arg)
       arg.page_no = page_no
@@ -990,7 +966,7 @@ export default {
           }
         })
     },
-    refreshTable (param) {
+    refreshTable(param) {
       if (this.$refs.table) {
         this.$refs.table.refresh(param)
       }
@@ -1018,7 +994,7 @@ export default {
         this.$refs.alarm.query()
       }
     },
-    getStatusCount () {
+    getStatusCount() {
       console.log('query data', this.queryData)
       if (this.queryData.device_id === '') {
         this.queryData.device_id = null
@@ -1035,7 +1011,7 @@ export default {
           this.statusCount = res.data
         })
     },
-    onMapChange () {
+    onMapChange() {
       console.log('map change', this.showMap)
       this.table_visible = !this.showMap
       if (this.showMap) {
@@ -1045,14 +1021,14 @@ export default {
         }
       }
     },
-    onAlarmChange () {
+    onAlarmChange() {
       console.log('alarm change', this.showAlarm)
     },
-    onDeviceStatusChange () {
+    onDeviceStatusChange() {
       console.log('device status change', this.deviceStatus)
       this.refreshTable(true)
     },
-    onTabChange (tab) {
+    onTabChange(tab) {
       console.log('tab change', tab)
       if (tab === 'map') {
         console.log('show map')
@@ -1083,7 +1059,7 @@ export default {
         this.showAlarm = false
       }
     },
-    getClusterStyle (context) {
+    getClusterStyle(context) {
       const u = context.count / this.data.length
       const hue = ~~interpolate(u, 90, 0)
       const size = ~~interpolate(u, 30, 50)
@@ -1100,7 +1076,7 @@ export default {
         textAlign: 'center'
       }
     },
-    getMarkerOptions (point) {
+    getMarkerOptions(point) {
       console.log('getMarkerOptions', point)
       return {
         // position: point.lnglat,
@@ -1117,7 +1093,7 @@ export default {
       //   content: 'abc'
       // }
     },
-    getClusterOptions (context) {
+    getClusterOptions(context) {
       return {
         gridSize: 80,
         minClusterSize: 2
@@ -1129,7 +1105,7 @@ export default {
       //   offset: [-size / 2, -size / 2]
       // }
     },
-    localTime (time) {
+    localTime(time) {
       return moment.utc(time).local().format('YYYY-MM-DD HH:mm:ss')
     }
   }

@@ -19,7 +19,11 @@ const components = {
   'Status': '状态',
   'Online': '在线',
   'Offline': '离线',
-  'Standby': '待机'
+  'Standby': '待机',
+  'No': '编号',
+  'Organization': '运营单位',
+  'BT Code': 'BT码',
+  'Alarm': '告警'
 }
 
 export default {
