@@ -7,7 +7,7 @@
         @change="onTabChange"
       >
         <a-tab-pane key="table">
-          <template #tab><a-icon type="table" /><span>表格</span></template>
+          <template #tab><a-icon type="table" /><span>列表</span></template>
         </a-tab-pane>
         <a-tab-pane key="map">
           <template #tab><a-icon type="environment" /><span>地图</span></template>
@@ -85,6 +85,8 @@
       <div v-if="table_visible" class="table-operator">
         <a-button type='primary' icon='plus' @click='handleAdd'>添加</a-button>
         <a-button type='primary' @click='handleBatchCommandManager'>下发指令管理</a-button>
+        <a-button type='primary' @click='handleExport'>导出</a-button>
+        <a-button type='primary' @click='handleImport'>导入</a-button>
         <a-dropdown v-action:edit v-if='selectedRowKeys.length > 0'>
           <a-menu slot='overlay'>
             <a-menu-item key='send-command' @click='handleSendCommandBatch'>
@@ -135,6 +137,16 @@
             组织: <span>{{ record.organization_name }}</span>
             <br />
             仓库: <span>{{ record.storehouse_name }}</span>
+          </template>
+        </span>
+
+        <span slot="bms_info" slot-scope="text, record">
+          <template>
+            SOC: <span>{{ record.bms_soc }}</span>
+            <br />
+            SOH: <span>{{ record.bms_soh }}</span>
+            <br />
+            循环次数: <span>{{ record.bms_battery_cycle}}</span>
           </template>
         </span>
 
@@ -419,6 +431,11 @@ const columns = [
     title: '组织信息',
     dataIndex: 'organization_name',
     scopedSlots: { customRender: 'organization_info' }
+  },
+  {
+    title: 'BMS',
+    dataIndex: 'bms',
+    scopedSlots: { customRender: 'bms_info' }
   },
   {
     title: '设备型号',
@@ -716,6 +733,12 @@ export default {
       setTimeout(() => {
         this.$refs.sendCommandManager.refresh()
       }, 100)
+    },
+    handleExport() {
+      console.log('handleExport')
+    },
+    handleImport() {
+      console.log('handleImport')
     },
     handleEdit(record) {
       console.log('handleEdit', record)

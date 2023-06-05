@@ -49,12 +49,12 @@
               </a-dropdown>
             </a-form-item>
           </a-col>
-          <a-col :md="4" :sm="12">
+          <a-col :md="8" :sm="12">
             <a-form-item label='开始时间'>
               <a-date-picker v-model="queryData.start_date" show-time format="YYYY-MM-DD HH:mm:ss" placeholder="起始时间"/>
             </a-form-item>
           </a-col>
-          <a-col :md="4" :sm="12">
+          <a-col :md="8" :sm="12">
             <a-form-item label='结束时间'>
               <a-date-picker v-model="queryData.end_date" show-time format="YYYY-MM-DD HH:mm:ss" placeholder="结束时间"/>
             </a-form-item>
