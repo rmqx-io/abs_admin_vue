@@ -1,6 +1,12 @@
 <template>
   <!--  <page-header-wrapper>-->
   <a-card :bordered="false" :bodyStyle="{ padding: '16px 16px', height: '100%' }" :style="{ height: '100%' }">
+    <a-spin v-if='showExporting' tip="导出中...">
+      <a-alert
+        message="导出设备"
+        description="导出选中的设备"
+      ></a-alert>
+    </a-spin>
     <div class="table-page-search-wrapper">
       <a-tabs
         v-model="activeTab"
@@ -638,6 +644,7 @@ export default {
         alarm: null
       },
       showMoreParam: false,
+      showExporting: false,
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
         const arg = Object.assign(parameter, this.queryData)
@@ -722,19 +729,19 @@ export default {
     // }
   },
   methods: {
-    handleAdd() {
+    handleAdd () {
       console.log('handle add')
       this.device_create_form_data = null
       this.device_create_form_visible = true
     },
-    handleBatchCommandManager() {
+    handleBatchCommandManager () {
       this.showBatchCommandManager = true
       // after 1s refresh
       setTimeout(() => {
         this.$refs.sendCommandManager.refresh()
       }, 100)
     },
-    handleExport() {
+    handleExport () {
       console.log('handleExport')
       const arg = Object.assign({}, this.queryData)
       arg.page_no = arg.pageNo
@@ -745,6 +752,7 @@ export default {
       if (this.deviceStatus) {
         arg.device_status = this.deviceStatus
       }
+      this.showExporting = true
       getExportDeviceList(arg).then(res => {
         // console.log('exportDeviceList', res)
         const url = window.URL.createObjectURL(new Blob([res]))
@@ -754,12 +762,18 @@ export default {
         link.setAttribute('download', 'export.csv')
         document.body.appendChild(link)
         link.click()
+        document.body.removeChild(link)
+      }).catch(err => {
+        console.log('exportDeviceList', err)
+        this.$message.error(err.data.message)
+      }).finally(() => {
+        this.showExporting = false
       })
     },
-    handleImport() {
+    handleImport () {
       console.log('handleImport')
     },
-    handleEdit(record) {
+    handleEdit (record) {
       console.log('handleEdit', record)
       this.device_create_form_visible = true
       this.device_create_form_data = { ...record }
