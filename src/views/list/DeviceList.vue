@@ -391,9 +391,9 @@
 import moment from 'moment'
 import { STable, Ellipsis } from '@/components'
 import {
-  addDevice,
+  addDevice, exportDeviceList,
   getAdminOrgTree,
-  getDeviceList,
+  getDeviceList, getExportDeviceList,
   getLocation,
   getStatusCount, refreshOnlineStatus,
   updateDevice
@@ -736,6 +736,25 @@ export default {
     },
     handleExport() {
       console.log('handleExport')
+      const arg = Object.assign({}, this.queryData)
+      arg.page_no = arg.pageNo
+      arg.page_size = arg.pageSize
+      arg.location_only = false
+      delete arg.pageNo
+      delete arg.pageSize
+      if (this.deviceStatus) {
+        arg.device_status = this.deviceStatus
+      }
+      getExportDeviceList(arg).then(res => {
+        // console.log('exportDeviceList', res)
+        const url = window.URL.createObjectURL(new Blob([res]))
+        const link = document.createElement('a')
+        link.style.display = 'none'
+        link.href = url
+        link.setAttribute('download', 'export.csv')
+        document.body.appendChild(link)
+        link.click()
+      })
     },
     handleImport() {
       console.log('handleImport')

@@ -29,6 +29,7 @@ const api = {
   role: '/admin/role',
   service: '/service',
   device: '/admin/device',
+  device_export: '/admin/device/export',
   device_alarm: '/admin/device/alarm',
   bms_alarm_count: '/admin/device/alarm/bms/count',
   device_alarm_types: '/admin/device/alarm/type',
@@ -93,6 +94,22 @@ export function getDeviceList (arg) {
     url: api.device,
     method: 'post',
     data: arg
+  })
+}
+
+export function exportDeviceList (arg) {
+  return request({
+    url: api.device_export,
+    method: 'post',
+    data: arg
+  })
+}
+
+export function getExportDeviceList (parameters) {
+  return request({
+    url: api.device_export,
+    method: 'get',
+    params: parameters
   })
 }
 
