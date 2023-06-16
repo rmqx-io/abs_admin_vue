@@ -224,11 +224,13 @@ export default {
         })
     },
     device_type_name (type) {
-      if (type === 227) {
-        return '弗铭'
-      } else {
-        return type
-      }
+      const hexString = type.toString(16);
+      return '0x' + hexString + ' (' + type + ')'
+      // if (type === 227) {
+      //   return '弗铭'
+      // } else {
+      //   return type
+      // }
     },
     alarm_name (alarm) {
       let alarmName = ''

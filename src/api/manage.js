@@ -35,6 +35,7 @@ const api = {
   device_alarm_types: '/admin/device/alarm/type',
   add_device: '/admin/device/add',
   update_device: '/admin/device/update',
+  device_packet_log: '/admin/device/packet/log',
 
   org: '/admin/org',
   add_org: '/admin/org/add',
@@ -148,6 +149,14 @@ export function updateDevice (arg) {
   return request({
     url: api.update_device,
     method: 'post',
+    data: arg
+  })
+}
+
+export function getDevicePacketLog (deviceId, arg) {
+  return request({
+    url: api.device_packet_log + '/' + deviceId,
+    method: 'get',
     data: arg
   })
 }

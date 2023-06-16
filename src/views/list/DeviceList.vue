@@ -210,6 +210,9 @@
                   <a @click="handleSendCommand(record)">下发指令</a>
                 </a-menu-item>
                 <a-menu-item>
+                  <a @click="handleProtocolLog(record)">协议日志</a>
+                </a-menu-item>
+                <a-menu-item>
                   <a @click='handleRefreshOnlineStatus(record)'>刷新在线状态</a>
                 </a-menu-item>
               </a-menu>
@@ -245,6 +248,16 @@
         @cancel="handleSendCommandManagerCancel"
         @ok="handleSendCommandManagerOk"
       />
+
+      <protocol-log
+        ref="protocolLog"
+        :visible="protocol_log_visible"
+        :loading="false"
+        :devcie-id="device_id"
+        @cancel="handleProtocolLogCancel"
+        @ok="handleProtocolLogOk"
+      />
+
       <step-by-step-modal v-if="table_visible" ref="modal" @ok="handleCreateFormOk"/>
 
       <battery-info
@@ -391,7 +404,8 @@
 <!--  </page-header-wrapper>-->
 </template>
 
-<script>var showMoreParam
+<script>
+var showMoreParam
 
 // import VueAMap from 'vue-amap'
 import moment from 'moment'
@@ -413,6 +427,7 @@ import BatteryInfo from '@/views/list/components/BatteryInfo'
 import storage from 'store'
 import { ROLE } from '@/store/mutation-types'
 import DeviceAlarm from '@/views/list/components/DeviceAlarm'
+import ProtocolLog from '@/views/list/components/ProtocolLog'
 
 function interpolate(u, begin, end) {
   if (u < 0) u = 0
@@ -546,7 +561,8 @@ export default {
     CreateForm,
     SendCommandForm,
     StepByStepModal,
-    BatteryInfo
+    BatteryInfo,
+    ProtocolLog
   },
   data() {
     this.columns = columns
@@ -609,6 +625,7 @@ export default {
       showTableTab: true,
       showAlarm: false,
       send_command_form_visible: false,
+      protocol_log_visible: false,
       battery_detail_visible: false,
       map_visible: false,
       confirmLoading: false,
@@ -860,6 +877,12 @@ export default {
     handleSendCommandManagerCancel() {
       this.showBatchCommandManager = false
     },
+    handleProtocolLogCancel () {
+      this.protocol_log_visible = false
+    },
+    handleProtocolLogOk () {
+      this.protocol_log_visible = false
+    },
     handleSendCommandManagerOk() {
       this.showBatchCommandManager = false
     },
@@ -916,6 +939,11 @@ export default {
       this.device_ids = [{ 'deviceId': record.code }]
       console.log('send command')
       this.send_command_form_visible = true
+    },
+    handleProtocolLog (record) {
+      console.log('handleProtocolLog')
+      this.device_id = record.code
+      this.protocol_log_visible = true
     },
     handleRefreshOnlineStatus(record) {
       console.log('refresh online status')
