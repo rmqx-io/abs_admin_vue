@@ -249,14 +249,25 @@
         @ok="handleSendCommandManagerOk"
       />
 
-      <protocol-log
-        ref="protocolLog"
-        :visible="protocol_log_visible"
-        :loading="false"
-        :devcie-id="device_id"
-        @cancel="handleProtocolLogCancel"
-        @ok="handleProtocolLogOk"
-      />
+      <div style='width: 100%'>
+        <Modal
+          v-model='protocol_log_visible'
+          title='协议日志'
+          @cancel='handleProtocolLogCancel'
+          modal-class="fullscreen-modal"
+        >
+          <protocol-log ref='protocolLog' :device-id='device_id' :visible='protocol_log_visible'/>
+        </Modal>
+      </div>
+
+<!--      <protocol-log-->
+<!--        ref="protocolLog"-->
+<!--        :visible="protocol_log_visible"-->
+<!--        :loading="false"-->
+<!--        :devcie-id="device_id"-->
+<!--        @cancel="handleProtocolLogCancel"-->
+<!--        @ok="handleProtocolLogOk"-->
+<!--      />-->
 
       <step-by-step-modal v-if="table_visible" ref="modal" @ok="handleCreateFormOk"/>
 
@@ -1197,6 +1208,7 @@ export default {
 </script>
 
 <style lang='scss' scoped>
+@import '~animate.css/animate.css';
 .popup {
   position: absolute;
   z-index: 1;
@@ -1209,5 +1221,35 @@ export default {
   border-radius: 12px;
   box-shadow: hsl(180, 100%, 50%) 0px 0px 1px;
   text-align: center;
+}
+.fullscreen-modal {
+  width: 100%;
+  max-width: 100%;
+  top: 0;
+  margin: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.fullscreen-modal .vm-titlebar {
+  flex-shrink: 0;
+}
+.fullscreen-modal .vm-content {
+  padding: 0;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.fullscreen-modal .vm-content .scrollable-content {
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 15px 10px 15px;
+  flex-grow: 1;
+}
+.fullscreen-modal .fullscreen-modal-footer {
+  border-top: 1px solid #e5e5e5;
+  padding: 15px;
 }
 </style>

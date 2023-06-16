@@ -1,17 +1,8 @@
 <template>
-  <a-modal
-    title="协议日志"
-    :width="800"
-    :visible="visible"
-    :confirmLoading="loading"
-    @ok="() => { $emit('ok') }"
-    @cancel="() => { $emit('cancel') }"
-  >
-    <div>
-      <a-table :columns='columns' rowKey='id' :data='loadData'>
-      </a-table>
-    </div>
-  </a-modal>
+  <div>
+    <a-table :columns='columns' rowKey='id' :data='loadData'>
+    </a-table>
+  </div>
 </template>
 
 <script>

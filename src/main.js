@@ -11,6 +11,12 @@ import { VueAxios } from './utils/request'
 import ProLayout, { PageHeaderWrapper } from '@ant-design-vue/pro-layout'
 import themePluginConfig from '../config/themePluginConfig'
 
+import { MdTable, MdButton, MdContent, MdTabs, MdDialog } from 'vue-material/dist/components'
+import 'vue-material/dist/vue-material.min.css'
+import 'vue-material/dist/theme/default.css'
+import VueModal from '@kouts/vue-modal'
+import '@kouts/vue-modal/dist/vue-modal.css'
+
 // mock
 // WARNING: `mockjs` NOT SUPPORT `IE` PLEASE DO NOT USE IN `production` ENV.
 import './mock'
@@ -33,6 +39,13 @@ Vue.config.productionTip = false
 Vue.use(ElementUI, {
   size: 'small',
 })
+
+Vue.use(MdTable)
+Vue.use(MdButton)
+Vue.use(MdContent)
+Vue.use(MdTabs)
+Vue.use(MdDialog)
+Vue.component('Modal', VueModal)
 
 // mount axios to `Vue.$http` and `this.$http`
 Vue.use(VueAxios)
