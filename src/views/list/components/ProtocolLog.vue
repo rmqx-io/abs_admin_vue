@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class='scrollable-content'>
     <a-table :columns='columns' rowKey='id' :data='loadData'>
     </a-table>
   </div>
@@ -11,7 +11,7 @@ import { getDevicePacketLog } from '@/api/manage'
 export default {
   name: 'ProtocolLog',
   props: {
-    devcieId: { type: String, default: () => null },
+    deviceId: { type: String, default: () => null },
     visible: { type: Boolean, required: true },
     loading: { type: Boolean, default: () => false },
     model: { type: Object, default: () => null },
@@ -52,5 +52,39 @@ export default {
 </script>
 
 <style scoped>
-
+.vm {
+  width: 100%;
+  max-width: 100%;
+}
+.fullscreen-modal {
+  width: 100%;
+  max-width: 100%;
+  top: 0;
+  margin: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.fullscreen-modal .vm-titlebar {
+  flex-shrink: 0;
+}
+.fullscreen-modal .vm-content {
+  padding: 0;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.scrollable-content {
+  width: 100%;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 15px 10px 15px;
+  flex-grow: 1;
+}
+.fullscreen-modal .fullscreen-modal-footer {
+  border-top: 1px solid #e5e5e5;
+  padding: 15px;
+}
 </style>

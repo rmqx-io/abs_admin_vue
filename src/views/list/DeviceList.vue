@@ -249,16 +249,6 @@
         @ok="handleSendCommandManagerOk"
       />
 
-      <div style='width: 100%'>
-        <Modal
-          v-model='protocol_log_visible'
-          title='协议日志'
-          @cancel='handleProtocolLogCancel'
-          modal-class="fullscreen-modal"
-        >
-          <protocol-log ref='protocolLog' :device-id='device_id' :visible='protocol_log_visible'/>
-        </Modal>
-      </div>
 
 <!--      <protocol-log-->
 <!--        ref="protocolLog"-->
@@ -348,6 +338,22 @@
       </div>
     </div>
 
+    <div>
+      <Modal
+        v-model='protocol_log_visible'
+        title='协议日志'
+        modal-class="fullscreen-modal"
+      >
+        <protocol-log
+          ref='protocolLog'
+          :visible="protocol_log_visible"
+          :device-id='device_id'
+          @cancel='handleProtocolLogCancel'
+          @ok='handleProtocolLogOk'
+        />
+      </Modal>
+    </div>
+
     <div
       v-if="showMap"
       style="width: 100%; height: 70vh"
@@ -416,8 +422,6 @@
 </template>
 
 <script>
-var showMoreParam
-
 // import VueAMap from 'vue-amap'
 import moment from 'moment'
 import { STable, Ellipsis } from '@/components'
@@ -1207,7 +1211,7 @@ export default {
 }
 </script>
 
-<style lang='scss' scoped>
+<style>
 @import '~animate.css/animate.css';
 .popup {
   position: absolute;
@@ -1223,11 +1227,9 @@ export default {
   text-align: center;
 }
 .fullscreen-modal {
-  width: 100%;
-  max-width: 100%;
-  top: 0;
-  margin: 0;
-  height: 100%;
+  width: 95%;
+  max-width: 95%;
+  height: 95%;
   display: flex;
   flex-direction: column;
 }
