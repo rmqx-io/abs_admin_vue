@@ -1,6 +1,7 @@
 <template>
   <div class='scrollable-content'>
     <s-table
+      ref='packetLogTable'
       :columns='columns'
       rowKey='id'
       :data='loadData'
@@ -28,14 +29,16 @@
       </span>
     </s-table>
     <div class='pagination'>
-      <button>上一页</button>
-      <button>下一页</button>
+      <Button :disabled='currentPage === 1' @click='handleFirstPage()' >首页</Button>
+<!--      <Button :disabled='currentPage === 1' @click="handlePreviousPage()">上一页</Button>-->
+      <Button :disabled='hasMore === false' @click='handleNextPage()'>下一页</Button>
     </div>
   </div>
 </template>
 
 <script>
 import { STable, Ellipsis } from '@/components'
+import Button from 'ant-design-vue/lib/button'
 import { getDevicePacketLog } from '@/api/manage'
 import moment from 'moment'
 
@@ -43,7 +46,8 @@ export default {
   name: 'ProtocolLog',
   components: {
     STable,
-    Ellipsis
+    Ellipsis,
+    Button
   },
   props: {
     deviceId: { type: String, default: () => null },
@@ -71,6 +75,10 @@ export default {
       let arg = Object.assign(parameter, this.queryData)
       arg.page_no = arg.pageNo
       arg.page_size = arg.pageSize
+      if (this.cursor !== null) {
+        console.log('packet log cursor', this.cursor)
+        arg.cursor = this.cursor.join(',')
+      }
       delete arg.pageNo
       delete arg.pageSize
       return getDevicePacketLog(this.deviceId, arg)
@@ -92,7 +100,6 @@ export default {
         })
     },
     localTime (time) {
-      console.log('localTime', time)
       return moment.utc(time).local().format('YYYY-MM-DD HH:mm:ss')
     },
     byteArrayToHexArray (byteArray) {
@@ -102,6 +109,29 @@ export default {
         hexArray.push(hexValue)
       }
       return hexArray
+    },
+    refresh () {
+      if (this.currentPage === 1) {
+        this.cursor = null;
+      }
+      this.$refs.packetLogTable.refresh()
+    },
+    handleFirstPage () {
+      console.log('handleFirstPage')
+      this.currentPage = 1
+      this.cursor = null
+      this.refresh()
+    },
+    handlePreviousPage () {
+      console.log('handlePreviousPage')
+      if (this.currentPage > 1)  {
+        this.currentPage--
+      }
+    },
+    handleNextPage () {
+      console.log('handleNextPage')
+      this.currentPage++
+      this.refresh()
     }
   }
 }

@@ -153,11 +153,11 @@ export function updateDevice (arg) {
   })
 }
 
-export function getDevicePacketLog (deviceId, arg) {
+export function getDevicePacketLog (deviceId, parameter) {
   return request({
     url: api.device_packet_log + '/' + deviceId,
     method: 'get',
-    data: arg
+    params: parameter
   })
 }
 
