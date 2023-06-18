@@ -1,34 +1,71 @@
 <template>
   <div class='scrollable-content'>
-    <a-table :columns='columns' rowKey='id' :data='loadData'>
-    </a-table>
+    <s-table
+      :columns='columns'
+      rowKey='id'
+      :data='loadData'
+      showPagination='auto'
+    >
+      <span slot='time_tracking' slot-scope="text, record">
+        <template>
+          {{ record.time_tracking ? localTime(record.time_tracking) : ''}}
+        </template>
+      </span>
+      <span slot='command' slot-scope='text, record'>
+        <template>
+          {{ record.command ? '0x' + record.command.toString(16).padStart(4, '0') : '' }}
+        </template>
+      </span>
+      <span slot='upload' slot-scope='text, record'>
+        <template>
+          {{ record.upload ? '上行' : '下行' }}
+        </template>
+      </span>
+      <span slot='packet' slot-scope="text, record">
+        <template>
+          {{ byteArrayToHexArray(record.packet).join(' ') }}
+        </template>
+      </span>
+    </s-table>
+    <div class='pagination'>
+      <button>上一页</button>
+      <button>下一页</button>
+    </div>
   </div>
 </template>
 
 <script>
+import { STable, Ellipsis } from '@/components'
 import { getDevicePacketLog } from '@/api/manage'
+import moment from 'moment'
 
 export default {
   name: 'ProtocolLog',
+  components: {
+    STable,
+    Ellipsis
+  },
   props: {
     deviceId: { type: String, default: () => null },
     visible: { type: Boolean, required: true },
-    loading: { type: Boolean, default: () => false },
-    model: { type: Object, default: () => null },
+    model: { type: Object, default: () => null }
   },
   data () {
     return {
       columns: [
         { title: '编号', dataIndex: 'id' },
-        { title: '时间', dataIndex: 'timestamp' },
-        { title: '类型', dataIndex: 'type' },
-        { title: '内容', dataIndex: 'content' }
-      ]
+        { title: '时间', dataIndex: 'time_tracking', scopedSlots: { customRender: 'time_tracking' } },
+        { title: '类型', dataIndex: 'command', scopedSlots: { customRender: 'command' } },
+        { title: '方向', dataIndex: 'upload' },
+        { title: '内容', dataIndex: 'packet', scopedSlots: { customRender: 'packet' } }
+      ],
+      cursor: null,
+      currentPage: 1,
+      hasMore: false
     }
   },
   methods: {
     loadData (parameter) {
-      this.loading = true
       console.log('packet log parameter', parameter)
       console.log('packet log queryData', this.queryData)
       let arg = Object.assign(parameter, this.queryData)
@@ -36,16 +73,35 @@ export default {
       arg.page_size = arg.pageSize
       delete arg.pageNo
       delete arg.pageSize
-      return getDevicePacketLog(this.devcieId, arg)
+      return getDevicePacketLog(this.deviceId, arg)
         .then(res => {
-          this.loading = false
+          console.log('packet log res', res)
+          this.hasMore = res.data.has_more
+          this.cursor = res.data.cursor
           return {
-            pageSize: res.data.page_size,
-            pageNo: res.data.page_no,
-            totalCount: res.data.total,
-            total: res.data.total,
-            data: res.data.records}
+            // pageSize: res.data.page_size,
+            // pageNo: res.data.page_no,
+            // totalCount: res.data.total,
+            // total: res.data.total,
+            pageSize: 10,
+            pageNo: 1,
+            totalCount: 10,
+            totalPage: 1,
+            data: res.data.packets
+          }
         })
+    },
+    localTime (time) {
+      console.log('localTime', time)
+      return moment.utc(time).local().format('YYYY-MM-DD HH:mm:ss')
+    },
+    byteArrayToHexArray (byteArray) {
+      const hexArray = []
+      for (let i = 0; i < byteArray.length; i++) {
+        const hexValue = byteArray[i].toString(16).padStart(2, '0')
+        hexArray.push(hexValue)
+      }
+      return hexArray
     }
   }
 }
