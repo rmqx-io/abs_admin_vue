@@ -1,7 +1,8 @@
 <template>
   <a-modal
     title="添加设备"
-    :width="640"
+    width="90vw"
+    centered
     :visible="visible"
     :confirmLoading="loading"
     @ok="() => { $emit('ok') }"

@@ -1,39 +1,79 @@
 <template>
-  <div class='scrollable-content'>
-    <s-table
-      ref='packetLogTable'
-      :columns='columns'
-      rowKey='id'
-      :data='loadData'
-      showPagination='auto'
-    >
-      <span slot='time_tracking' slot-scope="text, record">
-        <template>
-          {{ record.time_tracking ? localTime(record.time_tracking) : ''}}
-        </template>
-      </span>
-      <span slot='command' slot-scope='text, record'>
-        <template>
-          {{ record.command ? '0x' + record.command.toString(16).padStart(4, '0') : '' }}
-        </template>
-      </span>
-      <span slot='upload' slot-scope='text, record'>
-        <template>
-          {{ record.upload ? '上行' : '下行' }}
-        </template>
-      </span>
-      <span slot='packet' slot-scope="text, record">
-        <template>
-          {{ byteArrayToHexArray(record.packet).join(' ') }}
-        </template>
-      </span>
-    </s-table>
-    <div class='pagination'>
-      <Button :disabled='currentPage === 1' @click='handleFirstPage()' >首页</Button>
-<!--      <Button :disabled='currentPage === 1' @click="handlePreviousPage()">上一页</Button>-->
-      <Button :disabled='hasMore === false' @click='handleNextPage()'>下一页</Button>
+  <a-card :bordered="false" :bodyStyle="{ padding: '16px 16px', height: '100%' }" :style="{ height: '100%' }">
+    <div class='table-page-search-wrapper'>
+      <a-form>
+        <a-row :gutter='48'>
+          <a-col :span='16'>
+            <a-form-item label='时间'>
+              <a-range-picker
+                v-model='queryData.time'
+                @change='handleTimeChange'
+                format='YYYY-MM-DD HH:mm:ss'
+                showTime
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span='8'>
+            <a-form-item label='类型'>
+              <a-input
+                v-model='queryData.command'
+                @change='handleCommandChange'
+                placeholder='请输入类型'
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span='8'>
+            <a-form-item label='方向'>
+              <a-select
+                v-model='queryData.upload'
+                @change='handleUploadChange'
+                placeholder='请选择方向'
+              >
+                <a-select-option value=''>全部</a-select-option>
+                <a-select-option value='true'>上行</a-select-option>
+                <a-select-option value='false'>下行</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-form>
+      <div>
+        <s-table
+          ref='packetLogTable'
+          :columns='columns'
+          rowKey='id'
+          :data='loadData'
+          showPagination='auto'
+        >
+          <span slot='time_tracking' slot-scope="text, record">
+            <template>
+              {{ record.time_tracking ? localTime(record.time_tracking) : ''}}
+            </template>
+          </span>
+          <span slot='command' slot-scope='text, record'>
+            <template>
+              {{ record.command ? '0x' + record.command.toString(16).padStart(4, '0') : '' }}
+            </template>
+          </span>
+          <span slot='upload' slot-scope='text, record'>
+            <template>
+              {{ record.upload ? '上行' : '下行' }}
+            </template>
+          </span>
+          <span slot='packet' slot-scope="text, record">
+            <template>
+              {{ byteArrayToHexArray(record.packet).join(' ') }}
+            </template>
+          </span>
+        </s-table>
+        <div class='pagination'>
+          <Button :disabled='currentPage === 1' @click='handleFirstPage()' >首页</Button>
+    <!--      <Button :disabled='currentPage === 1' @click="handlePreviousPage()">上一页</Button>-->
+          <Button :disabled='hasMore === false' @click='handleNextPage()'>下一页</Button>
+        </div>
+      </div>
     </div>
-  </div>
+  </a-card>
 </template>
 
 <script>
@@ -65,7 +105,11 @@ export default {
       ],
       cursor: null,
       currentPage: 1,
-      hasMore: false
+      hasMore: false,
+      queryData: {
+        time: [],
+        upload: ''
+      }
     }
   },
   methods: {
@@ -132,12 +176,30 @@ export default {
       console.log('handleNextPage')
       this.currentPage++
       this.refresh()
+    },
+    handleTimeChange (value) {
+      console.log('handleTimeChange', value)
+      this.queryData.time = value
+      // this.refresh()
+    },
+    handleCommandChange (value) {
+      console.log('handleCommandChange', value)
+      this.queryData.command = value
+      // this.refresh()
+    },
+    handleUploadChange (value) {
+      console.log('handleUploadChange', value)
+      this.queryData.upload = value
+      // this.refresh()
     }
   }
 }
 </script>
 
 <style scoped>
+.container {
+  margin: 8px;
+}
 .vm {
   width: 100%;
   max-width: 100%;

@@ -338,11 +338,14 @@
       </div>
     </div>
 
-    <div>
-      <Modal
-        v-model='packet_log_visible'
-        title='协议日志'
-        modal-class="fullscreen-modal"
+    <div v-if='packet_log_visible'>
+      <a-modal
+        title="协议日志"
+        width='90vw'
+        centered
+        :visible="packet_log_visible"
+        @cancel='packet_log_visible = false'
+        @ok='packet_log_visible = false'
       >
         <packet-log
           ref='protocolLog'
@@ -351,7 +354,7 @@
           @cancel='handlePacketLogCancel'
           @ok='handlePacketLogOk'
         />
-      </Modal>
+      </a-modal>
     </div>
 
     <div
@@ -1212,7 +1215,6 @@ export default {
 </script>
 
 <style>
-@import '~animate.css/animate.css';
 .popup {
   position: absolute;
   z-index: 1;
@@ -1253,5 +1255,21 @@ export default {
 .fullscreen-modal .fullscreen-modal-footer {
   border-top: 1px solid #e5e5e5;
   padding: 15px;
+}
+.ant-modal {
+  height: -webkit-fill-available;
+  max-width: 100vw;
+}
+.ant-modal-content {
+  width: 90vw;
+  height: 90vh;
+  top: 0;
+  overflow: auto;
+}
+.ant-modal-centered::before {
+  content: unset;
+}
+.ant-modal-footer {
+  display: none;
 }
 </style>

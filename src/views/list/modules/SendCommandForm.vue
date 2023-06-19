@@ -1,7 +1,8 @@
 <template>
   <a-modal
     title="下发指令"
-    :width="800"
+    width="90vw"
+    centered
     :visible="visible"
     :confirmLoading="loading"
     @ok="() => { handleOk(); $emit('ok') }"
