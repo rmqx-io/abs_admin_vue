@@ -112,7 +112,7 @@ export default {
     },
     refresh () {
       if (this.currentPage === 1) {
-        this.cursor = null;
+        this.cursor = null
       }
       this.$refs.packetLogTable.refresh()
     },

@@ -340,16 +340,16 @@
 
     <div>
       <Modal
-        v-model='protocol_log_visible'
+        v-model='packet_log_visible'
         title='协议日志'
         modal-class="fullscreen-modal"
       >
-        <protocol-log
+        <packet-log
           ref='protocolLog'
-          :visible="protocol_log_visible"
+          :visible="packet_log_visible"
           :device-id='device_id'
-          @cancel='handleProtocolLogCancel'
-          @ok='handleProtocolLogOk'
+          @cancel='handlePacketLogCancel'
+          @ok='handlePacketLogOk'
         />
       </Modal>
     </div>
@@ -442,7 +442,7 @@ import BatteryInfo from '@/views/list/components/BatteryInfo'
 import storage from 'store'
 import { ROLE } from '@/store/mutation-types'
 import DeviceAlarm from '@/views/list/components/DeviceAlarm'
-import ProtocolLog from '@/views/list/components/ProtocolLog'
+import PacketLog from '@/views/list/components/PacketLog'
 
 function interpolate(u, begin, end) {
   if (u < 0) u = 0
@@ -577,7 +577,7 @@ export default {
     SendCommandForm,
     StepByStepModal,
     BatteryInfo,
-    ProtocolLog
+    PacketLog
   },
   data() {
     this.columns = columns
@@ -640,7 +640,7 @@ export default {
       showTableTab: true,
       showAlarm: false,
       send_command_form_visible: false,
-      protocol_log_visible: false,
+      packet_log_visible: false,
       battery_detail_visible: false,
       map_visible: false,
       confirmLoading: false,
@@ -892,11 +892,11 @@ export default {
     handleSendCommandManagerCancel() {
       this.showBatchCommandManager = false
     },
-    handleProtocolLogCancel () {
-      this.protocol_log_visible = false
+    handlePacketLogCancel () {
+      this.packet_log_visible = false
     },
-    handleProtocolLogOk () {
-      this.protocol_log_visible = false
+    handlePacketLogOk () {
+      this.packet_log_visible = false
     },
     handleSendCommandManagerOk() {
       this.showBatchCommandManager = false
@@ -958,7 +958,7 @@ export default {
     handleProtocolLog (record) {
       console.log('handleProtocolLog')
       this.device_id = record.code
-      this.protocol_log_visible = true
+      this.packet_log_visible = true
     },
     handleRefreshOnlineStatus(record) {
       console.log('refresh online status')
