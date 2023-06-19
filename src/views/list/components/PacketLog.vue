@@ -3,7 +3,7 @@
     <div class='table-page-search-wrapper'>
       <a-form>
         <a-row :gutter='48'>
-          <a-col :span='16'>
+          <a-col :span='12'>
             <a-form-item label='时间'>
               <a-range-picker
                 v-model='queryData.time'
@@ -13,16 +13,15 @@
               />
             </a-form-item>
           </a-col>
-          <a-col :span='8'>
+          <a-col :span='4'>
             <a-form-item label='类型'>
               <a-input
                 v-model='queryData.command'
-                @change='handleCommandChange'
                 placeholder='请输入类型'
               />
             </a-form-item>
           </a-col>
-          <a-col :span='8'>
+          <a-col :span='4'>
             <a-form-item label='方向'>
               <a-select
                 v-model='queryData.upload'
@@ -34,6 +33,19 @@
                 <a-select-option value='false'>下行</a-select-option>
               </a-select>
             </a-form-item>
+          </a-col>
+          <a-col :span='4'>
+            <a-form-item label='编号'>
+              <a-input
+                v-model='queryData.no'
+                placeholder='请输入协议日志编号'
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row>
+          <a-col :span='4'>
+            <a-button type='primary' @click='handleSearch'>查询</a-button>
           </a-col>
         </a-row>
       </a-form>
@@ -47,7 +59,9 @@
         >
           <span slot='time_tracking' slot-scope="text, record">
             <template>
-              {{ record.time_tracking ? localTime(record.time_tracking) : ''}}
+              <span>
+                {{ record.time_tracking ? localTime(record.time_tracking) : ''}}
+              </span>
             </template>
           </span>
           <span slot='command' slot-scope='text, record'>
@@ -57,7 +71,14 @@
           </span>
           <span slot='upload' slot-scope='text, record'>
             <template>
-              {{ record.upload ? '上行' : '下行' }}
+              <span v-if='record.upload'>
+                <img width='16' src="../../../assets/icons/upload.png" alt="Upload Image">
+                <span>上行</span>
+              </span>
+              <span v-if='!record.upload'>
+                <img width='16' src="../../../assets/icons/download.png" alt="Download Image">
+                <span>下行</span>
+              </span>
             </template>
           </span>
           <span slot='packet' slot-scope="text, record">
@@ -100,16 +121,13 @@ export default {
         { title: '编号', dataIndex: 'id' },
         { title: '时间', dataIndex: 'time_tracking', scopedSlots: { customRender: 'time_tracking' } },
         { title: '类型', dataIndex: 'command', scopedSlots: { customRender: 'command' } },
-        { title: '方向', dataIndex: 'upload' },
+        { title: '方向', dataIndex: 'upload', scopedSlots: { customRender: 'upload' } },
         { title: '内容', dataIndex: 'packet', scopedSlots: { customRender: 'packet' } }
       ],
       cursor: null,
       currentPage: 1,
       hasMore: false,
-      queryData: {
-        time: [],
-        upload: ''
-      }
+      queryData: {}
     }
   },
   methods: {
@@ -178,20 +196,28 @@ export default {
       this.refresh()
     },
     handleTimeChange (value) {
-      console.log('handleTimeChange', value)
+      console.log('handleTimeChange', this.formatDateString(value[0]), this.formatDateString(value[1]))
       this.queryData.time = value
       // this.refresh()
     },
     handleCommandChange (value) {
       console.log('handleCommandChange', value)
-      this.queryData.command = value
+      // this.queryData.command = value
       // this.refresh()
     },
     handleUploadChange (value) {
       console.log('handleUploadChange', value)
       this.queryData.upload = value
       // this.refresh()
-    }
+    },
+    formatDateString (date) {
+      if (!date) return ''
+      return date.format('YYYY-MM-DD HH:mm:ss')
+    },
+    handleSearch () {
+      console.log('handleSearch', this.queryData)
+      this.refresh()
+    },
   }
 }
 </script>
