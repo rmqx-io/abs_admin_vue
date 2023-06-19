@@ -1258,12 +1258,12 @@ export default {
 }
 .ant-modal {
   height: -webkit-fill-available;
-  max-width: 100vw;
+  max-width: 90vw;
 }
 .ant-modal-content {
   width: 90vw;
   height: 90vh;
-  top: 0;
+  top: 5vh;
   overflow: auto;
 }
 .ant-modal-centered::before {
