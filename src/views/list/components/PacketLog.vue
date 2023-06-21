@@ -127,7 +127,9 @@ export default {
       cursor: null,
       currentPage: 1,
       hasMore: false,
-      queryData: {}
+      queryData: {
+        time: [moment.utc().local().subtract(1, 'day'), moment.utc().local()]
+      }
     }
   },
   methods: {
@@ -158,6 +160,21 @@ export default {
             totalCount: 10,
             totalPage: 1,
             data: res.data.packets
+          }
+        })
+        .catch(err => {
+          console.log('packet log err', err)
+          // get the body of the response
+          const body = err.response.data
+          // show the error message
+          this.$message.error(body.msg)
+          // stop the loading
+          return {
+            pageSize: 10,
+            pageNo: 1,
+            totalCount: 10,
+            totalPage: 1,
+            data: []
           }
         })
     },
@@ -214,9 +231,21 @@ export default {
       if (!date) return ''
       return date.format('YYYY-MM-DD HH:mm:ss')
     },
+    validateFields (callback) {
+      if (this.queryData.time.length !== 2) {
+        this.$message.error('请选择时间范围')
+        return false
+      }
+      return true
+    },
     handleSearch () {
       console.log('handleSearch', this.queryData)
-      this.refresh()
+      const validated = this.validateFields()
+      if (validated) {
+        // console.log('Received values of form: ', values)
+        // this.queryData = values
+        this.refresh()
+      }
     },
   }
 }
