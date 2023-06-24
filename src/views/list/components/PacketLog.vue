@@ -14,10 +14,10 @@
             </a-form-item>
           </a-col>
           <a-col :span='4'>
-            <a-form-item label='类型'>
+            <a-form-item label='命令'>
               <a-input
                 v-model='queryData.command'
-                placeholder='请输入类型'
+                placeholder='请输入命令 16 进制'
               />
             </a-form-item>
           </a-col>
@@ -37,7 +37,7 @@
           <a-col :span='4'>
             <a-form-item label='编号'>
               <a-input
-                v-model='queryData.no'
+                v-model='queryData.id'
                 placeholder='请输入协议日志编号'
               />
             </a-form-item>
@@ -120,7 +120,7 @@ export default {
       columns: [
         { title: '编号', dataIndex: 'id' },
         { title: '时间', dataIndex: 'time_tracking', scopedSlots: { customRender: 'time_tracking' } },
-        { title: '类型', dataIndex: 'command', scopedSlots: { customRender: 'command' } },
+        { title: '命令', dataIndex: 'command', scopedSlots: { customRender: 'command' } },
         { title: '方向', dataIndex: 'upload', scopedSlots: { customRender: 'upload' } },
         { title: '内容', dataIndex: 'packet', scopedSlots: { customRender: 'packet' } }
       ],
