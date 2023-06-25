@@ -1259,17 +1259,15 @@ export default {
 .ant-modal {
   height: -webkit-fill-available;
   max-width: 90vw;
+  max-height: 90vh;
 }
 .ant-modal-content {
   width: 90vw;
-  height: 90vh;
+  max-height: 90vh;
   top: 5vh;
   overflow: auto;
 }
 .ant-modal-centered::before {
   content: unset;
-}
-.ant-modal-footer {
-  display: none;
 }
 </style>
