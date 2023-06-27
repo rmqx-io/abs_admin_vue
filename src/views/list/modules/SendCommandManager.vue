@@ -91,6 +91,14 @@ export default {
           dataIndex: 'params'
         },
         {
+          title: '离线重发',
+          dataIndex: 'enable_offline_message'
+        },
+        {
+          title: '过期时间',
+          dataIndex: 'ttl'
+        },
+        {
           title: '操作',
           dataIndex: 'action',
           scopedSlots: { customRender: 'action' }

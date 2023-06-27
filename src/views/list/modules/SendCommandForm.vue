@@ -60,12 +60,28 @@
         placeholder="输入参数"
       ></a-input>
     </a-form-item>
+    <a-form-item>
+      <a-checkbox
+        v-model:checked="enableOfflineMessage"
+        @change="handleSaveOfflineMessageChange"
+      >离线设备自动重发</a-checkbox>
+    </a-form-item>
+    <a-form-item v-if="enableOfflineMessage">
+      <a-date-picker
+        v-model="offlineMessageTtl"
+        :showTime="true"
+        :format="'YYYY-MM-DD HH:mm:ss'"
+        placeholder="选择离线重发有限截止时间"
+        />
+        <p v-if="offlineMessageTtl !== null">有效期 {{ getTimeGap(offlineMessageTtl) }}。</p>
+    </a-form-item>
     <div v-if='formErrorMessage' class='error'>{{ this.formErrorMessage}}</div>
   </a-modal>
 </template>
 
 <script>
 import { batchSendCommand, getSendCommandList, sendCommand } from '@/api/manage'
+import moment from 'moment'
 
 export default {
   props: {
@@ -90,6 +106,8 @@ export default {
     return {
       enableDeviceIdRange: false,
       sendCommandList: [],
+      enableOfflineMessage: false,
+      offlineMessageTtl: null,
       columns: [
         {
           title: '指令名称',
@@ -175,8 +193,11 @@ export default {
         name: this.currentRow.name,
         command: this.currentRow.command,
         subCommand: this.currentRow.sub_command,
-        param: this.param
+        param: this.param,
+        enableOfflineMessage: this.enableOfflineMessage,
+        offlineMessageTtl: this.offlineMessageTtl
       }
+      console.log('arg', arg)
         //
         // send the device id set (array of device id and/or device id range) to the backend.
         // The backend will send the command to each device in the set one by one in background.
@@ -278,6 +299,35 @@ export default {
           this.deviceIds.push({ deviceId: id })
         }
       })
+    },
+    handleSaveOfflineMessageChange (value) {
+      if (value) {
+        const now = new Date()
+        now.setMonth(now.getMonth() + 1)
+        this.offlineMessageTtl = moment(now).format('YYYY-MM-DD HH:mm:ss')
+      }
+    },
+    getTimeGap(date) {
+      if (date == null) {
+        return ''
+      }
+      const dateObj = new Date(date)
+      const now = new Date()
+      const gap = dateObj.getTime() - now.getTime()
+      const seconds = Math.floor(gap / 1000)
+      const minutes = Math.floor(seconds / 60)
+      const hours = Math.floor(minutes / 60)
+      const days = Math.floor(hours / 24)
+
+      if (days > 0) {
+        return `${days} 天 ${hours % 24} 小时`
+      } else if (hours > 0) {
+        return `${hours} 小时 ${minutes % 60} 分钟`
+      } else if (minutes > 0) {
+        return `${minutes} 分钟 ${seconds % 60} 秒`
+      } else {
+        return `${seconds} 秒`
+      }
     }
   }
 }
