@@ -245,9 +245,16 @@
         ref='sendCommandManager'
         :visible="showBatchCommandManager"
         :loading="false"
-        :showCommand="send_command_manager_show_command"
         @cancel="handleSendCommandManagerCancel"
         @ok="handleSendCommandManagerOk"
+      />
+
+      <send-command-manager-devices
+        ref="sendCommandManagerDevices"
+        :visible="showBatchCommandManagerDevices"
+        :currentBatchSendCommandId='currentBatchSendCommandId'
+        @ok="() => { showBatchCommandManagerDevices = false }"
+        @cancel="() => { showBatchCommandManagerDevices = false }"
       />
 
 
@@ -442,6 +449,7 @@ import StepByStepModal from './modules/StepByStepModal'
 import CreateForm from './modules/CreateForm'
 import SendCommandForm from '@/views/list/modules/SendCommandForm'
 import SendCommandManager from '@/views/list/modules/SendCommandManager'
+import SendCommandManagerDevices from './modules/SendCommandManagerDevices.vue'
 import BatteryInfo from '@/views/list/components/BatteryInfo'
 import storage from 'store'
 import { ROLE } from '@/store/mutation-types'
@@ -574,6 +582,7 @@ export default {
   name: 'TableList',
   components: {
     SendCommandManager,
+    SendCommandManagerDevices,
     DeviceAlarm,
     STable,
     Ellipsis,
@@ -715,7 +724,8 @@ export default {
       statusCount: {},
       deviceStatus: 'online',
       showBatchCommandManager: false,
-      send_command_manager_show_command: null
+      showBatchCommandManagerDevices: false,
+      currentBatchSendCommandId: 0,
     }
   },
   filters: {
@@ -894,15 +904,11 @@ export default {
     handleSendCommandFormOk(id) {
       console.log('handleSendCommandFormOk', id)
       this.send_command_form_visible = false
-      this.send_command_manager_show_command = id
-      setTimeout(() => {
-        this.showBatchCommandManager = true
-        this.$refs.sendCommandManager.viewDevices(id)
-      }, 1000)
+      this.currentBatchSendCommandId = id
+      this.showBatchCommandManagerDevices = true
     },
     handleSendCommandManagerCancel() {
       this.showBatchCommandManager = false
-      this.send_command_manager_show_command = null
     },
     handlePacketLogCancel () {
       this.packet_log_visible = false
@@ -912,7 +918,6 @@ export default {
     },
     handleSendCommandManagerOk() {
       this.showBatchCommandManager = false
-      this.send_command_manager_show_command = null
     },
     handleBatteryInfoOk() {
       this.battery_detail_visible = false

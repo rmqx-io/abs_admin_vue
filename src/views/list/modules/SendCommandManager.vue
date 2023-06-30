@@ -5,7 +5,6 @@
     centered
     :visible="visible"
     :confirmLoading="loading"
-    :showCommand="showCommand"
     @ok="() => { handleOk(); $emit('ok') }"
     @cancel="() => { handleCancel(); $emit('cancel') }"
   >
@@ -23,30 +22,19 @@
         </span>
       </s-table>
     </div>
-    <div v-if='showDevices'>
-      <a-row>
-        <a @click='handleBack'><< 返回</a>
-      </a-row>
-      <a-row>
-        <span>编号 {{ this.currentBatchSendCommandId }}</span>
-      </a-row>
-      <s-table
-        ref='tableDevices'
-        :columns="columnsDevices"
-        :data="loadDataDevices"
-        :rowKey="(record) => record.id"
-      >
-      </s-table>
-      <a-row>
-        <button @click="handleRefreshDevices()">刷新</button>
-      </a-row>
-    </div>
+    <send-command-manager-devices
+      :visible='showDevices'
+      :currentBatchSendCommandId='currentBatchSendCommandId'
+      @ok="() => { showDevices = false }"
+      @cancel="() => { showDevices = false }"
+    />
   </a-modal>
 </template>
 
 <script>
-import { getBatchSendCommandDevices, getBatchSendCommandList } from '@/api/manage'
+import { getBatchSendCommandList } from '@/api/manage'
 import { STable } from '@/components'
+import SendCommandManagerDevices from './SendCommandManagerDevices.vue'
 
 export default {
   name: 'SendCommandManager',
@@ -58,14 +46,11 @@ export default {
     loading: {
       type: Boolean,
       default: () => false
-    },
-    showCommand: {
-      type: Number,
-      default: () => null
     }
   },
   components: {
-    STable
+    STable,
+    SendCommandManagerDevices
   },
   data () {
     return {
@@ -112,28 +97,6 @@ export default {
           scopedSlots: { customRender: 'action' }
         }
       ],
-      columnsDevices: [
-        {
-          title: '编号',
-          dataIndex: 'id'
-        },
-        {
-          title: '设备编号',
-          dataIndex: 'device_id'
-        },
-        {
-          title: '发送时间',
-          dataIndex: 'sent_time'
-        },
-        {
-          title: '应答时间',
-          dataIndex: 'ack_time'
-        },
-        {
-          title: '状态',
-          dataIndex: 'status'
-        }
-      ],
       queryData: {
         page_no: 1,
         page_size: 5,
@@ -142,7 +105,7 @@ export default {
       },
       showBatchCommand: true,
       showDevices: false,
-      currentBatchSendCommandId: null
+      currentBatchSendCommandId: 0 
     }
   },
   mounted () {
@@ -163,43 +126,8 @@ export default {
     },
     handleViewDevices (record) {
       console.log('handleViewDevices', record)
-      this.showBatchCommand = false
-      this.showDevices = true
       this.currentBatchSendCommandId = record.id
-      // next 1s refresh
-      setTimeout(() => {
-        this.$refs.tableDevices.refresh(true)
-      }, 100)
-    },
-    viewDevices (id) {
-      console.log('viewDevices', this.showCommand)
-      this.showDevices = false // make sure to refresh the table
-      this.showBatchCommand = true
-      setTimeout(() => {
-        // refresh the command table
-        this.refresh()
-
-        // then show the device table
-        setTimeout(() => {
-          this.currentBatchSendCommandId = id
-          this.showBatchCommand = false
-          this.showDevices = true
-          setTimeout(() => {
-            this.$refs.tableDevices.refresh(true)
-          }, 500)
-        }, 100)
-      }, 100)
-    },
-    handleBack () {
-      this.showDevices = false
-      this.showBatchCommand = true
-      this.currentBatchSendCommandId = null
-      setTimeout(() => {
-        this.$refs.table.refresh(true)
-      }, 100)
-    },
-    handleRefreshDevices () {
-      this.$refs.tableDevices.refresh(true)
+      this.showDevices = true
     },
     loadData (parameter) {
       let arg = Object.assign(parameter, this.queryData)
@@ -209,24 +137,6 @@ export default {
       delete arg.pageSize
       return getBatchSendCommandList(arg).then(res => {
         console.log('loadData res', res)
-        return {
-          pageSize: res.data.page_size,
-          pageNo: res.data.page_no,
-          totalCount: res.data.total,
-          totalPage: res.data.pages,
-          data: res.data.records
-        }
-      })
-    },
-    loadDataDevices (parameter) {
-      let arg = Object.assign(parameter, this.queryData)
-      arg.page_no = arg.pageNo
-      arg.page_size = arg.pageSize
-      delete arg.pageNo
-      delete arg.pageSize
-      arg.batch_command_id = this.currentBatchSendCommandId
-      return getBatchSendCommandDevices(arg).then(res => {
-        console.log('loadDataDevices res', res)
         return {
           pageSize: res.data.page_size,
           pageNo: res.data.page_no,

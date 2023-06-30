@@ -211,6 +211,7 @@ export default {
         //
         // arg.deviceIdSet = this.deviceIdSet
       arg.deviceIds = this.deviceIds.map(item => item.deviceId)
+      this.$message.info('正在发送指令')
       batchSendCommand(arg).then(res => {
         console.log(res)
         if (res.data && res.data.id) {
@@ -219,6 +220,7 @@ export default {
           this.$emit('ok', res.data.id)
         } else {
           // send command failed
+          this.$message.error(res)
         }
       })
     },
