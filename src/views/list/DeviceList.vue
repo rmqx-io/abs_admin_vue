@@ -245,6 +245,7 @@
         ref='sendCommandManager'
         :visible="showBatchCommandManager"
         :loading="false"
+        :showCommand="send_command_manager_show_command"
         @cancel="handleSendCommandManagerCancel"
         @ok="handleSendCommandManagerOk"
       />
@@ -713,7 +714,8 @@ export default {
       orgList: [],
       statusCount: {},
       deviceStatus: 'online',
-      showBatchCommandManager: false
+      showBatchCommandManager: false,
+      send_command_manager_show_command: null
     }
   },
   filters: {
@@ -889,11 +891,18 @@ export default {
     handleSendCommandFormCancel() {
       this.send_command_form_visible = false
     },
-    handleSendCommandFormOk() {
-
+    handleSendCommandFormOk(id) {
+      console.log('handleSendCommandFormOk', id)
+      this.send_command_form_visible = false
+      this.send_command_manager_show_command = id
+      setTimeout(() => {
+        this.showBatchCommandManager = true
+        this.$refs.sendCommandManager.viewDevices(id)
+      }, 1000)
     },
     handleSendCommandManagerCancel() {
       this.showBatchCommandManager = false
+      this.send_command_manager_show_command = null
     },
     handlePacketLogCancel () {
       this.packet_log_visible = false
@@ -903,6 +912,7 @@ export default {
     },
     handleSendCommandManagerOk() {
       this.showBatchCommandManager = false
+      this.send_command_manager_show_command = null
     },
     handleBatteryInfoOk() {
       this.battery_detail_visible = false

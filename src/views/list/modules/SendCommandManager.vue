@@ -5,6 +5,7 @@
     centered
     :visible="visible"
     :confirmLoading="loading"
+    :showCommand="showCommand"
     @ok="() => { handleOk(); $emit('ok') }"
     @cancel="() => { handleCancel(); $emit('cancel') }"
   >
@@ -36,6 +37,9 @@
         :rowKey="(record) => record.id"
       >
       </s-table>
+      <a-row>
+        <button @click="handleRefreshDevices()">刷新</button>
+      </a-row>
     </div>
   </a-modal>
 </template>
@@ -54,6 +58,10 @@ export default {
     loading: {
       type: Boolean,
       default: () => false
+    },
+    showCommand: {
+      type: Number,
+      default: () => null
     }
   },
   components: {
@@ -138,7 +146,7 @@ export default {
     }
   },
   mounted () {
-    console.log('mounted')
+    console.log('SendCommandManager mounted')
     this.fetch()
   },
   methods: {
@@ -163,6 +171,25 @@ export default {
         this.$refs.tableDevices.refresh(true)
       }, 100)
     },
+    viewDevices (id) {
+      console.log('viewDevices', this.showCommand)
+      this.showDevices = false // make sure to refresh the table
+      this.showBatchCommand = true
+      setTimeout(() => {
+        // refresh the command table
+        this.refresh()
+
+        // then show the device table
+        setTimeout(() => {
+          this.currentBatchSendCommandId = id
+          this.showBatchCommand = false
+          this.showDevices = true
+          setTimeout(() => {
+            this.$refs.tableDevices.refresh(true)
+          }, 500)
+        }, 100)
+      }, 100)
+    },
     handleBack () {
       this.showDevices = false
       this.showBatchCommand = true
@@ -170,6 +197,9 @@ export default {
       setTimeout(() => {
         this.$refs.table.refresh(true)
       }, 100)
+    },
+    handleRefreshDevices () {
+      this.$refs.tableDevices.refresh(true)
     },
     loadData (parameter) {
       let arg = Object.assign(parameter, this.queryData)

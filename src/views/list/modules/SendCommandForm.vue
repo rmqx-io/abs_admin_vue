@@ -5,7 +5,7 @@
     centered
     :visible="visible"
     :confirmLoading="loading"
-    @ok="() => { handleOk(); $emit('ok') }"
+    @ok="() => { handleOk() }"
     @cancel="() => { handleCancel(); $emit('cancel') }"
   >
     <div>
@@ -82,6 +82,7 @@
 <script>
 import { batchSendCommand, getSendCommandList, sendCommand } from '@/api/manage'
 import moment from 'moment'
+import res from '@/views/setting/Res'
 
 export default {
   props: {
@@ -210,7 +211,16 @@ export default {
         //
         // arg.deviceIdSet = this.deviceIdSet
       arg.deviceIds = this.deviceIds.map(item => item.deviceId)
-      batchSendCommand(arg)
+      batchSendCommand(arg).then(res => {
+        console.log(res)
+        if (res.data && res.data.id) {
+          console.log('batch command id', res.data.id)
+          // close current dialog and show batch command manager dialog
+          this.$emit('ok', res.data.id)
+        } else {
+          // send command failed
+        }
+      })
     },
     handleCancel () {
       console.log('handleCancel')
