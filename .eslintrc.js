@@ -36,12 +36,10 @@ module.exports = {
     'vue/html-closing-bracket-newline': 0,
     'vue/no-parsing-error': 0,
     'no-tabs': 0,
+    'quotes': [0],
+    'space-before-function-paren': 0,
     'semi': [
-      2,
-      'never',
-      {
-        'beforeStatementContinuationChars': 'never'
-      }
+      0,
     ],
     'no-delete-var': 2,
     'prefer-const': [
