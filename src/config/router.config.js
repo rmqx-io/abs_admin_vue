@@ -75,22 +75,22 @@ export const asyncRouterMap = [
         ]
       },
       // OTA
-      {
-        path: '/ota',
-        name: 'ota',
-        component: RouteView,
-        redirect: '/ota/ota-list',
-        meta: { title: 'menu.ota', icon: 'cloud-download', permission: ['table'] },
-        children: [
-          {
-            path: '/ota/ota-list/:page_no([1-9]\\d*)?',
-            name: 'OtaList',
-            hideChildrenInMenu: true,
-            component: () => import('@/views/ota/OtaList'),
-            meta: { title: 'menu.ota', keepAlive: true, permission: ['table'] }
-          }
-        ]
-      },
+      // {
+      //   path: '/ota',
+      //   name: 'ota',
+      //   component: RouteView,
+      //   redirect: '/ota/ota-list',
+      //   meta: { title: 'menu.ota', icon: 'cloud-download', permission: ['table'] },
+      //   children: [
+      //     {
+      //       path: '/ota/ota-list/:page_no([1-9]\\d*)?',
+      //       name: 'OtaList',
+      //       hideChildrenInMenu: true,
+      //       component: () => import('@/views/ota/OtaList'),
+      //       meta: { title: 'menu.ota', keepAlive: true, permission: ['table'] }
+      //     }
+      //   ]
+      // },
       {
         path: '/org',
         name: 'org',
@@ -147,16 +147,16 @@ export const asyncRouterMap = [
       {
         path: '/account',
         component: RouteView,
-        redirect: '/account/center',
+        redirect: '/account/settings',
         name: 'account',
         meta: { title: 'menu.account', icon: 'user', keepAlive: true, permission: ['user'] },
         children: [
-          {
-            path: '/account/center',
-            name: 'center',
-            component: () => import('@/views/account/center'),
-            meta: { title: 'menu.account.center', keepAlive: true, permission: ['user'] }
-          },
+          // {
+          //   path: '/account/center',
+          //   name: 'center',
+          //   component: () => import('@/views/account/center'),
+          //   meta: { title: 'menu.account.center', keepAlive: true, permission: ['user'] }
+          // },
           {
             path: '/account/settings',
             name: 'settings',
@@ -294,13 +294,13 @@ export const asyncRouterMap = [
             name: 'setting_res',
             component: () => import('@/views/setting/Res'),
             meta: { title: '权限管理', keepAlive: true, permission: ['setting'] }
-          },
-          {
-            path: '/setting/dict',
-            name: 'setting_dict',
-            component: () => import('@/views/setting/Dict'),
-            meta: { title: '字典管理', keepAlive: true, permission: ['setting'] }
           }
+          // ,{
+          //   path: '/setting/dict',
+          //   name: 'setting_dict',
+          //   component: () => import('@/views/setting/Dict'),
+          //   meta: { title: '字典管理', keepAlive: true, permission: ['setting'] }
+          // }
         ]
       }
     ]
