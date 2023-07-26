@@ -687,6 +687,7 @@ export default {
               ])
             })
           }
+          // if the result is empty, add a empty data
           if (bmsList.length === 0) {
             const timestamp = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
             bmsList.push([{ value: 0, date: timestamp }, { value: 0, date: timestamp }, { value: 0, date: timestamp },

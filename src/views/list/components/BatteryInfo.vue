@@ -4,6 +4,7 @@
       <a @click="handleClose()"><< 返回</a>
       <a-radio-group v-model:value="mode" :style="{ marginBottom: '8px', marginRight: '8px', float: 'right' }">
         <a-radio-button value="basic">基础信息</a-radio-button>
+        <a-radio-button value="history">历史信息</a-radio-button>
         <a-radio-button value="config">配置信息</a-radio-button>
       </a-radio-group>
     </div>
@@ -104,6 +105,7 @@
     </div>
     <bms-config v-if='mode === "config"' :device-id='deviceId'>
     </bms-config>
+    <bms-history v-if='mode === "history"' :device-id='deviceId' />
   </a-card>
 </template>
 
@@ -113,6 +115,7 @@ import { getBatteryInfo } from '@/api/manage'
 import { STable } from '@/components'
 import BmsInfoCharts from '@/views/list/components/BmsInfoCharts'
 import BmsConfig from '@/views/list/components/BmsConfig'
+import BmsHistory from '@/views/list/components/BmsHistory'
 
 const columns = [
   {
@@ -161,6 +164,7 @@ export default {
   name: 'Info',
   components: {
     BmsConfig,
+    BmsHistory,
     STable,
     BmsInfoCharts
   },
