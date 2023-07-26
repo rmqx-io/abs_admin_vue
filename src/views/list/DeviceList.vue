@@ -1084,6 +1084,9 @@ export default {
         })
     },
     refreshTable(param) {
+      // make sure table is visible
+      this.handleBatteryInfoCancel()
+
       if (this.$refs.table) {
         this.$refs.table.refresh(param)
       }
