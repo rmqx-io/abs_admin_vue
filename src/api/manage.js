@@ -1,63 +1,66 @@
 import request from '@/utils/request'
 
+const prefix = '/admin'
+
 const api = {
-  sys_dict_page: '/admin/sys_dict_page',
-  sys_dict_layer_top: '/admin/sys_dict_layer_top',
-  sys_dict_add: '/admin/sys_dict_add',
-  sys_dict_update: '/admin/sys_dict_update',
-  sys_dict_delete: '/admin/sys_dict_remove',
+  sys_dict_page: `${prefix}/sys_dict_page`,
+  sys_dict_layer_top: `${prefix}/sys_dict_layer_top`,
+  sys_dict_add: `${prefix}/sys_dict_add`,
+  sys_dict_update: `${prefix}/sys_dict_update`,
+  sys_dict_delete: `${prefix}/sys_dict_remove`,
 
-  sys_res_page: '/admin/sys_res_page',
-  sys_res_add: '/admin/sys_res_add',
-  sys_res_update: '/admin/sys_res_update',
-  sys_res_delete: '/admin/sys_res_remove',
+  sys_res_page: `${prefix}/sys_res_page`,
+  sys_res_add: `${prefix}/sys_res_add`,
+  sys_res_update: `${prefix}/sys_res_update`,
+  sys_res_delete: `${prefix}/sys_res_remove`,
 
-  sys_role_page: '/admin/sys_role_page',
-  sys_role_add: '/admin/sys_role_add',
-  sys_role_update: '/admin/sys_role_update',
-  sys_role_delete: '/admin/sys_role_delete',
-  sys_res_all: '/admin/sys_res_all',
-  sys_res_layer_top: '/admin/sys_res_layer_top',
+  sys_role_page: `${prefix}/sys_role_page`,
+  sys_role_add: `${prefix}/sys_role_add`,
+  sys_role_update: `${prefix}/sys_role_update`,
+  sys_role_delete: `${prefix}/sys_role_delete`,
+  sys_res_all: `${prefix}/sys_res_all`,
+  sys_res_layer_top: `${prefix}/sys_res_layer_top`,
 
-  sys_user_page: '/admin/sys_user_page',
-  sys_user_add: '/admin/sys_user_add',
-  sys_user_update: '/admin/sys_user_update',
-  sys_user_remove: '/admin/sys_user_remove',
-  sys_role_layer_top: '/admin/sys_role_layer_top',
+  sys_user_page: `${prefix}/sys_user_page`,
+  sys_user_add: `${prefix}/sys_user_add`,
+  sys_user_update: `${prefix}/sys_user_update`,
+  sys_user_remove: `${prefix}/sys_user_remove`,
+  sys_role_layer_top: `${prefix}/sys_role_layer_top`,
 
-  user: '/admin/sys_user_page',
-  role: '/admin/role',
-  service: '/service',
-  device: '/admin/device',
-  device_export: '/admin/device/export',
-  device_alarm: '/admin/device/alarm',
-  bms_alarm_count: '/admin/device/alarm/bms/count',
-  device_alarm_types: '/admin/device/alarm/type',
-  add_device: '/admin/device/add',
-  update_device: '/admin/device/update',
-  device_packet_log: '/admin/device/packet/log',
+  user: `${prefix}/sys_user_page`,
+  role: `${prefix}/role`,
+  service: `${prefix}/service`,
+  device: `${prefix}/device`,
+  device_export: `${prefix}/device/export`,
+  device_alarm: `${prefix}/device/alarm`,
+  bms_alarm_count: `${prefix}/device/alarm/bms/count`,
+  device_alarm_types: `${prefix}/device/alarm/type`,
+  add_device: `${prefix}/device/add`,
+  update_device: `${prefix}/device/update`,
+  device_packet_log: `${prefix}/device/packet/log`,
 
-  org: '/admin/org',
-  add_org: '/admin/org/add',
-  org_tree: '/admin/organization/tree',
+  org: `${prefix}/org`,
+  add_org: `${prefix}/org/add`,
+  org_tree: `${prefix}/organization/tree`,
 
-  device_model: '/admin/device/model/page',
-  battery_model: '/admin/battery/model/page',
+  device_model: `${prefix}/device/model/page`,
+  battery_model: `${prefix}/battery/model/page`,
 
-  battery_info: '/admin/device/bms/info',
-  battery_info_latest: '/admin/device/bms/info/latest',
-  bms_config: '/admin/device/bms/config',
-  bms_config_data_types: '/admin/device/bms/config/data_types',
-  bms_config_data_types_map: '/admin/device/bms/config/data_types/map',
-  location: '/admin/device/location',
+  battery_info: `${prefix}/device/bms/info`,
+  battery_info_latest: `${prefix}/device/bms/info/latest`,
+  bms_config: `${prefix}/device/bms/config`,
+  bms_config_data_types: `${prefix}/device/bms/config/data_types`,
+  bms_config_data_types_map: `${prefix}/device/bms/config/data_types/map`,
+  location: `${prefix}/device/location`,
+  bms_type: `${prefix}/device/bms/type`,
 
-  send_command_list: '/admin/device/config/commands',
-  send_command: '/admin/device/control/send/command',
-  send_batch_command: '/admin/device/control/send_batch/command',
-  send_batch_command_list: '/admin/device/control/send_batch/command/list',
-  send_batch_command_devices: '/admin/device/control/send_batch/command/devices',
+  send_command_list: `${prefix}/device/config/commands`,
+  send_command: `${prefix}/device/control/send/command`,
+  send_batch_command: `${prefix}/device/control/send_batch/command`,
+  send_batch_command_list: `${prefix}/device/control/send_batch/command/list`,
+  send_batch_command_devices: `${prefix}/device/control/send_batch/command/devices`,
 
-  refresh_online_status: '/admin/device/refresh/online/status',
+  refresh_online_status: `${prefix}/device/refresh/online/status`,
 
   permission: '/permission',
   permissionNoPager: '/permission/no-pager',
@@ -217,17 +220,17 @@ export function getBatteryModelList (arg) {
   })
 }
 
-export function getBatteryInfo (deviceId, arg) {
+export function getBatteryInfo (deviceId, bmsType, arg) {
   return request({
-    url: api.battery_info + '/' + deviceId,
+    url: api.battery_info + '/' + deviceId + '/' + bmsType,
     method: 'post',
     data: arg
   })
 }
 
-export function getBatteryInfoLatest (deviceId, arg) {
+export function getBatteryInfoLatest (deviceId, bmsType, arg) {
   return request({
-    url: api.battery_info_latest + '/' + deviceId,
+    url: api.battery_info_latest + '/' + deviceId + '/' + bmsType,
     method: 'post',
     data: arg
   })
@@ -251,6 +254,13 @@ export function getBmsConfigDataTypes (bmsType) {
 export function getBmsConfigDataTypesMap (bmsType) {
   return request({
     url: api.bms_config_data_types_map + '/' + bmsType,
+    method: 'get'
+  })
+}
+
+export function getBmsType(deviceId) {
+  return request({
+    url: api.bms_type + '/' + deviceId,
     method: 'get'
   })
 }
