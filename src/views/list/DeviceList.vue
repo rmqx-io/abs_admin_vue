@@ -442,7 +442,8 @@ import {
   getDeviceList, getExportDeviceList,
   getLocation,
   getStatusCount, refreshOnlineStatus,
-  updateDevice
+  updateDevice,
+  getBmsType
 } from '@/api/manage'
 
 import StepByStepModal from './modules/StepByStepModal'
@@ -943,7 +944,6 @@ export default {
         console.log(this.$refs)
         this.$refs.batteryInfo.getBatteryInfo(record.code)
       })
-      // this.$refs.batteryInfo.getBatteryInfo(record.code)
     },
     onSelectChange(selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys

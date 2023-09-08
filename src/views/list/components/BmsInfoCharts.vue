@@ -418,7 +418,10 @@
 <script>
 import ChartBmsMore from '@/views/history/bms_history/components/ChartBmsMore.vue'
 // import BmsInfoCharts from '@/views/list/components/BmsInfoCharts'
-import { getBatteryInfo, getBatteryInfoLatest } from '@/api/manage'
+import {
+  getBatteryInfo, getBatteryInfoLatest,
+  getBmsType
+} from '@/api/manage'
 import moment from 'moment/moment'
 
 export default {
@@ -438,55 +441,58 @@ export default {
     }
   },
   mounted () {
-    getBatteryInfoLatest(this.deviceId, {})
-      .then(res => {
-        console.log('battery info latest', res)
-        if (res.data && res.data.vehicle_detail_vo) {
-          this.battery_capacity_config = res.data.battery_capacity
-          this.gps_battery_voltage = res.data.vehicle_detail_vo.gps_battery_voltage
-          this.rssi = res.data.vehicle_detail_vo.rssi
-          this.gnss = res.data.vehicle_detail_vo.gnss
-          this.gps_location = res.data.vehicle_detail_vo.gps_location
-          this.gps_location_time = moment(res.data.vehicle_detail_vo.time_tracking).format('YYYY-MM-DD HH:mm:ss')
-          this.receive_time = moment(res.data.vehicle_detail_vo.receive_time).format('YYYY-MM-DD HH:mm:ss')
-        }
-        if (res.data && res.data.logs && res.data.logs.length > 0) {
-          const bmsInfo = res.data.logs[0]
-          this.time_tracking = moment(bmsInfo.time_tracking).format('YYYY-MM-DD HH:mm:ss')
-          this.battery_capacity_soc = bmsInfo.battery_capacity_soc
-          this.battery_healthy = bmsInfo.battery_healthy
-          this.battery_voltage = bmsInfo.battery_voltage
-          this.batteryList = this.form_battery_voltage_array_for_display(bmsInfo.single_battery_voltage_arr.split(','), 5)
-          this.tempList = this.form_temperature_array_for_display(bmsInfo)
-          // console.log('battery list', this.batteryList)
-          // single_battery_voltage_arr
-          this.battery_currency = bmsInfo.battery_currency
-          this.isMosRec = bmsInfo.battery_status_charging_mos === 1
-          this.isMosDis = bmsInfo.battery_status_discharging_mos === 1
-          this.battery_charging_cycle = bmsInfo.battery_charging_cycle
-          this.humidity = bmsInfo.humidity
+    getBmsType(this.deviceId).then(res => {
+      console.log('bms type', res.data.bms_type)
+      getBatteryInfoLatest(this.deviceId, res.data.bms_type, {})
+        .then(res => {
+          console.log('battery info latest', res)
+          if (res.data && res.data.vehicle_detail_vo) {
+            this.battery_capacity_config = res.data.battery_capacity
+            this.gps_battery_voltage = res.data.vehicle_detail_vo.gps_battery_voltage
+            this.rssi = res.data.vehicle_detail_vo.rssi
+            this.gnss = res.data.vehicle_detail_vo.gnss
+            this.gps_location = res.data.vehicle_detail_vo.gps_location
+            this.gps_location_time = moment(res.data.vehicle_detail_vo.time_tracking).format('YYYY-MM-DD HH:mm:ss')
+            this.receive_time = moment(res.data.vehicle_detail_vo.receive_time).format('YYYY-MM-DD HH:mm:ss')
+          }
+          if (res.data && res.data.logs && res.data.logs.length > 0) {
+            const bmsInfo = res.data.logs[0]
+            this.time_tracking = moment(bmsInfo.time_tracking).format('YYYY-MM-DD HH:mm:ss')
+            this.battery_capacity_soc = bmsInfo.battery_capacity_soc
+            this.battery_healthy = bmsInfo.battery_healthy
+            this.battery_voltage = bmsInfo.battery_voltage
+            this.batteryList = this.form_battery_voltage_array_for_display(bmsInfo.single_battery_voltage_arr.split(','), 5)
+            this.tempList = this.form_temperature_array_for_display(bmsInfo)
+            // console.log('battery list', this.batteryList)
+            // single_battery_voltage_arr
+            this.battery_currency = bmsInfo.battery_currency
+            this.isMosRec = bmsInfo.battery_status_charging_mos === 1
+            this.isMosDis = bmsInfo.battery_status_discharging_mos === 1
+            this.battery_charging_cycle = bmsInfo.battery_charging_cycle
+            this.humidity = bmsInfo.humidity
 
-          this.battery_alarm_low_power = bmsInfo.battery_alarm_low_power
-          this.battery_alarm_mos_high_temperature = bmsInfo.battery_alarm_mos_high_temperature
-          this.battery_alarm_charging_high_voltage = bmsInfo.battery_alarm_charging_high_voltage
-          this.battery_alarm_discharging_low_voltage = bmsInfo.battery_alarm_discharging_low_voltage
-          this.battery_alarm_high_temperature = bmsInfo.battery_alarm_high_temperature
-          this.battery_alarm_charging_high_current = bmsInfo.battery_alarm_charging_high_current
-          this.battery_alarm_discharging_high_current = bmsInfo.battery_alarm_discharging_high_current
-          this.battery_alarm_voltage_difference = bmsInfo.battery_alarm_voltage_difference
-          this.battery_alarm_box_high_temperature = bmsInfo.battery_alarm_box_high_temperature
-          this.battery_alarm_low_temperature = bmsInfo.battery_alarm_low_temperature
-          this.battery_alarm_single_cell_high_voltage = bmsInfo.battery_alarm_single_cell_high_voltage
-          this.battery_alarm_single_cell_low_voltage = bmsInfo.battery_alarm_single_cell_low_voltage
-          this.battery_alarm_309_a = bmsInfo.battery_alarm_309_a
-          this.battery_alarm_309_b = bmsInfo.battery_alarm_309_b
-          this.battery_alarm_humidity = bmsInfo.battery_alarm_humidity
-          this.battery_alarm_disassemble = bmsInfo.battery_alarm_disassemble
+            this.battery_alarm_low_power = bmsInfo.battery_alarm_low_power
+            this.battery_alarm_mos_high_temperature = bmsInfo.battery_alarm_mos_high_temperature
+            this.battery_alarm_charging_high_voltage = bmsInfo.battery_alarm_charging_high_voltage
+            this.battery_alarm_discharging_low_voltage = bmsInfo.battery_alarm_discharging_low_voltage
+            this.battery_alarm_high_temperature = bmsInfo.battery_alarm_high_temperature
+            this.battery_alarm_charging_high_current = bmsInfo.battery_alarm_charging_high_current
+            this.battery_alarm_discharging_high_current = bmsInfo.battery_alarm_discharging_high_current
+            this.battery_alarm_voltage_difference = bmsInfo.battery_alarm_voltage_difference
+            this.battery_alarm_box_high_temperature = bmsInfo.battery_alarm_box_high_temperature
+            this.battery_alarm_low_temperature = bmsInfo.battery_alarm_low_temperature
+            this.battery_alarm_single_cell_high_voltage = bmsInfo.battery_alarm_single_cell_high_voltage
+            this.battery_alarm_single_cell_low_voltage = bmsInfo.battery_alarm_single_cell_low_voltage
+            this.battery_alarm_309_a = bmsInfo.battery_alarm_309_a
+            this.battery_alarm_309_b = bmsInfo.battery_alarm_309_b
+            this.battery_alarm_humidity = bmsInfo.battery_alarm_humidity
+            this.battery_alarm_disassemble = bmsInfo.battery_alarm_disassemble
 
-          this.set_alarms()
-        }
-      }).catch(err => {
-        console.log('battery info latest', err)
+            this.set_alarms()
+          }
+        }).catch(err => {
+          console.log('battery info latest', err)
+      })
     })
     if (this.dataListBMS.length === 0) {
       setTimeout(() => {
@@ -651,69 +657,72 @@ export default {
         start_date: moment(new Date() - 2 * 60 * 60 * 1000),
         start_time: moment(new Date() - 2 * 60 * 60 * 1000)
       }
-      getBatteryInfo(this.deviceId, arg)
-        .then(res => {
-          console.log('get battery info', res)
-          const bmsList = []
-          if (res.data && res.data.length > 0) {
-            res.data.forEach(item => {
-              const timestamp = moment(item.time_tracking).format('YYYY-MM-DD HH:mm:ss')
-              console.log('timestamp', timestamp)
-              bmsList.push([
-                {
-                  value: item.battery_voltage,
-                  date: timestamp
-                },
-                {
-                  value: item.battery_currency,
-                  date: timestamp
-                },
-                {
-                  value: item.battery_capacity_soc,
-                  date: timestamp
-                },
-                {
-                  value: item.power_transistor_temperature,
-                  date: timestamp
-                },
-                {
-                  value: item.battery_temperature,
-                  date: timestamp
-                },
-                {
-                  value: item.battery_box_temperature,
-                  date: timestamp
-                }
-              ])
-            })
-          }
-          // if the result is empty, add a empty data
-          if (bmsList.length === 0) {
-            const timestamp = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
-            bmsList.push([{ value: 0, date: timestamp }, { value: 0, date: timestamp }, { value: 0, date: timestamp },
+      getBmsType(this.deviceId).then(res => {
+        console.log('get bms type', res)
+        getBatteryInfo(this.deviceId, res.data.bms_type, arg)
+          .then(res => {
+            console.log('get battery info', res)
+            const bmsList = []
+            if (res.data && res.data.length > 0) {
+              res.data.forEach(item => {
+                const timestamp = moment(item.time_tracking).format('YYYY-MM-DD HH:mm:ss')
+                console.log('timestamp', timestamp)
+                bmsList.push([
+                  {
+                    value: item.battery_voltage,
+                    date: timestamp
+                  },
+                  {
+                    value: item.battery_currency,
+                    date: timestamp
+                  },
+                  {
+                    value: item.battery_capacity_soc,
+                    date: timestamp
+                  },
+                  {
+                    value: item.power_transistor_temperature,
+                    date: timestamp
+                  },
+                  {
+                    value: item.battery_temperature,
+                    date: timestamp
+                  },
+                  {
+                    value: item.battery_box_temperature,
+                    date: timestamp
+                  }
+                ])
+              })
+            }
+            // if the result is empty, add a empty data
+            if (bmsList.length === 0) {
+              const timestamp = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+              bmsList.push([{ value: 0, date: timestamp }, { value: 0, date: timestamp }, { value: 0, date: timestamp },
               { value: 0, date: timestamp }, { value: 0, date: timestamp }, { value: 0, date: timestamp }])
-          }
-          setTimeout(() => {
-            this.$nextTick(() => {
-              if (this.$refs && this.$refs.bmschart) {
-                this.$refs.bmschart.init(
-                  bmsList,
-                  ['电压', '电流', 'SOC', '箱内温度', '电池温度', '功率管温度'],
-                  ['V', 'A', '%', '℃', '℃', '℃'],
-                  [
-                    '#6AD6E6',
-                    '#6F95DA',
-                    '#47ba80',
-                    '#E8A456',
-                    '#DBBB5B',
-                    '#E8E156'
-                  ],
-                  3
-                )
-              }
-            })
-          }, 300)
-        })
+            }
+            setTimeout(() => {
+              this.$nextTick(() => {
+                if (this.$refs && this.$refs.bmschart) {
+                  this.$refs.bmschart.init(
+                    bmsList,
+                    ['电压', '电流', 'SOC', '箱内温度', '电池温度', '功率管温度'],
+                    ['V', 'A', '%', '℃', '℃', '℃'],
+                    [
+                      '#6AD6E6',
+                      '#6F95DA',
+                      '#47ba80',
+                      '#E8A456',
+                      '#DBBB5B',
+                      '#E8E156'
+                    ],
+                    3
+                  )
+                }
+              })
+            }, 300)
+          })
+      })
     },
     form_battery_voltage_array_for_display (array, subGroupLength) {
       let index = 0

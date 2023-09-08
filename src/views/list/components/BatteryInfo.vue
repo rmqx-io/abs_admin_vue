@@ -111,7 +111,7 @@
 
 <script>
 import moment from 'moment'
-import { getBatteryInfo } from '@/api/manage'
+import { getBatteryInfo, getBmsType } from '@/api/manage'
 import { STable } from '@/components'
 import BmsInfoCharts from '@/views/list/components/BmsInfoCharts'
 import BmsConfig from '@/views/list/components/BmsConfig'
@@ -213,20 +213,23 @@ export default {
         console.log('parameter', parameter)
         let arg = this.queryData
         console.log('loadData request arg:', arg)
-        return getBatteryInfo(this.deviceId, arg)
-          .then(res => {
-            this.bms_loading = false
-            return {
-              pageSize: 1000,
-              pageNo: 0,
-              totalCount: 1,
-              totalPage: 1,
-              data: res.data
-            }
-          }).catch(err => {
-            console.log('load bms data failed', err)
-            this.bms_loading = false
-          })
+        return getBmsType(this.deviceId).then(res => {
+          console.log('getBmsType', res)
+          return getBatteryInfo(this.deviceId, res.data.bms_type, arg)
+            .then(res => {
+              this.bms_loading = false
+              return {
+                pageSize: 1000,
+                pageNo: 0,
+                totalCount: 1,
+                totalPage: 1,
+                data: res.data
+              }
+            }).catch(err => {
+              console.log('load bms data failed', err)
+              this.bms_loading = false
+            })
+        })
       },
       selectedRowKeys: [],
       selectedRows: [],

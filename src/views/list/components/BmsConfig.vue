@@ -39,7 +39,10 @@
 </template>
 
 <script>
-import { setBmsConfig, getBatteryInfoLatest, getBmsConfigDataTypes, getBmsConfigDataTypesMap } from '@/api/manage'
+import {
+  setBmsConfig, getBatteryInfoLatest, getBmsConfigDataTypes, getBmsConfigDataTypesMap,
+  getBmsType
+} from '@/api/manage'
 import Error from '@/views/result/Error'
 
 function localErrorMessage (errorMsg) {
@@ -65,14 +68,17 @@ export default {
         console.log('nw bms data types map', res)
         this.bmsConfigKeyToNameFromServer = res.data
       })
-    getBatteryInfoLatest(this.deviceId, {})
-      .then(res => {
-        console.log('latest battery info', res.data.device_bms_config)
-        this.bmsConfig = res.data.device_bms_config
-        // remove id
-        delete this.bmsConfig.id
-        delete this.bmsConfig.device_id
-      })
+    getBmsType(this.deviceId).then(res => {
+      console.log('bms type', res.bms_type)
+      getBatteryInfoLatest(this.deviceId, res.bms_type, {})
+        .then(res => {
+          console.log('latest battery info', res.data.device_bms_config)
+          this.bmsConfig = res.data.device_bms_config
+          // remove id
+          delete this.bmsConfig.id
+          delete this.bmsConfig.device_id
+        })
+    })
   },
   data () {
     return {
