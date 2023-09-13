@@ -259,10 +259,22 @@ export function getBmsConfigDataTypesMap (bmsType) {
 }
 
 export function getBmsType(deviceId) {
+  // Implementing a cache for bms_type
+  if (getBmsType.cache && getBmsType.cache[deviceId]) {
+    return Promise.resolve(getBmsType.cache[deviceId]);
+  }
+
   return request({
     url: api.bms_type + '/' + deviceId,
     method: 'get'
-  })
+  }).then(res => {
+    // Storing the bms_type in the cache
+    if (!getBmsType.cache) {
+      getBmsType.cache = {};
+    }
+    getBmsType.cache[deviceId] = res;
+    return res;
+  });
 }
 
 export function getLocation (deviceId, arg) {
@@ -457,7 +469,7 @@ export function sys_user_update (arg) {
   })
 }
 
-export function sys_role_layer_top(arg){
+export function sys_role_layer_top(arg) {
   return request({
     url: api.sys_role_layer_top,
     method: 'post',
