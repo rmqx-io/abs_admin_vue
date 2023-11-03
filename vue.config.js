@@ -156,6 +156,11 @@ const vueConfig = {
         target: 'http://localhost:8000/',
         ws: false,
         changeOrigin: true
+      },
+      '/api': {
+        target: 'http://localhost:8000/',
+        ws: false,
+        changeOrigin: true
       }
     }
   },
