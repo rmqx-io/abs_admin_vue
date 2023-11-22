@@ -260,9 +260,9 @@ export function getBmsConfigDataTypesMap (bmsType) {
 
 export function getBmsType(deviceId) {
   // Implementing a cache for bms_type
-  if (getBmsType.cache && getBmsType.cache[deviceId]) {
-    return Promise.resolve(getBmsType.cache[deviceId]);
-  }
+  // if (getBmsType.cache && getBmsType.cache[deviceId]) {
+    // return Promise.resolve(getBmsType.cache[deviceId]);
+  // }
 
   return request({
     url: api.bms_type + '/' + deviceId,

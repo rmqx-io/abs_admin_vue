@@ -443,6 +443,7 @@ export default {
   mounted () {
     getBmsType(this.deviceId).then(res => {
       console.log('bms type', res.data.bms_type)
+      let bms_type = res.data.bms_type
       getBatteryInfoLatest(this.deviceId, res.data.bms_type, {})
         .then(res => {
           console.log('battery info latest', res)
@@ -489,6 +490,10 @@ export default {
             this.battery_alarm_disassemble = bmsInfo.battery_alarm_disassemble
 
             this.set_alarms()
+
+            if (bms_type === "bms_jx") {
+              this.getBatteryInfoLatestJx(bmsInfo)
+            }
           }
         }).catch(err => {
           console.log('battery info latest', err)
@@ -799,6 +804,10 @@ export default {
         { key: '湿度报警', value: this.battery_alarm_humidity },
         { key: '防拆报警', value: this.battery_alarm_disassemble }
       ]
+    },
+    getBatteryInfoLatestJx(bmsInfo) {
+      this.isMosRec = bmsInfo.charge_mos === 1
+      this.isMosDis = bmsInfo.discharge_mos === 1
     }
   }
 }
