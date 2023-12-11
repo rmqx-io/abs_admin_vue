@@ -108,8 +108,8 @@
             <el-descriptions-item label="当前功率" span="1">
               <el-tag size="small">{{ battery_voltage * battery_currency }} W</el-tag>
             </el-descriptions-item>
-            <el-descriptions-item label="当前湿度" span="1">
-              <el-tag size="small">{{ humidity }}%</el-tag>
+            <el-descriptions-item label="标称容量" span="1">
+              <el-tag size="small">{{ battery_capacity_config }} Ah</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="剩余容量" span="1">
               <el-tag size="small">{{ battery_capacity_soc * battery_capacity_config / 100 }} Ah</el-tag>
