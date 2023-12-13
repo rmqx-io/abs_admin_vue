@@ -137,7 +137,7 @@ const columns = [
     scopedSlots: { customRender: 'single_battery_voltage' }
   },
   {
-    title: '电池容量',
+    title: 'SOC',
     dataIndex: 'battery_capacity_soc',
     scopedSlots: { customRender: 'battery_capacity_soc' }
   },

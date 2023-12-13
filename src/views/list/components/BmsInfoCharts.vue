@@ -443,7 +443,8 @@ export default {
   mounted () {
     getBmsType(this.deviceId).then(res => {
       console.log('bms type', res.data.bms_type)
-      let bms_type = res.data.bms_type
+      this.bms_type = res.data.bms_type
+      const bms_type = res.data.bms_type
       getBatteryInfoLatest(this.deviceId, res.data.bms_type, {})
         .then(res => {
           console.log('battery info latest', res)
@@ -629,7 +630,8 @@ export default {
       mEquilibriumCurrent: '-',
       mChargeSwitch: '-',
       mDischargeSwitch: '-',
-      mLowSOCAlarmValue: '-'
+      mLowSOCAlarmValue: '-',
+      bms_type: ''
     }
   },
   methods: {
@@ -656,6 +658,42 @@ export default {
         img = 4
       }
       return img
+    },
+    bms_chart_init_jx (bmsList) {
+      this.$refs.bmschart.init(
+        bmsList,
+        ['电压', '电流', 'SOC', 'T01', 'T02', 'T03'],
+        ['V', 'A', '%', '℃', '℃', '℃'],
+        [
+          '#6AD6E6',
+          '#6F95DA',
+          '#47ba80',
+          '#E8A456',
+          '#DBBB5B',
+          '#E8E156'
+        ],
+        3
+      )
+    },
+    form_temperature_array_for_display_jx(item) {
+        // 温度数组
+        const tempList = []
+        tempList.push({
+          pos: 0,
+          name: 'T01',
+          value: item.battery_box_temperature
+        })
+        tempList.push({
+          pos: 1,
+          name: 'T02',
+          value: item.battery_temperature
+        })
+        tempList.push({
+          pos: 2,
+          name: 'T03',
+          value: item.power_transistor_temperature
+        })
+        return [tempList]
     },
     initBMSUI () {
       const arg = {
@@ -709,20 +747,24 @@ export default {
             setTimeout(() => {
               this.$nextTick(() => {
                 if (this.$refs && this.$refs.bmschart) {
-                  this.$refs.bmschart.init(
-                    bmsList,
-                    ['电压', '电流', 'SOC', '箱内温度', '电池温度', '功率管温度'],
-                    ['V', 'A', '%', '℃', '℃', '℃'],
-                    [
-                      '#6AD6E6',
-                      '#6F95DA',
-                      '#47ba80',
-                      '#E8A456',
-                      '#DBBB5B',
-                      '#E8E156'
-                    ],
-                    3
-                  )
+                  if (this.bms_type === "bms_jx") {
+                    this.bms_chart_init_jx(bmsList);
+                  } else {
+                    this.$refs.bmschart.init(
+                      bmsList,
+                      ['电压', '电流', 'SOC', '箱内温度', '电池温度', '功率管温度'],
+                      ['V', 'A', '%', '℃', '℃', '℃'],
+                      [
+                        '#6AD6E6',
+                        '#6F95DA',
+                        '#47ba80',
+                        '#E8A456',
+                        '#DBBB5B',
+                        '#E8E156'
+                      ],
+                      3
+                    )
+                  }
                 }
               })
             }, 300)
@@ -757,24 +799,28 @@ export default {
       return newArray
     },
     form_temperature_array_for_display (item) {
-      // 温度数组
-      const tempList = []
-      tempList.push({
-        pos: 0,
-        name: '箱内温度',
-        value: item.battery_box_temperature
-      })
-      tempList.push({
-        pos: 1,
-        name: '电池温度',
-        value: item.battery_temperature
-      })
-      tempList.push({
-        pos: 2,
-        name: '功率管温度',
-        value: item.power_transistor_temperature
-      })
-      return [tempList]
+      if (this.bms_type === "bms_jx") {
+        return this.form_temperature_array_for_display_jx(item);
+      } else {
+        // 温度数组
+        const tempList = []
+        tempList.push({
+          pos: 0,
+          name: '箱内温度',
+          value: item.battery_box_temperature
+        })
+        tempList.push({
+          pos: 1,
+          name: '电池温度',
+          value: item.battery_temperature
+        })
+        tempList.push({
+          pos: 2,
+          name: '功率管温度',
+          value: item.power_transistor_temperature
+        })
+        return [tempList]
+      }
     },
     alarm_display (alarm) {
       if (alarm === true) {
