@@ -806,8 +806,8 @@ export default {
       ]
     },
     getBatteryInfoLatestJx(bmsInfo) {
-      this.isMosRec = bmsInfo.charge_mos === 1
-      this.isMosDis = bmsInfo.discharge_mos === 1
+      this.isMosRec = bmsInfo.battery_status_charging_mos
+      this.isMosDis = bmsInfo.battery_status_discharging_mos
       this.battery_capacity_config = bmsInfo.battery_capacity_config
     }
   }
