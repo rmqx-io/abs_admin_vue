@@ -300,6 +300,10 @@ export default {
       this[k] && (props[k] = this[k])
       return props[k]
     })
+    props['pagination'] = {
+      ...props['pagination'],
+      pageSizeOptions: ['10', '20', '30', '40', '100', '1000']
+    }
     const table = (
       <a-table {...{ props, scopedSlots: { ...this.$scopedSlots } }} onChange={this.loadData} onExpand={ (expanded, record) => { this.$emit('expand', expanded, record) } }>
         { Object.keys(this.$slots).map(name => (<template slot={name}>{this.$slots[name]}</template>)) }
