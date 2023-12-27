@@ -127,7 +127,7 @@
               size="mini"
               type="danger"
               effect="dark"
-              @click="onSendOrderTag('放电MOS关闭')"
+              @click="controlMos('discharge', '0')"
             >
               关闭
             </el-tag>
@@ -135,7 +135,7 @@
               size="mini"
               type="success"
               effect="dark"
-              @click="onSendOrderTag('放电MOS打开')"
+              @click="controlMos('discharge', '1')"
             >
               开启
             </el-tag>
@@ -146,7 +146,7 @@
               size="mini"
               type="danger"
               effect="dark"
-              @click="onSendOrderTag('充电MOS关闭')"
+              @click="controlMos('charge', '0')"
             >
               关闭
             </el-tag>
@@ -154,7 +154,7 @@
               size="mini"
               type="success"
               effect="dark"
-              @click="onSendOrderTag('充电MOS打开')"
+              @click="controlMos('charge', '1')"
             >
               开启
             </el-tag>
@@ -420,7 +420,8 @@ import ChartBmsMore from '@/views/history/bms_history/components/ChartBmsMore.vu
 // import BmsInfoCharts from '@/views/list/components/BmsInfoCharts'
 import {
   getBatteryInfo, getBatteryInfoLatest,
-  getBmsType
+  getBmsType,
+  sendFmBmsCommand
 } from '@/api/manage'
 import moment from 'moment/moment'
 
@@ -855,6 +856,26 @@ export default {
       this.isMosRec = bmsInfo.battery_status_charging_mos
       this.isMosDis = bmsInfo.battery_status_discharging_mos
       this.battery_capacity_config = bmsInfo.battery_capacity_config
+    },
+    controlMos(mos, on_off) {
+      var mos_address;
+      if (mos === 'charge') {
+        mos_address = 0xab;
+      } else if (mos === 'discharge') {
+        mos_address = 0xac;
+      } else {
+        console.warn('unknown mos', mos);
+        return;
+      }
+
+      const arg = {
+        command: mos_address,
+        param: on_off
+      }
+      sendFmBmsCommand(this.deviceId, arg)
+      .then(res => {
+        console.log("send command", mos, on_off, res);
+      })
     }
   }
 }

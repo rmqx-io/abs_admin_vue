@@ -56,6 +56,9 @@ const api = {
 
   send_command_list: `${prefix}/device/config/commands`,
   send_command: `${prefix}/device/control/send/command`,
+  send_fm_bms_command: `${prefix}/device/control/send/command_fm_bms/`,
+  send_bt_command: `${prefix}/device/control/send/bt_command/`,
+  send_bt_commands: `${prefix}/device/control/send/bt_commands/`,
   send_batch_command: `${prefix}/device/control/send_batch/command`,
   send_batch_command_list: `${prefix}/device/control/send_batch/command/list`,
   send_batch_command_devices: `${prefix}/device/control/send_batch/command/devices`,
@@ -326,6 +329,30 @@ export function getBatchSendCommandDevices (arg) {
 export function sendCommand (deviceId, arg) {
   return request({
     url: api.send_command + '/' + deviceId,
+    method: 'post',
+    data: arg
+  })
+}
+
+export function sendFmBmsCommand (deviceId, arg) {
+  return request({
+    url: api.send_fm_bms_command + '/' + deviceId,
+    method: 'post',
+    data: arg
+  })
+}
+
+export function sendCommandSetBtCode (deviceId, btCode, arg) {
+  return request({
+    url: api.send_bt_command + '/' + deviceId + '/' + btCode,
+    method: 'post',
+    data: arg
+  })
+}
+
+export function sendCommandSetBtCodes (arg) {
+  return request({
+    url: api.send_bt_commands,
     method: 'post',
     data: arg
   })
