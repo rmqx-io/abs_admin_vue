@@ -127,7 +127,7 @@
               size="mini"
               type="danger"
               effect="dark"
-              @click="controlMos('discharge', '0')"
+              @click="controlMos('discharge', '00')"
             >
               关闭
             </el-tag>
@@ -135,7 +135,7 @@
               size="mini"
               type="success"
               effect="dark"
-              @click="controlMos('discharge', '1')"
+              @click="controlMos('discharge', '01')"
             >
               开启
             </el-tag>
@@ -146,7 +146,7 @@
               size="mini"
               type="danger"
               effect="dark"
-              @click="controlMos('charge', '0')"
+              @click="controlMos('charge', '00')"
             >
               关闭
             </el-tag>
@@ -154,7 +154,7 @@
               size="mini"
               type="success"
               effect="dark"
-              @click="controlMos('charge', '1')"
+              @click="controlMos('charge', '01')"
             >
               开启
             </el-tag>

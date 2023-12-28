@@ -56,7 +56,7 @@ const api = {
 
   send_command_list: `${prefix}/device/config/commands`,
   send_command: `${prefix}/device/control/send/command`,
-  send_fm_bms_command: `${prefix}/device/control/send/command_fm_bms/`,
+  send_fm_bms_command: `${prefix}/device/control/send/command_fm_bms`,
   send_bt_command: `${prefix}/device/control/send/bt_command/`,
   send_bt_commands: `${prefix}/device/control/send/bt_commands/`,
   send_batch_command: `${prefix}/device/control/send_batch/command`,

@@ -93,6 +93,7 @@
         <a-button type='primary' @click='handleBatchCommandManager'>下发指令管理</a-button>
         <a-button type='primary' @click='handleExport'>导出</a-button>
         <a-button type='primary' @click='handleImport'>导入</a-button>
+        <a-button type='primary' @click='handleSendBtCode'>下发 BT 码</a-button>
         <a-dropdown v-action:edit v-if='selectedRowKeys.length > 0'>
           <a-menu slot='overlay'>
             <a-menu-item key='send-command' @click='handleSendCommandBatch'>
@@ -247,6 +248,14 @@
         :loading="false"
         @cancel="handleSendCommandManagerCancel"
         @ok="handleSendCommandManagerOk"
+      />
+
+      <send-bt-code
+        ref='sendBtCode'
+        :visible="send_bt_code_visible"
+        :loading="false"
+        @cancel="handleSendBtCodeCancel"
+        @ok="handleSendBtCodeOk"
       />
 
       <send-command-manager-devices
@@ -450,6 +459,7 @@ import StepByStepModal from './modules/StepByStepModal'
 import CreateForm from './modules/CreateForm'
 import SendCommandForm from '@/views/list/modules/SendCommandForm'
 import SendCommandManager from '@/views/list/modules/SendCommandManager'
+import SendBtCode from '@/views/list/modules/SendBtCode'
 import SendCommandManagerDevices from './modules/SendCommandManagerDevices.vue'
 import BatteryInfo from '@/views/list/components/BatteryInfo'
 import storage from 'store'
@@ -583,6 +593,7 @@ export default {
   name: 'TableList',
   components: {
     SendCommandManager,
+    SendBtCode,
     SendCommandManagerDevices,
     DeviceAlarm,
     STable,
@@ -654,6 +665,7 @@ export default {
       showTableTab: true,
       showAlarm: false,
       send_command_form_visible: false,
+      send_bt_code_visible: false,
       packet_log_visible: false,
       battery_detail_visible: false,
       map_visible: false,
@@ -789,6 +801,14 @@ export default {
         this.$refs.sendCommandManager.refresh()
       }, 100)
     },
+    handleSendBtCode () {
+      console.log('handleSendBtCode')
+      this.send_bt_code_visible = true
+      // after 1s refresh
+      // setTimeout(() => {
+        // this.$refs.sendBtCode.refresh()
+      // }, 100)
+    },
     handleExport () {
       console.log('handleExport')
       const arg = Object.assign({}, this.queryData)
@@ -910,6 +930,12 @@ export default {
     },
     handleSendCommandManagerCancel() {
       this.showBatchCommandManager = false
+    },
+    handleSendBtCodeCancel() {
+      this.send_bt_code_visible = false
+    },
+    handleSendBtCodeOk() {
+      this.send_bt_code_visible = false
     },
     handlePacketLogCancel () {
       this.packet_log_visible = false
