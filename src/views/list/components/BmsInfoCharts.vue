@@ -469,8 +469,8 @@ export default {
             // console.log('battery list', this.batteryList)
             // single_battery_voltage_arr
             this.battery_currency = bmsInfo.battery_currency
-            this.isMosRec = bmsInfo.battery_status_charging_mos === 1
-            this.isMosDis = bmsInfo.battery_status_discharging_mos === 1
+            this.isMosRec = bmsInfo.battery_status_charging_mos
+            this.isMosDis = bmsInfo.battery_status_discharging_mos
             this.battery_charging_cycle = bmsInfo.battery_charging_cycle
             this.humidity = bmsInfo.humidity
 
