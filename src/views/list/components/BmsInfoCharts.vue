@@ -872,9 +872,13 @@ export default {
         command: mos_address,
         param: on_off
       }
+      this.$message.info("设置 MOS")
       sendFmBmsCommand(this.deviceId, arg)
       .then(res => {
+        this.$message.info("设置 MOS 成功")
         console.log("send command", mos, on_off, res);
+      }).catch(() => {
+        this.$message.error("设置 MOS 失败")
       })
     }
   }

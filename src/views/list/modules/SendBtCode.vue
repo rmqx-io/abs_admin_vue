@@ -63,13 +63,12 @@ export default {
             const arg = {
                 device_id_and_bt_code: this.device_id_and_bt_code
             }
+            this.$message.info('下发 BT 码')
             sendCommandSetBtCodes(arg)
                 .then(res => {
+                    this.$message.success('下发成功')
                     if (res.data) {
-                        this.$message.success('下发成功')
-                        this.handleCancel()
-                    } else {
-                        this.formErrorMessage = res.data.message
+                        this.formErrorMessage = res.data
                     }
                 })
                 .catch(err => {
