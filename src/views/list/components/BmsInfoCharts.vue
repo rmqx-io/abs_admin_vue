@@ -99,14 +99,14 @@
                 size="small"
                 :type="battery_currency === 0 ? 'info' : battery_currency > 0 ? 'warning' : 'danger'"
               >
-                {{ battery_currency }} A
+                {{ battery_currency/100 }} A
               </el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="当前电压" span="1">
               <el-tag size="small">{{ battery_voltage }} V</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="当前功率" span="1">
-              <el-tag size="small">{{ battery_voltage * battery_currency }} W</el-tag>
+              <el-tag size="small">{{ battery_voltage * battery_currency /100 }} W</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="标称容量" span="1">
               <el-tag size="small">{{ battery_capacity_config }} Ah</el-tag>
