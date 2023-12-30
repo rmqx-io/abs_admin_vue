@@ -497,6 +497,11 @@ export default {
               this.getBatteryInfoLatestJx(bmsInfo)
             }
           }
+          if (res.data && res.data.device_bms_config) {
+            if (res.data.device_bms_config.battery_capacity_config) {
+              this.battery_capacity_config = res.data.device_bms_config.battery_capacity_config
+            }
+          }
         }).catch(err => {
           console.log('battery info latest', err)
       })
