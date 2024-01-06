@@ -823,10 +823,10 @@ export default {
         }
         refreshDevicePage(arg).then(res => {
           console.log('refreshDevicePage', res)
-          this.$message.info('刷新成功')
+          this.$message.info(res.data)
         }).catch(err => {
           console.log('refreshDevicePage', err)
-          this.$message.error(err.data.message)
+          this.$message.error(err.msg)
         })
     },
     handleExport () {
