@@ -824,6 +824,7 @@ export default {
         refreshDevicePage(arg).then(res => {
           console.log('refreshDevicePage', res)
           this.$message.info(res.data)
+          this.refreshTable(true)
         }).catch(err => {
           console.log('refreshDevicePage', err)
           this.$message.error(err.msg)
