@@ -64,6 +64,7 @@ const api = {
   send_batch_command_devices: `${prefix}/device/control/send_batch/command/devices`,
 
   refresh_online_status: `${prefix}/device/refresh/online/status`,
+  refresh_online_status_page: `${prefix}/device/refresh`,
 
   permission: '/permission',
   permissionNoPager: '/permission/no-pager',
@@ -292,6 +293,14 @@ export function refreshOnlineStatus (deviceId) {
   return request({
     url: api.refresh_online_status + '/' + deviceId,
     method: 'get'
+  })
+}
+
+export function refreshDevicePage (arg) {
+  return request({
+    url: api.refresh_online_status_page,
+    method: 'post',
+    data: arg
   })
 }
 

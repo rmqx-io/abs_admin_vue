@@ -94,6 +94,7 @@
         <a-button type='primary' @click='handleExport'>导出</a-button>
         <a-button type='primary' @click='handleImport'>导入</a-button>
         <a-button type='primary' @click='handleSendBtCode'>下发 BT 码</a-button>
+        <a-button type='primary' @click='handleRefreshOnlineStatusPage'>刷新设备在线状态(当前页)</a-button>
         <a-dropdown v-action:edit v-if='selectedRowKeys.length > 0'>
           <a-menu slot='overlay'>
             <a-menu-item key='send-command' @click='handleSendCommandBatch'>
@@ -452,7 +453,8 @@ import {
   getLocation,
   getStatusCount, refreshOnlineStatus,
   updateDevice,
-  getBmsType
+  getBmsType,
+  refreshDevicePage
 } from '@/api/manage'
 
 import StepByStepModal from './modules/StepByStepModal'
@@ -808,6 +810,24 @@ export default {
       // setTimeout(() => {
         // this.$refs.sendBtCode.refresh()
       // }, 100)
+    },
+    handleRefreshOnlineStatusPage () {
+        const arg = Object.assign({}, this.queryData)
+        arg.page_no = arg.pageNo
+        arg.page_size = arg.pageSize
+        arg.location_only = false
+        delete arg.pageNo
+        delete arg.pageSize
+        if (this.deviceStatus) {
+          arg.device_status = this.deviceStatus
+        }
+        refreshDevicePage(arg).then(res => {
+          console.log('refreshDevicePage', res)
+          this.$message.info('刷新成功')
+        }).catch(err => {
+          console.log('refreshDevicePage', err)
+          this.$message.error(err.data.message)
+        })
     },
     handleExport () {
       console.log('handleExport')
