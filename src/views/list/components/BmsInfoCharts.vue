@@ -412,6 +412,7 @@
         </el-descriptions-item>
       </el-descriptions>
     </el-row>
+    <span>{{ this.bms_type === "bms_details" ? "fm/jk" : this.bms_type }}</span>
   </a-card>
 </template>
 
