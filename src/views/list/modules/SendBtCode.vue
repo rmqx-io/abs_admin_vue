@@ -9,6 +9,10 @@
         @cancel="() => { handleCancel(); $emit('cancel') }"
     >
         <div>
+            <a-radio-group v-model="bms_type">
+                <a-radio-button value="bms_jk">bms_jk</a-radio-button>
+                <a-radio-button value="bms_ls">bms_ls</a-radio-button>
+            </a-radio-group>
             <a-form-item
                 :label="`设备编号和 BT 码`"
             >
@@ -23,6 +27,7 @@
             />
             </a-form-item>
             <div v-if='formErrorMessage' class='error'>{{ this.formErrorMessage }}</div>
+            <div v-if='formInfoMessage' class='info'>{{ this.formInfoMessage }}</div>
             <a-button type="primary" @click="handleSend">
                 下发
             </a-button>
@@ -49,7 +54,9 @@ export default {
     data () {
         return {
             formErrorMessage: null,
-            device_id_and_bt_code: ''
+            formInfoMessage: null,
+            device_id_and_bt_code: '',
+            bms_type: 'bms_jk'
         }
     },
     methods: {
@@ -61,14 +68,17 @@ export default {
         },
         handleSend() {
             const arg = {
-                device_id_and_bt_code: this.device_id_and_bt_code
+                device_id_and_bt_code: this.device_id_and_bt_code,
+                bms_type: this.bms_type
             }
             this.$message.info('下发 BT 码')
+            this.formErrorMessage = null
+            this.formInfoMessage = null
             sendCommandSetBtCodes(arg)
                 .then(res => {
                     this.$message.success('下发成功')
                     if (res.data) {
-                        this.formErrorMessage = res.data
+                        this.formInfoMessage = res.data
                     }
                 })
                 .catch(err => {
