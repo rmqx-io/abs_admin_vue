@@ -865,6 +865,8 @@ export default {
       this.isMosRec = bmsInfo.battery_status_charging_mos
       this.isMosDis = bmsInfo.battery_status_discharging_mos
       this.battery_capacity_config = bmsInfo.battery_capacity_config
+      this.batteryVer = "100"
+      this.batteryType = this.bms_type === "bms_details" ? "fm/jk" : this.bms_type
     },
     controlMos(mos, on_off) {
       var mos_address;
