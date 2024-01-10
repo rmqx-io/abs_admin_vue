@@ -494,7 +494,10 @@ export default {
 
             this.set_alarms()
 
-            if (bms_type === "bms_jx") {
+            if (
+              bms_type === "bms_jx" ||
+              bms_type === "bms_ls"
+            ) {
               this.getBatteryInfoLatestJx(bmsInfo)
             }
           }
