@@ -354,6 +354,9 @@
           </amap-circle-marker>
         </amap>
       </div>
+      <div>
+        <p @click='handleRefreshOnlineStatusAll'>.</p>
+      </div>
     </div>
 
     <div v-if='packet_log_visible'>
@@ -454,7 +457,8 @@ import {
   getStatusCount, refreshOnlineStatus,
   updateDevice,
   getBmsType,
-  refreshDevicePage
+  refreshDevicePage,
+refreshDeviceOnlineStatusAll
 } from '@/api/manage'
 
 import StepByStepModal from './modules/StepByStepModal'
@@ -829,6 +833,16 @@ export default {
           console.log('refreshDevicePage', err)
           this.$message.error(err.msg)
         })
+    },
+    handleRefreshOnlineStatusAll () {
+      refreshDeviceOnlineStatusAll().then(res => {
+        console.log('refreshDeviceOnlineStatusAll', res)
+        this.$message.info(res.data)
+        this.refreshTable(true)
+      }).catch(err => {
+        console.log('refreshDeviceOnlineStatusAll', err)
+        this.$message.error(err.msg)
+      })
     },
     handleExport () {
       console.log('handleExport')
