@@ -989,7 +989,7 @@ export default {
       // 需要在下一个循环里面执行 batteryInfo 的代码
       this.$nextTick(() => {
         console.log(this.$refs)
-        this.$refs.batteryInfo.getBatteryInfo(record.code)
+        this.$refs.batteryInfo.getBatteryInfoHandle(record.code)
       })
     },
     onSelectChange(selectedRowKeys, selectedRows) {

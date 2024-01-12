@@ -252,7 +252,7 @@ export default {
     handleClose: function handleCancel (e) {
       this.$emit('cancel', e)
     },
-    getBatteryInfo (deviceId) {
+    getBatteryInfoHandle (deviceId) {
     },
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys

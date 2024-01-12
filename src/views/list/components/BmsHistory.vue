@@ -47,7 +47,7 @@
     </a-card>
 </template>
 <script>
-import { getBatteryInfo } from '@/api/manage'
+import { getBmsType, getBatteryInfo } from '@/api/manage'
 import BmsChartComponent from '@/views/list/components/BmsChartComponent'
 import moment from 'moment/moment'
 
@@ -63,7 +63,10 @@ export default {
         }
     },
     mounted () {
-        this.getBmsHistoryDataAndUpdateChart()
+        getBmsType(this.deviceId).then(res => {
+            this.bms_type = res.data.bms_type
+            this.getBmsHistoryDataAndUpdateChart()
+        })
     },
     data() {
         return {
@@ -77,7 +80,8 @@ export default {
             singleBatteryVoltageTitle: '单体电池电压',
             singleBatteryVoltageYLabel: '电压 (V)',
             singleBatteryVoltageData: {},
-            loading: false
+            loading: false,
+            bms_type: "",
         }
     },
     methods: {
@@ -102,7 +106,7 @@ export default {
             }
             console.log('arg', arg)
             this.loading = true
-            getBatteryInfo(this.deviceId, arg)
+            getBatteryInfo(this.deviceId, this.bms_type, arg)
                 .then(res => {
                     this.loading = false
                     console.log('getBatteryInfo', res)
