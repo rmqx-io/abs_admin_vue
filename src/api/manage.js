@@ -241,6 +241,13 @@ export function getBatteryInfoLatest (deviceId, bmsType, arg) {
   })
 }
 
+export function getBatteryInfoLatestCql (deviceId, bmsType, arg) {
+  return request({
+    url: api.battery_info_latest + '/' + deviceId + '/' + bmsType + '/cql',
+    method: 'post',
+  })
+}
+
 export function setBmsConfig (deviceId, arg) {
   return request({
     url: api.bms_config + '/' + deviceId,

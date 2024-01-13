@@ -9,6 +9,8 @@
             </a-form>
             <div>bms 类型</div>
             <div>{{ this.bms_type_data }}</div>
+            <div>最后一笔数据 cql</div>
+            <div>{{ this.bms_latest_cql }}</div>
             <div>最后一笔数据</div>
             <div>{{ this.bms_latest_data }}</div>
             <div>历史数据</div>
@@ -20,6 +22,7 @@
 <script>
 import {
     getBmsType,
+    getBatteryInfoLatestCql,
     getBatteryInfoLatest,
     getBatteryInfo
 } from '@/api/manage'
@@ -32,6 +35,7 @@ export default {
             device_id: '',
             bms_type: '',
             bms_type_data: '',
+            bms_latest_cql: '',
             bms_latest_data: '',
             bms_history_data: ''
         }
@@ -44,6 +48,11 @@ export default {
                 console.log('getBmsType', res)
                 this.bms_type_data = res.data
                 this.bms_type = res.data.bms_type
+
+                getBatteryInfoLatestCql(this.device_id, this.bms_type, {}).then(res => {
+                    console.log('getBatteryInfoLatestCql', res)
+                    this.bms_latest_cql = res.data
+                })
 
                 // get bms latest data
                 getBatteryInfoLatest(this.device_id, this.bms_type, {}).then(res => {
