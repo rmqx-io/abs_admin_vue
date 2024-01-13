@@ -302,6 +302,26 @@ export const asyncRouterMap = [
           //   meta: { title: '字典管理', keepAlive: true, permission: ['setting'] }
           // }
         ]
+      },
+      {
+        path: '/tools',
+        component: RouteView,
+        redirect: '/tools/',
+        name: 'tools',
+        meta: { title: '工具', icon: 'tool', keepAlive: true, permission: ['setting'] },
+        children: [
+          {
+            path: '/tools/bms',
+            name: 'tools_bms',
+            component: () => import('@/views/tools/Bms'),
+            meta: {
+              title: 'account.settings.menuMap.security',
+              hidden: true,
+              keepAlive: true,
+              permission: ['setting']
+            }
+          }
+        ]
       }
     ]
   },
