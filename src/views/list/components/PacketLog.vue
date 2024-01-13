@@ -56,6 +56,7 @@
           rowKey='id'
           :data='loadData'
           showPagination='auto'
+          :customRow='rowClick'
         >
           <span slot='time_tracking' slot-scope="text, record">
             <template>
@@ -93,6 +94,18 @@
           <Button :disabled='hasMore === false' @click='handleNextPage()'>下一页</Button>
         </div>
       </div>
+      <a-modal
+        title="协议日志"
+        width='90vw'
+        center
+        :visible='packet_parse_visible'
+        @cancel='handlePacketParseCancel'
+        @ok='handlePacketParseCancel'
+      >
+        <div>
+          {{ this.packet_parse }}
+        </div>
+      </a-modal>
     </div>
   </a-card>
 </template>
@@ -100,7 +113,10 @@
 <script>
 import { STable, Ellipsis } from '@/components'
 import Button from 'ant-design-vue/lib/button'
-import { getDevicePacketLog } from '@/api/manage'
+import {
+  getDevicePacketLog,
+  devicePacketParse
+} from '@/api/manage'
 import moment from 'moment'
 
 export default {
@@ -129,7 +145,9 @@ export default {
       hasMore: false,
       queryData: {
         time: [moment.utc().local().subtract(1, 'day'), moment.utc().local()]
-      }
+      },
+      packet_parse: '',
+      packet_parse_visible: false
     }
   },
   methods: {
@@ -247,6 +265,29 @@ export default {
         this.refresh()
       }
     },
+    handlePacketParseCancel () {
+      this.packet_parse_visible = false
+    },
+    rowClick (record) {
+      return {
+        on: {
+          click: (event) => {
+            console.log('rowClick packet', record.packet)
+            const arg = { packet: '' + record.packet }
+            // parse packet
+            devicePacketParse(arg).then(res => {
+              console.log('rowClick packet parse', res)
+              // show parse result in a popup view
+              this.packet_parse = res.data
+              this.packet_parse_visible = true
+            }).catch(err => {
+              console.log('rowClick packet parse err', err)
+              this.$message.error(err)
+            })
+          }
+        }
+      }
+    }
   }
 }
 </script>

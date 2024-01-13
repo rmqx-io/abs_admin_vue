@@ -38,6 +38,7 @@ const api = {
   add_device: `${prefix}/device/add`,
   update_device: `${prefix}/device/update`,
   device_packet_log: `${prefix}/device/packet/log`,
+  device_packet_parse: `${prefix}/device/packet/parse`,
 
   org: `${prefix}/org`,
   add_org: `${prefix}/org/add`,
@@ -166,6 +167,14 @@ export function getDevicePacketLog (deviceId, parameter) {
     url: api.device_packet_log + '/' + deviceId,
     method: 'post',
     data: parameter
+  })
+}
+
+export function devicePacketParse (packet) {
+  return request({
+    url: api.device_packet_parse,
+    method: 'post',
+    data: packet
   })
 }
 

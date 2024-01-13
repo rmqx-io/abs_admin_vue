@@ -316,7 +316,7 @@ export const asyncRouterMap = [
             component: () => import('@/views/tools/Bms'),
             meta: {
               title: 'account.settings.menuMap.security',
-              hidden: true,
+              hidden: false,
               keepAlive: true,
               permission: ['setting']
             }
