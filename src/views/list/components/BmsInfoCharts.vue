@@ -462,7 +462,7 @@ export default {
           if (res.data && res.data.logs && res.data.logs.length > 0) {
             const bmsInfo = res.data.logs[0]
             this.time_tracking = moment(bmsInfo.time_tracking).format('YYYY-MM-DD HH:mm:ss')
-            this.battery_capacity_soc = bmsInfo.battery_capacity_soc
+            this.battery_capacity_soc = bmsInfo.battery_capacity_soc.toFixed(2)
             this.battery_healthy = bmsInfo.battery_healthy
             this.battery_voltage = bmsInfo.battery_voltage
             this.batteryList = this.form_battery_voltage_array_for_display(bmsInfo.single_battery_voltage_arr.split(','), 5)
