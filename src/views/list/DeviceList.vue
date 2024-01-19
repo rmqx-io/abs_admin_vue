@@ -458,7 +458,8 @@ import {
   updateDevice,
   getBmsType,
   refreshDevicePage,
-refreshDeviceOnlineStatusAll
+  refreshDeviceOnlineStatusAll,
+  wgs84togcj02
 } from '@/api/manage'
 
 import StepByStepModal from './modules/StepByStepModal'
@@ -1128,6 +1129,8 @@ export default {
           res.data.records.forEach((item, index) => {
             if (item.last_location_lng !== null && item.last_location_lat !== null) {
               this.markersFound += 1
+              const gcj02 = wgs84togcj02(item.last_location_lng, item.last_location_lat)
+              console.log('gcj02', gcj02)
               this.deviceMarkers.push({
                 lnglat: [item.last_location_lng, item.last_location_lat],
                 device: item
