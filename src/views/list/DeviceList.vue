@@ -1132,7 +1132,7 @@ export default {
               const gcj02 = wgs84togcj02(item.last_location_lng, item.last_location_lat)
               console.log('gcj02', gcj02)
               this.deviceMarkers.push({
-                lnglat: [item.last_location_lng, item.last_location_lat],
+                lnglat: gcj02,
                 device: item
               })
             }
