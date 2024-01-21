@@ -8,43 +8,10 @@
     @ok="() => { handleOk() }"
     @cancel="() => { handleCancel(); $emit('cancel') }"
   >
-    <div>
-      <a-table
-        :dataSource='deviceIds'
-        :columns='columnsDeviceIds'
-        rowKey='deviceId'
-      >
-        <span slot="action" slot-scope="text, record">
-          <template>
-            <a @click="handleDeviceIdsRemove(record)">删除</a>
-          </template>
-        </span>
-      </a-table>
-      <div>
-        <a-button type="primary" @click="handleAddDevice">
-          添加设备
-          <a-icon v-if='!showAddDevice' type="down" />
-          <a-icon v-if='showAddDevice' type="up" />
-        </a-button>
-      </div>
-      <div v-if='showAddDevice'>
-        <a-form-item
-          :label="`设备编号`"
-        >
-          <a-textarea
-            v-decorator="['newDeviceIds', {rules: [{required: true, message: '设备编号'}]}]"
-            :rows="4"
-            v-model='newDeviceIds'
-            placeholder='输入设备编号
-一行一个设备'
-          />
-        </a-form-item>
-        <div v-if='formErrorMessage' class='error'>{{ this.formErrorMessage}}</div>
-        <a-button type="primary" @click="handleAddDeviceIds">
-          添加
-        </a-button>
-      </div>
-    </div>
+    <select-device-ids
+      :deviceIds="deviceIds"
+      :showAdd=false
+    />
     <a-table
       :dataSource="sendCommandList"
       :columns="columns"
@@ -83,265 +50,270 @@
 import { batchSendCommand, getSendCommandList, sendCommand } from '@/api/manage'
 import moment from 'moment'
 import res from '@/views/setting/Res'
+import SelectDeviceIds from '@/views/list/modules/SelectDeviceIds'
 
 export default {
-  props: {
-    visible: {
-      type: Boolean,
-      required: true
-    },
-    loading: {
-      type: Boolean,
-      default: () => false
-    },
-    model: {
-      type: Object,
-      default: () => null
-    },
-    deviceIds: {
-      type: Array,
-      default: () => []
-    }
-  },
-  data () {
-    return {
-      enableDeviceIdRange: false,
-      sendCommandList: [],
-      enableOfflineMessage: false,
-      offlineMessageTtl: null,
-      columns: [
-        {
-          title: '指令名称',
-          dataIndex: 'name_cn',
-          key: 'name_cn'
+    props: {
+        visible: {
+            type: Boolean,
+            required: true
         },
-        {
-          title: '描述',
-          dataIndex: 'description_cn',
-          key: 'description_cn'
+        loading: {
+            type: Boolean,
+            default: () => false
         },
-        {
-          title: '指令',
-          dataIndex: 'command',
-          key: 'command'
+        model: {
+            type: Object,
+            default: () => null
         },
-        {
-          title: '子指令',
-          dataIndex: 'sub_command',
-          key: 'sub_command'
+        deviceIds: {
+            type: Array,
+            default: () => []
         }
-      ],
-      columnsDeviceIds: [
-        {
-          title: '设备ID',
-          dataIndex: 'deviceId',
-          key: 'deviceId'
+    },
+    data() {
+        return {
+            enableDeviceIdRange: false,
+            sendCommandList: [],
+            enableOfflineMessage: false,
+            offlineMessageTtl: null,
+            columns: [
+                {
+                    title: "指令名称",
+                    dataIndex: "name_cn",
+                    key: "name_cn"
+                },
+                {
+                    title: "描述",
+                    dataIndex: "description_cn",
+                    key: "description_cn"
+                },
+                {
+                    title: "指令",
+                    dataIndex: "command",
+                    key: "command"
+                },
+                {
+                    title: "子指令",
+                    dataIndex: "sub_command",
+                    key: "sub_command"
+                }
+            ],
+            columnsDeviceIds: [
+                {
+                    title: "设备ID",
+                    dataIndex: "deviceId",
+                    key: "deviceId"
+                },
+                {
+                    title: "操作",
+                    dataIndex: "action",
+                    scopedSlots: { customRender: "action" },
+                    fixed: "right"
+                }
+            ],
+            currentRow: null,
+            param: null,
+            showAddDevice: false,
+            activeTab: "singleDeviceId",
+            deviceIdNew: null,
+            deviceIdRangeBegin: null,
+            deviceIdRangeEnd: null,
+            deviceIdSet: null,
+            reload: true,
+            formErrorMessage: null,
+            newDeviceIds: null
+        };
+    },
+    created() {
+        this.getSendCommandList();
+    },
+    methods: {
+        getSendCommandList() {
+            return getSendCommandList("secnet")
+                .then(res => {
+                this.sendCommandList = res.data;
+            });
         },
-        {
-          title: '操作',
-          dataIndex: 'action',
-          scopedSlots: { customRender: 'action' },
-          fixed: 'right'
+        customRow(record) {
+            return {
+                on: {
+                    click: (event) => {
+                        console.log("row click", record);
+                        this.currentRow = record;
+                    }
+                }
+            };
+        },
+        handleOk() {
+            this.formErrorMessage = null;
+            if (this.currentRow === null) {
+                this.formErrorMessage = "请选择指令";
+                return;
+            }
+            console.log("deviceIds", this.deviceIds);
+            if (this.deviceIds.length === 0) {
+                this.formErrorMessage = "请添加设备";
+                return;
+            }
+            // console.log('handleOk', this.currentRow, this.param)
+            let arg = {
+                id: (new Date()).getTime(), // current timestamp in milliseconds
+                name: this.currentRow.name,
+                command: this.currentRow.command,
+                subCommand: this.currentRow.sub_command,
+                param: this.param,
+                enableOfflineMessage: this.enableOfflineMessage,
+                offlineMessageTtl: this.offlineMessageTtl
+            };
+            console.log("arg", arg);
+            //
+            // send the device id set (array of device id and/or device id range) to the backend.
+            // The backend will send the command to each device in the set one by one in background.
+            //
+            // The backend will store the command in a database table and return the batch command id.
+            //
+            // The frontend can use this id to query the status of the batch command.
+            //
+            // The backend will (should?) also send a notification to the frontend when the batch command is finished.
+            //
+            // arg.deviceIdSet = this.deviceIdSet
+            arg.deviceIds = this.deviceIds.map(item => item.deviceId);
+            this.$message.info("正在发送指令");
+            batchSendCommand(arg).then(res => {
+                console.log(res);
+                if (res.data && res.data.id) {
+                    console.log("batch command id", res.data.id);
+                    // close current dialog and show batch command manager dialog
+                    this.$emit("ok", res.data.id);
+                }
+                else {
+                    // send command failed
+                    this.$message.error(res);
+                }
+            });
+        },
+        handleCancel() {
+            console.log("handleCancel");
+            this.deviceIdSet = null;
+            this.showAddDevice = false;
+        },
+        handleAddDevice() {
+            console.log("handleAddDevice");
+            this.showAddDevice = !this.showAddDevice;
+        },
+        initDeviceSet() {
+            if (this.deviceIdSet == null) {
+                this.deviceIdSet = {
+                    list: []
+                };
+                if (this.deviceId) {
+                    this.deviceIdSet.list.push(this.deviceId);
+                }
+            }
+            if (this.deviceIdSet.list == null) {
+                this.deviceIdSet.list = [];
+            }
+            if (this.deviceIdSet.rangeList == null) {
+                this.deviceIdSet.rangeList = [];
+            }
+        },
+        reloadDeviceSet() {
+            this.reload = false;
+            this.reload = true;
+        },
+        handleAddDeviceId() {
+            console.log("handleAddDeviceId", this.deviceIdNew);
+            this.initDeviceSet();
+            this.deviceIdSet.list.push(this.deviceIdNew);
+            this.deviceIdNew = null;
+            this.reloadDeviceSet();
+        },
+        handleAddDeviceIdRange() {
+            console.log("handleAddDeviceIdRange", this.deviceIdRangeBegin, this.deviceIdRangeEnd);
+            this.initDeviceSet();
+            this.deviceIdSet.rangeList.push([this.deviceIdRangeBegin, this.deviceIdRangeEnd]);
+            this.deviceIdRangeBegin = null;
+            this.deviceIdRangeEnd = null;
+            this.reloadDeviceSet();
+        },
+        handleRemoveDeviceId(id) {
+            console.log("handleRemoveDeviceId", id);
+            if (this.deviceIdSet && this.deviceIdSet.list) {
+                const index = this.deviceIdSet.list.indexOf(id);
+                if (index >= 0) {
+                    this.deviceIdSet.list.splice(index, 1);
+                }
+            }
+            this.reloadDeviceSet();
+        },
+        handleRemoveDeviceIdRange(idRange) {
+            console.log("handleRemoveDeviceIdRange", idRange);
+            if (this.deviceIdSet && this.deviceIdSet.rangeList) {
+                let foundIndex = -1;
+                this.deviceIdSet.rangeList.forEach((range, index) => {
+                    console.log("range", range, "index", index);
+                    if (range[0] === idRange[0] && range[1] === idRange[1]) {
+                        foundIndex = index;
+                    }
+                });
+                if (foundIndex >= 0) {
+                    console.log("remove range", foundIndex);
+                    this.deviceIdSet.rangeList.splice(foundIndex, 1);
+                    console.log("rangeList", this.deviceIdSet.rangeList);
+                }
+            }
+            this.reloadDeviceSet();
+        },
+        handleDeviceIdsRemove(id) {
+            console.log("handleDeviceIdsRemove", id);
+            const index = this.deviceIds.indexOf(id);
+            if (index >= 0) {
+                this.deviceIds.splice(index, 1);
+            }
+        },
+        handleAddDeviceIds() {
+            console.log("handleAddDeviceIds", this.newDeviceIds);
+            this.newDeviceIds.split("\n").forEach(id => {
+                const index = this.deviceIds.findIndex(item => item.deviceId === id);
+                if (index < 0) {
+                    this.deviceIds.push({ deviceId: id });
+                }
+            });
+        },
+        handleSaveOfflineMessageChange(value) {
+            if (value) {
+                const now = new Date();
+                now.setMonth(now.getMonth() + 1);
+                this.offlineMessageTtl = moment(now).format("YYYY-MM-DD HH:mm:ss");
+            }
+        },
+        getTimeGap(date) {
+            if (date == null) {
+                return "";
+            }
+            const dateObj = new Date(date);
+            const now = new Date();
+            const gap = dateObj.getTime() - now.getTime();
+            const seconds = Math.floor(gap / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            if (days > 0) {
+                return `${days} 天 ${hours % 24} 小时`;
+            }
+            else if (hours > 0) {
+                return `${hours} 小时 ${minutes % 60} 分钟`;
+            }
+            else if (minutes > 0) {
+                return `${minutes} 分钟 ${seconds % 60} 秒`;
+            }
+            else {
+                return `${seconds} 秒`;
+            }
         }
-      ],
-      currentRow: null,
-      param: null,
-      showAddDevice: false,
-      activeTab: 'singleDeviceId',
-      deviceIdNew: null,
-      deviceIdRangeBegin: null,
-      deviceIdRangeEnd: null,
-      deviceIdSet: null,
-      reload: true,
-      formErrorMessage: null,
-      newDeviceIds: null
-    }
-  },
-  created () {
-    this.getSendCommandList()
-  },
-  methods: {
-    getSendCommandList () {
-      return getSendCommandList('secnet')
-        .then(res => {
-          this.sendCommandList = res.data
-        })
     },
-    customRow (record) {
-      return {
-        on: {
-          click: (event) => {
-            console.log('row click', record)
-            this.currentRow = record
-          }
-        }
-      }
-    },
-    handleOk () {
-      this.formErrorMessage = null
-      if (this.currentRow === null) {
-        this.formErrorMessage = '请选择指令'
-        return
-      }
-      console.log('deviceIds', this.deviceIds)
-      if (this.deviceIds.length === 0) {
-        this.formErrorMessage = '请添加设备'
-        return
-      }
-      // console.log('handleOk', this.currentRow, this.param)
-      let arg = {
-        id: (new Date()).getTime(), // current timestamp in milliseconds
-        name: this.currentRow.name,
-        command: this.currentRow.command,
-        subCommand: this.currentRow.sub_command,
-        param: this.param,
-        enableOfflineMessage: this.enableOfflineMessage,
-        offlineMessageTtl: this.offlineMessageTtl
-      }
-      console.log('arg', arg)
-        //
-        // send the device id set (array of device id and/or device id range) to the backend.
-        // The backend will send the command to each device in the set one by one in background.
-        //
-        // The backend will store the command in a database table and return the batch command id.
-        //
-        // The frontend can use this id to query the status of the batch command.
-        //
-        // The backend will (should?) also send a notification to the frontend when the batch command is finished.
-        //
-        // arg.deviceIdSet = this.deviceIdSet
-      arg.deviceIds = this.deviceIds.map(item => item.deviceId)
-      this.$message.info('正在发送指令')
-      batchSendCommand(arg).then(res => {
-        console.log(res)
-        if (res.data && res.data.id) {
-          console.log('batch command id', res.data.id)
-          // close current dialog and show batch command manager dialog
-          this.$emit('ok', res.data.id)
-        } else {
-          // send command failed
-          this.$message.error(res)
-        }
-      })
-    },
-    handleCancel () {
-      console.log('handleCancel')
-      this.deviceIdSet = null
-      this.showAddDevice = false
-    },
-    handleAddDevice () {
-      console.log('handleAddDevice')
-      this.showAddDevice = !this.showAddDevice
-    },
-    initDeviceSet () {
-      if (this.deviceIdSet == null) {
-        this.deviceIdSet = {
-          list: []
-        }
-        if (this.deviceId) {
-          this.deviceIdSet.list.push(this.deviceId)
-        }
-      }
-      if (this.deviceIdSet.list == null) {
-        this.deviceIdSet.list = []
-      }
-      if (this.deviceIdSet.rangeList == null) {
-        this.deviceIdSet.rangeList = []
-      }
-    },
-    reloadDeviceSet () {
-      this.reload = false
-      this.reload = true
-    },
-    handleAddDeviceId () {
-      console.log('handleAddDeviceId', this.deviceIdNew)
-      this.initDeviceSet()
-      this.deviceIdSet.list.push(this.deviceIdNew)
-      this.deviceIdNew = null
-      this.reloadDeviceSet()
-    },
-    handleAddDeviceIdRange () {
-      console.log('handleAddDeviceIdRange', this.deviceIdRangeBegin, this.deviceIdRangeEnd)
-      this.initDeviceSet()
-      this.deviceIdSet.rangeList.push([this.deviceIdRangeBegin, this.deviceIdRangeEnd])
-      this.deviceIdRangeBegin = null
-      this.deviceIdRangeEnd = null
-      this.reloadDeviceSet()
-    },
-    handleRemoveDeviceId (id) {
-      console.log('handleRemoveDeviceId', id)
-      if (this.deviceIdSet && this.deviceIdSet.list) {
-        const index = this.deviceIdSet.list.indexOf(id)
-        if (index >= 0) {
-          this.deviceIdSet.list.splice(index, 1)
-        }
-      }
-      this.reloadDeviceSet()
-    },
-    handleRemoveDeviceIdRange (idRange) {
-      console.log('handleRemoveDeviceIdRange', idRange)
-      if (this.deviceIdSet && this.deviceIdSet.rangeList) {
-        let foundIndex = -1
-        this.deviceIdSet.rangeList.forEach((range, index) => {
-          console.log('range', range, 'index', index)
-          if (range[0] === idRange[0] && range[1] === idRange[1]) {
-            foundIndex = index
-          }
-        })
-        if (foundIndex >= 0) {
-          console.log('remove range', foundIndex)
-          this.deviceIdSet.rangeList.splice(foundIndex, 1)
-          console.log('rangeList', this.deviceIdSet.rangeList)
-        }
-      }
-      this.reloadDeviceSet()
-    },
-    handleDeviceIdsRemove (id) {
-      console.log('handleDeviceIdsRemove', id)
-      const index = this.deviceIds.indexOf(id)
-      if (index >= 0) {
-        this.deviceIds.splice(index, 1)
-      }
-    },
-    handleAddDeviceIds () {
-      console.log('handleAddDeviceIds', this.newDeviceIds)
-      this.newDeviceIds.split('\n').forEach(id => {
-        const index = this.deviceIds.findIndex(item => item.deviceId === id)
-        if (index < 0) {
-          this.deviceIds.push({ deviceId: id })
-        }
-      })
-    },
-    handleSaveOfflineMessageChange (value) {
-      if (value) {
-        const now = new Date()
-        now.setMonth(now.getMonth() + 1)
-        this.offlineMessageTtl = moment(now).format('YYYY-MM-DD HH:mm:ss')
-      }
-    },
-    getTimeGap(date) {
-      if (date == null) {
-        return ''
-      }
-      const dateObj = new Date(date)
-      const now = new Date()
-      const gap = dateObj.getTime() - now.getTime()
-      const seconds = Math.floor(gap / 1000)
-      const minutes = Math.floor(seconds / 60)
-      const hours = Math.floor(minutes / 60)
-      const days = Math.floor(hours / 24)
-
-      if (days > 0) {
-        return `${days} 天 ${hours % 24} 小时`
-      } else if (hours > 0) {
-        return `${hours} 小时 ${minutes % 60} 分钟`
-      } else if (minutes > 0) {
-        return `${minutes} 分钟 ${seconds % 60} 秒`
-      } else {
-        return `${seconds} 秒`
-      }
-    }
-  }
+    components: { SelectDeviceIds }
 }
 </script>
 
