@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    title="添加设备"
+    title="添加/修改 设备"
     width="90vw"
     centered
     :visible="visible"
@@ -15,7 +15,12 @@
           <a-input v-decorator="['id', { initialValue: 0 }]" disabled />
         </a-form-item>
         <a-form-item label="设备编号">
-          <a-input v-decorator="['code', { initialValue: '', rules: [ {required: true, min: 5, message: '至少5位'} ]}]" />
+          <!-- <a-input v-decorator="['code', { initialValue: '', rules: [ {required: true, min: 5, message: '至少5位'} ]}]" /> -->
+          <a-textarea
+            v-decorator="['code', { rules: [{ required: true, message: '设备编号' }] }]"
+            :rows="4"
+            placeholder='输入设备编号
+一行一个设备' />
         </a-form-item>
         <a-form-item label="运营单位">
           <a-tree-select

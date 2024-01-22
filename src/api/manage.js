@@ -36,6 +36,7 @@ const api = {
   bms_alarm_count: `${prefix}/device/alarm/bms/count`,
   device_alarm_types: `${prefix}/device/alarm/type`,
   add_device: `${prefix}/device/add`,
+  add_update_device_batch: `${prefix}/device/add_update/batch`,
   update_device: `${prefix}/device/update`,
   device_packet_log: `${prefix}/device/packet/log`,
   device_packet_parse: `${prefix}/device/packet/parse`,
@@ -149,6 +150,14 @@ return request({
 export function addDevice (arg) {
   return request({
     url: api.add_device,
+    method: 'post',
+    data: arg
+  })
+}
+
+export function addUpdateDeviceBatch (arg) {
+  return request({
+    url: api.add_update_device_batch,
     method: 'post',
     data: arg
   })
