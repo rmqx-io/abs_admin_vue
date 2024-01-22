@@ -33,7 +33,14 @@
 
 <script>
 export default {
+	model: {
+		prop: 'value',
+		event: 'change'
+	},
 	props: {
+		value: {
+			type: String
+		},
 		deviceIds: {
 			type: Array,
 			default: () => []
@@ -45,6 +52,28 @@ export default {
 		showAdd: {
 			type: Boolean,
 			default: false
+		}
+	},
+	computed: {
+		currentValue: {
+			get () {
+				return this.value
+			},
+			set (newValue) {
+				this.$emit('input', newValue)
+			}
+		}
+	},
+	watch: {
+		currentValue: {
+			deep: true,
+			immediate: true,
+			handler: function (newValue) {
+				this.valuePro = newValue
+				if (newValue !== undefined) {
+					this.$emit('change', newValue)
+				}
+			}
 		}
 	},
 	data() {
@@ -64,9 +93,13 @@ export default {
                     fixed: "right"
                 }
             ],
+			valuePro: undefined
 		}
 	},
 	methods: {
+		inputChange (e) {
+			this.$emit('change', e.target.value)
+		},
 		handleDeviceIdsRemove(id) {
 			console.log("handleDeviceIdsRemove", id);
 			const index = this.deviceIds.indexOf(id);
