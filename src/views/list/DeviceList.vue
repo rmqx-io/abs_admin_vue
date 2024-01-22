@@ -89,7 +89,7 @@
 
     <div v-if='showTableTab'>
       <div v-if="table_visible" class="table-operator">
-        <a-button type='primary' icon='plus' @click='handleAdd'>添加</a-button>
+        <a-button type='primary' icon='plus' @click='handleAdd'>添加/修改</a-button>
         <a-button type='primary' @click='handleBatchCommandManager'>下发指令管理</a-button>
         <a-button type='primary' @click='handleExport'>导出</a-button>
         <a-button type='primary' @click='handleImport'>导入</a-button>
@@ -450,13 +450,12 @@
 import moment from 'moment'
 import { STable, Ellipsis } from '@/components'
 import {
-  addDevice, exportDeviceList,
+  addUpdateDeviceBatch,
   getAdminOrgTree,
   getDeviceList, getExportDeviceList,
   getLocation,
   getStatusCount, refreshOnlineStatus,
   updateDevice,
-  getBmsType,
   refreshDevicePage,
 refreshDeviceOnlineStatusAll
 } from '@/api/manage'
@@ -898,7 +897,7 @@ export default {
                 console.log('update device', err)
                 this.confirmLoading = false
                 this.$message.error(err.data.message)
-                reject(err)
+                reject(err.data.message)
               })
             }).then(res => {
               this.device_create_form_visible = false
@@ -916,10 +915,10 @@ export default {
             // 新增
             new Promise((resolve, reject) => {
               console.log('add device', values)
-              addDevice(values)
+              addUpdateDeviceBatch(values)
                 .then(res => {
                   console.log(res)
-                  resolve()
+                  resolve(res)
                 }).catch(err => {
                 console.log('add device', err)
                 this.confirmLoading = false
@@ -927,6 +926,7 @@ export default {
                 reject(err)
               })
             }).then(res => {
+              console.log('resolve', res)
               this.device_create_form_visible = false
               this.confirmLoading = false
               // 重置表单数据
@@ -935,7 +935,7 @@ export default {
               // this.$refs.table.refresh()
               this.refreshTable(null)
 
-              this.$message.info('新增成功')
+              this.$message.info('新增成功: ' + res.data[0] + '，修改成功: ' + res.data[1])
             })
           }
         } else {
