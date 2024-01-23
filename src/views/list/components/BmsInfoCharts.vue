@@ -9,7 +9,7 @@
         :md="24"
         :lg="12"
         :xl="12">
-        <div class="content_bt" style="width: 300px; margin-top: 16px">
+        <div class="content_bt" style="width: 380px; margin-top: 16px">
           <span
             style="
               font-size: 14px;
@@ -19,6 +19,9 @@
             "
           >
             电池编码：{{ this.bmsBt }}
+            <a-button type="link" @click="refresh">
+              <a-icon type="reload" />
+            </a-button>
             <br />
             更新时间：{{ this.time_tracking }}
             <el-tag
@@ -443,79 +446,7 @@ export default {
     }
   },
   mounted () {
-    getBmsType(this.deviceId).then(res => {
-      console.log('bms type', res.data.bms_type)
-      this.bms_type = res.data.bms_type
-      const bms_type = res.data.bms_type
-      getBatteryInfoLatest(this.deviceId, res.data.bms_type, {})
-        .then(res => {
-          console.log('battery info latest', res)
-          if (res.data && res.data.vehicle_detail_vo) {
-            this.battery_capacity_config = res.data.battery_capacity
-            this.gps_battery_voltage = res.data.vehicle_detail_vo.gps_battery_voltage
-            this.rssi = res.data.vehicle_detail_vo.rssi
-            this.gnss = res.data.vehicle_detail_vo.gnss
-            this.gps_location = res.data.vehicle_detail_vo.gps_location
-            this.gps_location_time = moment(res.data.vehicle_detail_vo.time_tracking).format('YYYY-MM-DD HH:mm:ss')
-            this.receive_time = moment(res.data.vehicle_detail_vo.receive_time).format('YYYY-MM-DD HH:mm:ss')
-          }
-          if (res.data && res.data.logs && res.data.logs.length > 0) {
-            const bmsInfo = res.data.logs[0]
-            this.time_tracking = moment(bmsInfo.time_tracking).format('YYYY-MM-DD HH:mm:ss')
-            this.battery_capacity_soc = bmsInfo.battery_capacity_soc.toFixed(2)
-            this.battery_healthy = bmsInfo.battery_healthy
-            this.battery_voltage = bmsInfo.battery_voltage
-            this.batteryList = this.form_battery_voltage_array_for_display(bmsInfo.single_battery_voltage_arr.split(','), 5)
-            this.tempList = this.form_temperature_array_for_display(bmsInfo)
-            // console.log('battery list', this.batteryList)
-            // single_battery_voltage_arr
-            this.battery_currency = bmsInfo.battery_currency
-            this.isMosRec = bmsInfo.battery_status_charging_mos
-            this.isMosDis = bmsInfo.battery_status_discharging_mos
-            this.battery_charging_cycle = bmsInfo.battery_charging_cycle
-            this.humidity = bmsInfo.humidity
-
-            this.battery_alarm_low_power = bmsInfo.battery_alarm_low_power
-            this.battery_alarm_mos_high_temperature = bmsInfo.battery_alarm_mos_high_temperature
-            this.battery_alarm_charging_high_voltage = bmsInfo.battery_alarm_charging_high_voltage
-            this.battery_alarm_discharging_low_voltage = bmsInfo.battery_alarm_discharging_low_voltage
-            this.battery_alarm_high_temperature = bmsInfo.battery_alarm_high_temperature
-            this.battery_alarm_charging_high_current = bmsInfo.battery_alarm_charging_high_current
-            this.battery_alarm_discharging_high_current = bmsInfo.battery_alarm_discharging_high_current
-            this.battery_alarm_voltage_difference = bmsInfo.battery_alarm_voltage_difference
-            this.battery_alarm_box_high_temperature = bmsInfo.battery_alarm_box_high_temperature
-            this.battery_alarm_low_temperature = bmsInfo.battery_alarm_low_temperature
-            this.battery_alarm_single_cell_high_voltage = bmsInfo.battery_alarm_single_cell_high_voltage
-            this.battery_alarm_single_cell_low_voltage = bmsInfo.battery_alarm_single_cell_low_voltage
-            this.battery_alarm_309_a = bmsInfo.battery_alarm_309_a
-            this.battery_alarm_309_b = bmsInfo.battery_alarm_309_b
-            this.battery_alarm_humidity = bmsInfo.battery_alarm_humidity
-            this.battery_alarm_disassemble = bmsInfo.battery_alarm_disassemble
-
-            this.set_alarms()
-
-            if (
-              bms_type === "bms_jx" ||
-              bms_type === "bms_ls"
-            ) {
-              this.getBatteryInfoLatestJx(bmsInfo)
-            }
-          }
-          if (res.data && res.data.device_bms_config) {
-            if (res.data.device_bms_config.battery_capacity_config) {
-              this.battery_capacity_config = res.data.device_bms_config.battery_capacity_config
-            }
-          }
-        }).catch(err => {
-          console.log('battery info latest', err)
-      })
-    })
-    if (this.dataListBMS.length === 0) {
-      setTimeout(() => {
-        this.initBMSUI()
-      }, 1000)
-      // this.getBmsHis(this.mCurSn, 227, 6)
-    }
+    this.refresh()
   },
   data () {
     return {
@@ -891,6 +822,83 @@ export default {
       }).catch(() => {
         this.$message.error("设置 MOS 失败")
       })
+    },
+    refresh () {
+      this.$message.info("刷新")
+      getBmsType(this.deviceId).then(res => {
+        console.log('bms type', res.data.bms_type)
+        this.bms_type = res.data.bms_type
+        const bms_type = res.data.bms_type
+        getBatteryInfoLatest(this.deviceId, res.data.bms_type, {})
+          .then(res => {
+            this.$message.info("刷新成功")
+            console.log('battery info latest', res)
+            if (res.data && res.data.vehicle_detail_vo) {
+              this.battery_capacity_config = res.data.battery_capacity
+              this.gps_battery_voltage = res.data.vehicle_detail_vo.gps_battery_voltage
+              this.rssi = res.data.vehicle_detail_vo.rssi
+              this.gnss = res.data.vehicle_detail_vo.gnss
+              this.gps_location = res.data.vehicle_detail_vo.gps_location
+              this.gps_location_time = moment(res.data.vehicle_detail_vo.time_tracking).format('YYYY-MM-DD HH:mm:ss')
+              this.receive_time = moment(res.data.vehicle_detail_vo.receive_time).format('YYYY-MM-DD HH:mm:ss')
+            }
+            if (res.data && res.data.logs && res.data.logs.length > 0) {
+              const bmsInfo = res.data.logs[0]
+              this.time_tracking = moment(bmsInfo.time_tracking).format('YYYY-MM-DD HH:mm:ss')
+              this.battery_capacity_soc = bmsInfo.battery_capacity_soc.toFixed(2)
+              this.battery_healthy = bmsInfo.battery_healthy
+              this.battery_voltage = bmsInfo.battery_voltage
+              this.batteryList = this.form_battery_voltage_array_for_display(bmsInfo.single_battery_voltage_arr.split(','), 5)
+              this.tempList = this.form_temperature_array_for_display(bmsInfo)
+              // console.log('battery list', this.batteryList)
+              // single_battery_voltage_arr
+              this.battery_currency = bmsInfo.battery_currency
+              this.isMosRec = bmsInfo.battery_status_charging_mos
+              this.isMosDis = bmsInfo.battery_status_discharging_mos
+              this.battery_charging_cycle = bmsInfo.battery_charging_cycle
+              this.humidity = bmsInfo.humidity
+
+              this.battery_alarm_low_power = bmsInfo.battery_alarm_low_power
+              this.battery_alarm_mos_high_temperature = bmsInfo.battery_alarm_mos_high_temperature
+              this.battery_alarm_charging_high_voltage = bmsInfo.battery_alarm_charging_high_voltage
+              this.battery_alarm_discharging_low_voltage = bmsInfo.battery_alarm_discharging_low_voltage
+              this.battery_alarm_high_temperature = bmsInfo.battery_alarm_high_temperature
+              this.battery_alarm_charging_high_current = bmsInfo.battery_alarm_charging_high_current
+              this.battery_alarm_discharging_high_current = bmsInfo.battery_alarm_discharging_high_current
+              this.battery_alarm_voltage_difference = bmsInfo.battery_alarm_voltage_difference
+              this.battery_alarm_box_high_temperature = bmsInfo.battery_alarm_box_high_temperature
+              this.battery_alarm_low_temperature = bmsInfo.battery_alarm_low_temperature
+              this.battery_alarm_single_cell_high_voltage = bmsInfo.battery_alarm_single_cell_high_voltage
+              this.battery_alarm_single_cell_low_voltage = bmsInfo.battery_alarm_single_cell_low_voltage
+              this.battery_alarm_309_a = bmsInfo.battery_alarm_309_a
+              this.battery_alarm_309_b = bmsInfo.battery_alarm_309_b
+              this.battery_alarm_humidity = bmsInfo.battery_alarm_humidity
+              this.battery_alarm_disassemble = bmsInfo.battery_alarm_disassemble
+
+              this.set_alarms()
+
+              if (
+                bms_type === 'bms_jx' ||
+                bms_type === 'bms_ls'
+              ) {
+                this.getBatteryInfoLatestJx(bmsInfo)
+              }
+            }
+            if (res.data && res.data.device_bms_config) {
+              if (res.data.device_bms_config.battery_capacity_config) {
+                this.battery_capacity_config = res.data.device_bms_config.battery_capacity_config
+              }
+            }
+          }).catch(err => {
+          console.log('battery info latest', err)
+        })
+      })
+      if (this.dataListBMS.length === 0) {
+        setTimeout(() => {
+          this.initBMSUI()
+        }, 1000)
+        // this.getBmsHis(this.mCurSn, 227, 6)
+      }
     }
   }
 }
