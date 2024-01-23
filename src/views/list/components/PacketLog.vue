@@ -57,6 +57,7 @@
           :data='loadData'
           showPagination='auto'
           :customRow='rowClick'
+          :pageSize=100
         >
           <span slot='time_tracking' slot-scope="text, record">
             <template>
@@ -173,7 +174,7 @@ export default {
             // pageNo: res.data.page_no,
             // totalCount: res.data.total,
             // total: res.data.total,
-            pageSize: 10,
+            pageSize: 100,
             pageNo: 1,
             totalCount: 10,
             totalPage: 1,
@@ -188,7 +189,7 @@ export default {
           this.$message.error(body.msg)
           // stop the loading
           return {
-            pageSize: 10,
+            pageSize: 100,
             pageNo: 1,
             totalCount: 10,
             totalPage: 1,
