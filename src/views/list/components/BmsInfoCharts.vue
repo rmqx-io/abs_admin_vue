@@ -812,6 +812,7 @@ export default {
 
       const arg = {
         command: mos_address,
+        bms_type: this.bms_type,
         param: on_off
       }
       this.$message.info("设置 MOS")
