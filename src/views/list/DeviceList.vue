@@ -89,7 +89,7 @@
 
     <div v-if='showTableTab'>
       <div v-if="table_visible" class="table-operator">
-        <a-button type='primary' icon='plus' @click='handleAdd'>添加/修改</a-button>
+        <a-button type='primary' icon='plus' @click='handleAdd'>添加</a-button>
         <a-button type='primary' @click='handleBatchCommandManager'>下发指令管理</a-button>
         <a-button type='primary' @click='handleExport'>导出</a-button>
         <a-button type='primary' @click='handleImport'>导入</a-button>
@@ -184,13 +184,13 @@
 
         <span slot="other_time" slot-scope="text, record">
           <template>
-            上次基站定位: <span>{{ record.last_cell_location_time ? localTime(record.last_cell_location_time) : '' }}</span>
-            <br />
+            <!-- 上次基站定位: <span>{{ record.last_cell_location_time ? localTime(record.last_cell_location_time) : '' }}</span> -->
+            <!-- <br /> -->
             上次网络通讯: <span>{{ record.last_communication_time ? localTime(record.last_communication_time) : '' }}</span>
-            <br />
-            第一次 GPS 定位: <span>{{ record.first_gps_location_time ? localTime(record.first_gps_location_time) : '' }}</span>
-            <br />
-            第一次基站定位: <span>{{ record.first_cell_location_time ? localTime(record.first_cell_location_time) : '' }}</span>
+            <!-- <br /> -->
+            <!-- 第一次 GPS 定位: <span>{{ record.first_gps_location_time ? localTime(record.first_gps_location_time) : '' }}</span> -->
+            <!-- <br /> -->
+            <!-- 第一次基站定位: <span>{{ record.first_cell_location_time ? localTime(record.first_cell_location_time) : '' }}</span> -->
           </template>
         </span>
 
@@ -450,15 +450,15 @@
 import moment from 'moment'
 import { STable, Ellipsis } from '@/components'
 import {
-  addUpdateDeviceBatch,
+  addDevice, exportDeviceList,
   getAdminOrgTree,
   getDeviceList, getExportDeviceList,
   getLocation,
   getStatusCount, refreshOnlineStatus,
   updateDevice,
+  getBmsType,
   refreshDevicePage,
-  refreshDeviceOnlineStatusAll,
-  wgs84togcj02
+refreshDeviceOnlineStatusAll
 } from '@/api/manage'
 
 import StepByStepModal from './modules/StepByStepModal'
@@ -898,7 +898,7 @@ export default {
                 console.log('update device', err)
                 this.confirmLoading = false
                 this.$message.error(err.data.message)
-                reject(err.data.message)
+                reject(err)
               })
             }).then(res => {
               this.device_create_form_visible = false
@@ -916,10 +916,10 @@ export default {
             // 新增
             new Promise((resolve, reject) => {
               console.log('add device', values)
-              addUpdateDeviceBatch(values)
+              addDevice(values)
                 .then(res => {
                   console.log(res)
-                  resolve(res)
+                  resolve()
                 }).catch(err => {
                 console.log('add device', err)
                 this.confirmLoading = false
@@ -927,7 +927,6 @@ export default {
                 reject(err)
               })
             }).then(res => {
-              console.log('resolve', res)
               this.device_create_form_visible = false
               this.confirmLoading = false
               // 重置表单数据
@@ -936,7 +935,7 @@ export default {
               // this.$refs.table.refresh()
               this.refreshTable(null)
 
-              this.$message.info('新增成功: ' + res.data[0] + '，修改成功: ' + res.data[1])
+              this.$message.info('新增成功')
             })
           }
         } else {
@@ -1129,10 +1128,8 @@ export default {
           res.data.records.forEach((item, index) => {
             if (item.last_location_lng !== null && item.last_location_lat !== null) {
               this.markersFound += 1
-              const gcj02 = wgs84togcj02(item.last_location_lng, item.last_location_lat)
-              console.log('gcj02', gcj02)
               this.deviceMarkers.push({
-                lnglat: gcj02,
+                lnglat: [item.last_location_lng, item.last_location_lat],
                 device: item
               })
             }
