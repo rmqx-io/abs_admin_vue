@@ -184,13 +184,13 @@
 
         <span slot="other_time" slot-scope="text, record">
           <template>
-            上次基站定位: <span>{{ record.last_cell_location_time ? localTime(record.last_cell_location_time) : '' }}</span>
-            <br />
+            <!-- 上次基站定位: <span>{{ record.last_cell_location_time ? localTime(record.last_cell_location_time) : '' }}</span> -->
+            <!-- <br /> -->
             上次网络通讯: <span>{{ record.last_communication_time ? localTime(record.last_communication_time) : '' }}</span>
-            <br />
-            第一次 GPS 定位: <span>{{ record.first_gps_location_time ? localTime(record.first_gps_location_time) : '' }}</span>
-            <br />
-            第一次基站定位: <span>{{ record.first_cell_location_time ? localTime(record.first_cell_location_time) : '' }}</span>
+            <!-- <br /> -->
+            <!-- 第一次 GPS 定位: <span>{{ record.first_gps_location_time ? localTime(record.first_gps_location_time) : '' }}</span> -->
+            <!-- <br /> -->
+            <!-- 第一次基站定位: <span>{{ record.first_cell_location_time ? localTime(record.first_cell_location_time) : '' }}</span> -->
           </template>
         </span>
 
