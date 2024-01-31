@@ -184,13 +184,13 @@
 
         <span slot="other_time" slot-scope="text, record">
           <template>
-            <!-- 上次基站定位: <span>{{ record.last_cell_location_time ? localTime(record.last_cell_location_time) : '' }}</span> -->
-            <!-- <br /> -->
+            上次基站定位: <span>{{ record.last_cell_location_time ? localTime(record.last_cell_location_time) : '' }}</span>
+            <br />
             上次网络通讯: <span>{{ record.last_communication_time ? localTime(record.last_communication_time) : '' }}</span>
-            <!-- <br /> -->
-            <!-- 第一次 GPS 定位: <span>{{ record.first_gps_location_time ? localTime(record.first_gps_location_time) : '' }}</span> -->
-            <!-- <br /> -->
-            <!-- 第一次基站定位: <span>{{ record.first_cell_location_time ? localTime(record.first_cell_location_time) : '' }}</span> -->
+            <br />
+            第一次 GPS 定位: <span>{{ record.first_gps_location_time ? localTime(record.first_gps_location_time) : '' }}</span>
+            <br />
+            第一次基站定位: <span>{{ record.first_cell_location_time ? localTime(record.first_cell_location_time) : '' }}</span>
           </template>
         </span>
 
@@ -457,7 +457,8 @@ import {
   getStatusCount, refreshOnlineStatus,
   updateDevice,
   refreshDevicePage,
-refreshDeviceOnlineStatusAll
+  refreshDeviceOnlineStatusAll,
+  wgs84togcj02
 } from '@/api/manage'
 
 import StepByStepModal from './modules/StepByStepModal'
@@ -1128,8 +1129,10 @@ export default {
           res.data.records.forEach((item, index) => {
             if (item.last_location_lng !== null && item.last_location_lat !== null) {
               this.markersFound += 1
+              const gcj02 = wgs84togcj02(item.last_location_lng, item.last_location_lat)
+              console.log('gcj02', gcj02)
               this.deviceMarkers.push({
-                lnglat: [item.last_location_lng, item.last_location_lat],
+                lnglat: gcj02,
                 device: item
               })
             }
