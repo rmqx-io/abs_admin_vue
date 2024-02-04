@@ -69,6 +69,8 @@ const api = {
   refresh_online_status_page: `${prefix}/device/refresh/page`,
   refresh_online_status_all: `${prefix}/device/refresh/all`,
 
+  reload_plugin: `${prefix}/plugin/reload`,
+
   permission: '/permission',
   permissionNoPager: '/permission/no-pager',
   orgTree: '/org/tree'
@@ -576,6 +578,13 @@ export function dictDelete (arg) {
     url: api.sys_dict_delete,
     method: 'post',
     data: arg
+  })
+}
+
+export function reloadPlugin () {
+  return request({
+    url: api.reload_plugin,
+    method: 'get'
   })
 }
 

@@ -16,6 +16,9 @@
             <div>历史数据</div>
             <div>{{ this.bms_history_data }}</div>
         </div>
+        <div>
+            <a-button type="primary" @click="reloadPlugin">重新加载插件</a-button>
+        </div>
     </a-card>
 </template>
 
@@ -24,7 +27,8 @@ import {
     getBmsType,
     getBatteryInfoLatestCql,
     getBatteryInfoLatest,
-    getBatteryInfo
+    getBatteryInfo,
+    reloadPlugin
 } from '@/api/manage'
 import moment from 'moment/moment'
 
@@ -69,6 +73,12 @@ export default {
                     console.log('getBatteryInfo', res)
                     this.bms_history_data = res.data
                 })
+            })
+        },
+        reloadPlugin () {
+            console.log('reloadPlugin')
+            reloadPlugin().then(res => {
+                console.log('reloadPlugin', res)
             })
         }
     }
