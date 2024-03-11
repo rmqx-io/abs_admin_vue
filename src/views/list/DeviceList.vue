@@ -423,7 +423,7 @@
                 <div>
                   <p>设备编号：{{ record.device.code }}</p>
                   <p>电池编号：{{ record.device.bms_bt }}</p>
-                  <p>定位时间：{{ record.device.location_time }}</p>
+                  <p>定位时间：{{ localTime(record.device.location_time) }}</p>
                 </div>
               </template>
               <div class="custom-marker" />
