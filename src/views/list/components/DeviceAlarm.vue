@@ -214,11 +214,13 @@ export default {
         .then(res => {
           this.loading = false
           console.log('device alarm', res)
+          // pages is round up res.data.total / res.data.page_size
+          const pages = Math.ceil(res.data.total / res.data.page_size)
           return {
             pageSize: res.data.page_size,
             pageNo: res.data.page_no,
             totalCount: res.data.total,
-            totalPage: res.data.pages,
+            totalPage: pages,
             data: res.data.records
           }
         })
