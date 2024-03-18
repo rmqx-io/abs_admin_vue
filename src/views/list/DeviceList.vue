@@ -1112,6 +1112,13 @@ export default {
           this.orgList = []
           this.orgList.push(res.data)
         })
+        .catch(err => {
+          console.log('org list', err)
+          // retry after 3s
+          setTimeout(() => {
+            this.getAdminOrgList()
+          }, 3000)
+        })
     },
     getDeviceLocation(arg, page_no) {
       // get all device location
