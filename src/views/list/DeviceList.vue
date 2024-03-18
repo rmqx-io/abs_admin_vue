@@ -721,6 +721,7 @@ export default {
           arg.device_status = this.deviceStatus
         }
         console.log('loadData request arg:', arg)
+        const pages = Math.ceil(this.data.total / this.data.page_size)
         return getDeviceList(arg)
           .then(res => {
             console.log('device list', res)
@@ -728,7 +729,7 @@ export default {
               pageSize: res.data.page_size,
               pageNo: res.data.page_no,
               totalCount: res.data.total,
-              totalPage: res.data.pages,
+              totalPage: pages,
               data: res.data.records
             }
           })
@@ -1122,8 +1123,10 @@ export default {
         .then(res => {
           console.log('device list', res)
 
+          const pages = Math.ceil(res.data.total / res.data.page_size)
+
           this.getDevicesLocationPageNo = page_no
-          this.getDevicesLocationPages = res.data.pages
+          this.getDevicesLocationPages = pages
 
           // append device to deviceMarkers
           res.data.records.forEach((item, index) => {
@@ -1137,7 +1140,7 @@ export default {
               })
             }
           })
-          if (page_no >= res.data.pages) {
+          if (page_no >= pages || res.data.records.length === 0) {
             this.isGettingDeviceLocation = false
             this.getDevicesLocationPages = 1
             this.getDevicesLocationPageNo = 0

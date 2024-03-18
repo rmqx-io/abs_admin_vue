@@ -103,8 +103,10 @@ export default {
         .then(res => {
           console.log('device list', res)
 
+          const pages = Math.ceil(res.data.total / res.data.page_size)
+
           this.getDevicesLocationPageNo = page_no
-          this.getDevicesLocationPages = res.data.pages
+          this.getDevicesLocationPages = pages
 
           // append device to deviceMarkers
           res.data.records.forEach((item, index) => {
@@ -118,7 +120,7 @@ export default {
               })
             }
           })
-          if (page_no >= res.data.pages) {
+          if (page_no >= pages || res.data.records.length === 0) {
             this.isGettingDeviceLocation = false
             this.getDevicesLocationPages = 1
             this.getDevicesLocationPageNo = 0

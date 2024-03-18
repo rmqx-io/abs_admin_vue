@@ -112,12 +112,14 @@ export default {
         console.log('loadData request arg:', arg)
         return getDeviceModelList(arg)
           .then(res => {
-            console.log('laod data', res)
+            console.log('load data', res)
+            const pages = Math.ceil(res.data.total / res.data.page_size)
+
             return {
               pageSize: res.data.page_size,
               pageNo: res.data.page_no,
               totalCount: res.data.total,
-              totalPage: res.data.pages,
+              totalPage: pages,
               data: res.data.records
             }
           })

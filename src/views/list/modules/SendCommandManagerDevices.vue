@@ -72,11 +72,13 @@ export default {
             arg.batch_command_id = this.currentBatchSendCommandId
             return getBatchSendCommandDevices(arg).then(res => {
                 console.log('loadDataDevices res', res)
+                const pages = Math.ceil(res.data.total / res.data.page_size)
+
                 return {
                     pageSize: res.data.page_size,
                     pageNo: res.data.page_no,
                     totalCount: res.data.total,
-                    totalPage: res.data.pages,
+                    totalPage: pages,
                     data: res.data.records
                 }
             })
