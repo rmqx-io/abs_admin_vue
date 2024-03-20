@@ -63,7 +63,10 @@ export default {
     },
     methods: {
         renderChart(series) {
-            const chart = echarts.init(this.$refs.chart);
+            let chart = echarts.getInstanceByDom(this.$refs.chart);
+            if (chart == null) {
+                chart = echarts.init(this.$refs.chart);
+            }
             const options = {
                 sampling: 'lttb',
                 color: this.color,
