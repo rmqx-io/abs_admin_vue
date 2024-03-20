@@ -99,9 +99,9 @@ export default {
             end_time.minute(59)
             end_time.second(59)
             const arg = {
-                start_date: start_date.format('YYYY-MM-DD HH:mm:ss'),
-                start_time: start_time.format('YYYY-MM-DD HH:mm:ss'),
-                end_date: end_date.format('YYYY-MM-DD HH:mm:ss'),
+                start_date: start_time,
+                start_time: start_time,
+                end_date: end_time.format('YYYY-MM-DD HH:mm:ss'),
                 end_time: end_time.format('YYYY-MM-DD HH:mm:ss')
             }
             console.log('arg', arg)
