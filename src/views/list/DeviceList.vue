@@ -1066,8 +1066,11 @@ export default {
       this.send_command_form_visible = true
     },
     refreshMap(deviceId) {
+      this.polyline.path = []
+      this.polyline.markers = []
+
       this.map_loading = true
-      const arg = this.queryData
+      const arg = Object.assign({}, this.queryData)
       console.log('loadData request arg:', arg)
       return getLocation(deviceId, arg)
         .then(res => {
