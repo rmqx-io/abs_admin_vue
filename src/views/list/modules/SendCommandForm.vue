@@ -22,6 +22,33 @@
       v-if="currentRow"
       :label="currentRow.name_cn"
     >
+      <!-- create a a-input for each currentRow.params -->
+      <!-- loop with index -->
+        <!-- https://stackoverflow.com/questions/44351978/vue-js-v-for-loop-with-index -->
+        <p>字符串辅助填写</p>
+        <a-input
+            v-model='help_param'
+            placeholder="16进制字符串自动拆分填充"
+            @change="helpInputParams"
+        ></a-input>
+        <a-form-item
+            v-if="currentRow.params"
+            v-for="(p, i) in currentRow.params"
+            :key="p.name"
+            :label="p.name"
+        >
+            <!-- v-if params_errors[i].length > 0 -->
+            <p v-if="params_errors[i]" class="error">
+                {{ params_errors[i] }}
+            </p>
+            <p>16进制格式：00 00 （低字节 高字节)</p>
+            <a-input
+              v-model='params[i]'
+              placeholder="00 00"
+              @change="handleParamChange(i)"
+            ></a-input>
+        </a-form-item>
+      <p v-if="currentRow.params">根据上面的参数拼接的结果：</p>
       <a-input
         v-model='param'
         placeholder="输入参数"
@@ -114,6 +141,10 @@ export default {
             ],
             currentRow: null,
             param: null,
+            params: [],
+            params_errors: [],
+            params_check_timer: [],
+            help_param: '',
             showAddDevice: false,
             activeTab: "singleDeviceId",
             deviceIdNew: null,
@@ -130,10 +161,512 @@ export default {
     },
     methods: {
         getSendCommandList() {
-            return getSendCommandList("secnet")
-                .then(res => {
-                this.sendCommandList = res.data;
+            this.sendCommandList = []
+/*
+1、单体欠压
+7E-89-00-00-0E-05-22-30-10-01-11-24-98-EC-00-00-00-0E-00-07-
+3A-7D-02-01-01-
+29-
+00-
+E3-47-7E
+2、单体过压
+7E-89-00-00-1C-05-22-30-10-01-11-24-97-EC-00-00-00-1C-00-15-
+3A-7D-02-01-00-
+28-
+0E-42-0E-AC-0D-AC-0D-E8-03-0A-00-0A-00-01-00-
+B1-A0-7E
+3、放电过流
+7E-89-00-00-1C-05-22-30-10-01-11-24-D1-EC-00-00-00-1C-00-15-
+3A-7D-02-01-00-
+2C-
+0E-90-01-FB-FF-5E-01-B8-0B-E8-03-D0-07-00-00-
+62-D2-7E
+4、充电过流
+7E-89-00-00-1C-05-22-30-10-01-11-24-D2-EC-00-00-00-1C-00-15-3A-7D-02-01-00-2D-0E-2C-01-FB-FF-18-01-D0-07-D0-07-D0-07-00-00-B9-A9-7E
+5、充电低温
+6、充电高温
+7E-89-00-00-1C-05-22-30-10-01-11-24-E7-EC-00-00-00-1C-00-15-3A-7D-02-01-00-2F-0E-D1-0C-6D-0C-6D-0C-E8-03-E8-03-E8-03-00-00-86-70-7E
+7、放电低温
+7E-89-00-00-1C-05-22-30-10-01-11-24-E8-EC-00-00-00-1C-00-15-3A-7D-02-01-00-30-0E-E3-09-15-0A-47-0A-E8-03-E8-03-E8-03-00-00-14-97-7E
+8、放电高温
+7E-89-00-00-1C-05-22-30-10-01-11-24-E6-EC-00-00-00-1C-00-15-3A-7D-02-01-00-2E-0E-35-0D-D1-0C-D1-0C-E8-03-E8-03-E8-03-00-00-B2-A1-7E
+*/
+/*
+单体电压过低保护 低字节 单体电压过低保护 高字节 单体电压过低保护恢复 低字节 单体电压过低保护恢复 高字节 单体电压过低报警 低字节 单体电压过低报警 高字节 单体电压过低保护延时 低字节 单体电压过低保护延时 高字节 单体电压过低保护恢复延时 低字节 单体电压过低保护恢复延时 高字节 单体电压过低报警延时 低字节 单体电压过低报警延时 高字节 单体电压欠压保护使能标志低字节 单体电压欠压保护使能标志高字节
+*/
+            this.sendCommandList.push({
+                name_cn: "BMS LS 单体欠压",
+                name: "BMS LS single cell under voltage",
+                command: "0x8900",
+                sub_command: "0x29",
+                description: "BMS LS single cell under voltage",
+                description_cn: "BMS LS 单体欠压",
+                params: [
+                    {
+                        name: "单体电压过低保护",
+                        type: "uint16",
+                        description: "单体电压过低保护"
+                    },
+                    {
+                        name: "单体电压过低保护恢复",
+                        type: "uint16",
+                        description: "单体电压过低保护恢复"
+                    },
+                    {
+                        name: "单体电压过低报警",
+                        type: "uint16",
+                        description: "单体电压过低报警"
+                    },
+                    {
+                        name: "单体电压过低保护延时",
+                        type: "uint16",
+                        description: "单体电压过低保护延时"
+                    },
+                    {
+                        name: "单体电压过低保护恢复延时",
+                        type: "uint16",
+                        description: "单体电压过低保护恢复延时"
+                    },
+                    {
+                        name: "单体电压过低报警延时",
+                        type: "uint16",
+                        description: "单体电压过低报警延时"
+                    },
+                    {
+                        name: "单体电压欠压保护使能标志",
+                        type: "uint16",
+                        description: "单体电压欠压保护使能标志"
+                    }
+                ]
             });
+            /*
+            单体电压过高保护 低字节 单体电压过高保护 高字节 单体电压过高保护恢复 低字节 单体电压过高保护恢复 高字节 单体电压过高报警 低字节 单体电压过高报警 高字节
+            单体电压过高保护延时 低字节 单体电压过高保护延时 高字节 单体电压过高保护恢复延时 低字节 单体电压过高保护恢复延时 高字节 单体电压过高报警延时 低字节 单体电压过高报警延时 高字节 单体电压过压保护使能标志低字节 单体电压过压保护使能标志高字节
+            */
+            this.sendCommandList.push({
+                name_cn: "BMS LS 单体过压",
+                name: "BMS LS single cell over voltage",
+                command: "0x8900",
+                sub_command: "0x28",
+                description: "BMS LS single cell over voltage",
+                description_cn: "BMS LS 单体过压",
+                params: [
+                    {
+                        name: "单体电压过高保护",
+                        type: "uint16",
+                        description: "单体电压过高保护"
+                    },
+                    {
+                        name: "单体电压过高保护恢复",
+                        type: "uint16",
+                        description: "单体电压过高保护恢复"
+                    },
+                    {
+                        name: "单体电压过高报警",
+                        type: "uint16",
+                        description: "单体电压过高报警"
+                    },
+                    {
+                        name: "单体电压过高保护延时",
+                        type: "uint16",
+                        description: "单体电压过高保护延时"
+                    },
+                    {
+                        name: "单体电压过高保护恢复延时",
+                        type: "uint16",
+                        description: "单体电压过高保护恢复延时"
+                    },
+                    {
+                        name: "单体电压过高报警延时",
+                        type: "uint16",
+                        description: "单体电压过高报警延时"
+                    },
+                    {
+                        name: "单体电压过压保护使能标志",
+                        type: "uint16",
+                        description: "单体电压过压保护使能标志"
+                    }
+                ]
+            });
+            /*
+            放电电流过高保护 低字节 放电电流过高保护 高字节 放电电流过高保护恢复 低字节 放电电流过高保护恢复 高字节 放电电流过高报警 低字节 放电电流过高报警 高字节
+            放电电流过高保护延时 低字节 放电电流过高保护延时 高字节 放电电流过高保护恢复延时 低字节 放电电流过高保护恢复延时 高字节 放电电流过高报警延时 低字节 放电电流过高报警延时 高字节 放电电流过高保护使能标志低字节 放电电流过高保护使能标志高字节
+            */
+            this.sendCommandList.push({
+                name_cn: "BMS LS 放电过流",
+                name: "BMS LS discharge over current",
+                command: "0x8900",
+                sub_command: "0x2C",
+                description: "BMS LS discharge over current",
+                description_cn: "BMS LS 放电过流",
+                params: [
+                    {
+                        name: "放电电流过高保护",
+                        type: "uint16",
+                        description: "放电电流过高保护"
+                    },
+                    {
+                        name: "放电电流过高保护恢复",
+                        type: "uint16",
+                        description: "放电电流过高保护恢复"
+                    },
+                    {
+                        name: "放电电流过高报警",
+                        type: "uint16",
+                        description: "放电电流过高报警"
+                    },
+                    {
+                        name: "放电电流过高保护延时",
+                        type: "uint16",
+                        description: "放电电流过高保护延时"
+                    },
+                    {
+                        name: "放电电流过高保护恢复延时",
+                        type: "uint16",
+                        description: "放电电流过高保护恢复延时"
+                    },
+                    {
+                        name: "放电电流过高报警延时",
+                        type: "uint16",
+                        description: "放电电流过高报警延时"
+                    },
+                    {
+                        name: "放电电流过高保护使能标志",
+                        type: "uint16",
+                        description: "放电电流过高保护使能标志"
+                    }
+                ]
+            });
+            /*
+            充电电流过高保护 低字节
+0.1A/bit 偏移量： 0
+充电电流过高保护 高字节
+充电电流过高保护恢复 低字节
+0.1A/bit 偏移量： 0
+充电电流过高保护恢复 高字节
+充电电流过高报警 低字节
+0.1A/bit 偏移量： 0
+充电电流过高报警 高字节
+充电电流过高保护延时 低字节
+100ms/bit
+充电电流过高保护延时 高字节
+充电电流过高保护恢复延时 低字节
+100ms/bit
+充电电流过高保护恢复延时 高字节
+充电电流过高报警延时 低字节
+100ms/bit
+充电电流过高报警延时 高字节
+充电电流过高保护使能标志低字节
+0： 屏蔽保护 1： 使能 充电电流过高保护使能标志高字节
+*/
+            this.sendCommandList.push({
+                name_cn: "BMS LS 充电过流",
+                name: "BMS LS charge over current",
+                command: "0x8900",
+                sub_command: "0x2D",
+                description: "BMS LS charge over current",
+                description_cn: "BMS LS 充电过流",
+                params: [
+                    {
+                        name: "充电电流过高保护",
+                        type: "uint16",
+                        description: "充电电流过高保护"
+                    },
+                    {
+                        name: "充电电流过高保护恢复",
+                        type: "uint16",
+                        description: "充电电流过高保护恢复"
+                    },
+                    {
+                        name: "充电电流过高报警",
+                        type: "uint16",
+                        description: "充电电流过高报警"
+                    },
+                    {
+                        name: "充电电流过高保护延时",
+                        type: "uint16",
+                        description: "充电电流过高保护延时"
+                    },
+                    {
+                        name: "充电电流过高保护恢复延时",
+                        type: "uint16",
+                        description: "充电电流过高保护恢复延时"
+                    },
+                    {
+                        name: "充电电流过高报警延时",
+                        type: "uint16",
+                        description: "充电电流过高报警延时"
+                    },
+                    {
+                        name: "充电电流过高保护使能标志",
+                        type: "uint16",
+                        description: "充电电流过高保护使能标志"
+                    }
+                ]
+            });
+            /*
+            充电温度过低保护 低字节 计算公式：（ 数据值 - 2731 ） * 0.1，例如： 数据值为 0xAAC , 温
+度值为（ 0xAAC - 2731 ） * 0.1 = 0.1 摄氏度 充电温度过低保护 高字节
+充电温度过低保护恢复 低字节 计算公式：（ 数据值 - 2731 ） * 0.1，例如： 数据值为 0xAAC , 温
+度值为（ 0xAAC - 2731 ） * 0.1 = 0.1 摄氏度 充电温度过低保护恢复 高字节
+充电温度过低报警 低字节 计算公式：（ 数据值 - 2731 ） * 0.1，例如： 数据值为 0xAAC , 温
+度值为（ 0xAAC - 2731 ） * 0.1 = 0.1 摄氏度 充电温度过低报警 高字节
+充电温度过低保护延时 低字节
+100ms/bit
+充电温度过低保护延时 高字节
+充电温度过低保护恢复延时 低字节
+100ms/bit
+充电温度过低保护恢复延时 高字节
+充电温度过低报警延时 低字节
+100ms/bit
+充电温度过低报警延时 高字节
+充电温度过低保护使能标志低字节
+0： 屏蔽保护 1： 使能 充电温度过低保护使能标志高字节
+            */
+            this.sendCommandList.push({
+                name_cn: "BMS LS 充电低温",
+                name: "BMS LS charge low temperature",
+                command: "0x8900",
+                sub_command: "0x31",
+                description: "BMS LS charge low temperature",
+                description_cn: "BMS LS 充电低温",
+                params: [
+                    {
+                        name: "充电温度过低保护",
+                        type: "uint16",
+                        description: "充电温度过低保护"
+                    },
+                    {
+                        name: "充电温度过低保护恢复",
+                        type: "uint16",
+                        description: "充电温度过低保护恢复"
+                    },
+                    {
+                        name: "充电温度过低报警",
+                        type: "uint16",
+                        description: "充电温度过低报警"
+                    },
+                    {
+                        name: "充电温度过低保护延时",
+                        type: "uint16",
+                        description: "充电温度过低保护延时"
+                    },
+                    {
+                        name: "充电温度过低保护恢复延时",
+                        type: "uint16",
+                        description: "充电温度过低保护恢复延时"
+                    },
+                    {
+                        name: "充电温度过低报警延时",
+                        type: "uint16",
+                        description: "充电温度过低报警延时"
+                    },
+                    {
+                        name: "充电温度过低保护使能标志",
+                        type: "uint16",
+                        description: "充电温度过低保护使能标志"
+                    }
+                ]
+            });
+            /*
+            充电温度过高保护 低字节 计算公式：（ 数据值 - 2731 ） * 0.1，例如： 数据值为 0xAAC , 温
+度值为（ 0xAAC - 2731 ） * 0.1 = 0.1 摄氏度 充电温度过高保护 高字节
+充电温度过高保护恢复 低字节 计算公式：（ 数据值 - 2731 ） * 0.1，例如： 数据值为 0xAAC , 温
+度值为（ 0xAAC - 2731 ） * 0.1 = 0.1 摄氏度 充电温度过高保护恢复 高字节
+充电温度过高报警 低字节 计算公式：（ 数据值 - 2731 ） * 0.1，例如： 数据值为 0xAAC , 温
+度值为（ 0xAAC - 2731 ） * 0.1 = 0.1 摄氏度 充电温度过高报警 高字节
+充电温度过高保护延时 低字节
+100ms/bit
+充电温度过高保护延时 高字节
+充电温度过高保护恢复延时 低字节
+100ms/bit
+充电温度过高保护恢复延时 高字节
+充电温度过高报警延时 低字节
+100ms/bit
+充电温度过高报警延时 高字节
+充电温度过高保护使能标志低字节
+0： 屏蔽保护 1： 使能 充电温度过高保护使能标志高字节
+            */
+            this.sendCommandList.push({
+                name_cn: "BMS LS 充电高温",
+                name: "BMS LS charge high temperature",
+                command: "0x8900",
+                sub_command: "0x2F",
+                description: "BMS LS charge high temperature",
+                description_cn: "BMS LS 充电高温",
+                params: [
+                    {
+                        name: "充电温度过高保护",
+                        type: "uint16",
+                        description: "充电温度过高保护"
+                    },
+                    {
+                        name: "充电温度过高保护恢复",
+                        type: "uint16",
+                        description: "充电温度过高保护恢复"
+                    },
+                    {
+                        name: "充电温度过高报警",
+                        type: "uint16",
+                        description: "充电温度过高报警"
+                    },
+                    {
+                        name: "充电温度过高保护延时",
+                        type: "uint16",
+                        description: "充电温度过高保护延时"
+                    },
+                    {
+                        name: "充电温度过高保护恢复延时",
+                        type: "uint16",
+                        description: "充电温度过高保护恢复延时"
+                    },
+                    {
+                        name: "充电温度过高报警延时",
+                        type: "uint16",
+                        description: "充电温度过高报警延时"
+                    },
+                    {
+                        name: "充电温度过高保护使能标志",
+                        type: "uint16",
+                        description: "充电温度过高保护使能标志"
+                    }
+                ]
+            });
+            /*
+            放电温度过低保护 低字节
+计算公式：（ 数据值 - 2731 ） * 0.1，例如： 数据值为 0xAAC , 温度值为（ 0xAAC - 2731 ） * 0.1 = 0.1 摄氏度
+放电温度过低保护 高字节 度值为（ 0xAAC - 2731 ） * 0.1 = 0.1 摄氏度
+放电温度过低保护恢复 低字节 计算公式：（ 数据值 - 2731 ） * 0.1，例如： 数据值为 0xAAC , 温
+度值为（ 0xAAC - 2731 ） * 0.1 = 0.1 摄氏度 放电温度过低保护恢复 高字节
+放电温度过低报警 低字节 计算公式：（ 数据值 - 2731 ） * 0.1，例如： 数据值为 0xAAC , 温
+度值为（ 0xAAC - 2731 ） * 0.1 = 0.1 摄氏度 放电温度过低报警 高字节
+放电温度过低保护延时 低字节
+100ms/bit
+放电温度过低保护延时 高字节
+放电温度过低保护恢复延时 低字节
+100ms/bit
+放电温度过低保护恢复延时 高字节
+放电温度过低报警延时 低字节
+100ms/bit
+放电温度过低报警延时 高字节
+放电温度过低保护使能标志低字节
+0： 屏蔽保护 1： 使能 放电温度过低保护使能标志高字节
+*/
+            this.sendCommandList.push({
+                name_cn: "BMS LS 放电低温",
+                name: "BMS LS discharge low temperature",
+                command: "0x8900",
+                sub_command: "0x30",
+                description: "BMS LS discharge low temperature",
+                description_cn: "BMS LS 放电低温",
+                params: [
+                    {
+                        name: "放电温度过低保护",
+                        type: "uint16",
+                        description: "放电温度过低保护"
+                    },
+                    {
+                        name: "放电温度过低保护恢复",
+                        type: "uint16",
+                        description: "放电温度过低保护恢复"
+                    },
+                    {
+                        name: "放电温度过低报警",
+                        type: "uint16",
+                        description: "放电温度过低报警"
+                    },
+                    {
+                        name: "放电温度过低保护延时",
+                        type: "uint16",
+                        description: "放电温度过低保护延时"
+                    },
+                    {
+                        name: "放电温度过低保护恢复延时",
+                        type: "uint16",
+                        description: "放电温度过低保护恢复延时"
+                    },
+                    {
+                        name: "放电温度过低报警延时",
+                        type: "uint16",
+                        description: "放电温度过低报警延时"
+                    },
+                    {
+                        name: "放电温度过低保护使能标志",
+                        type: "uint16",
+                        description: "放电温度过低保护使能标志"
+                    }
+                ]
+            });
+            /*
+            放电温度过高保护 低字节 计算公式：（ 数据值 - 2731 ） * 0.1，例如：数据值为 0xAAC , 温度
+值为（ 0xAAC - 2731 ）* 0.1 = 0.1 摄氏度 放电温度过高保护 高字节
+放电温度过高保护恢复 低字节 计算公式：（ 数据值 - 2731 ） * 0.1，例如： 数据值为 0xAAC , 温
+度值为（ 0xAAC - 2731 ） * 0.1 = 0.1 摄氏度 放电温度过高保护恢复 高字节
+放电温度过高报警 低字节 计算公式：（ 数据值 - 2731 ） * 0.1，例如： 数据值为 0xAAC , 温
+度值为（ 0xAAC - 2731 ） * 0.1 = 0.1 摄氏度 放电温度过高报警 高字节
+放电温度过高保护延时 低字节
+100ms/bit
+放电温度过高保护延时 高字节
+放电温度过高保护恢复延时 低字节
+100ms/bit
+放电温度过高保护恢复延时 高字节
+放电温度过高报警延时 低字节
+100ms/bit
+放电温度过高报警延时 高字节
+放电温度过高保护使能标志低字节
+0： 屏蔽保护 1： 使能 放电温度过高保护使能标志高字节
+            */
+            this.sendCommandList.push({
+                name_cn: "BMS LS 放电高温",
+                name: "BMS LS discharge high temperature",
+                command: "0x8900",
+                sub_command: "0x2E",
+                description: "BMS LS discharge high temperature",
+                description_cn: "BMS LS 放电高温",
+                params: [
+                    {
+                        name: "放电温度过高保护",
+                        type: "uint16",
+                        description: "放电温度过高保护"
+                    },
+                    {
+                        name: "放电温度过高保护恢复",
+                        type: "uint16",
+                        description: "放电温度过高保护恢复"
+                    },
+                    {
+                        name: "放电温度过高报警",
+                        type: "uint16",
+                        description: "放电温度过高报警"
+                    },
+                    {
+                        name: "放电温度过高保护延时",
+                        type: "uint16",
+                        description: "放电温度过高保护延时"
+                    },
+                    {
+                        name: "放电温度过高保护恢复延时",
+                        type: "uint16",
+                        description: "放电温度过高保护恢复延时"
+                    },
+                    {
+                        name: "放电温度过高报警延时",
+                        type: "uint16",
+                        description: "放电温度过高报警延时"
+                    },
+                    {
+                        name: "放电温度过高保护使能标志",
+                        type: "uint16",
+                        description: "放电温度过高保护使能标志"
+                    }
+                ]
+            });
+            getSendCommandList("secnet")
+                .then(res => {
+                // append res.data to this.sendCommandList
+                console.log(res);
+                this.sendCommandList = this.sendCommandList.concat(res.data);
+            })
         },
         customRow(record) {
             return {
@@ -141,6 +674,9 @@ export default {
                     click: (event) => {
                         console.log("row click", record);
                         this.currentRow = record;
+                        this.param = "";
+                        this.params = [];
+                        this.help_param = "";
                     }
                 }
             };
@@ -156,12 +692,26 @@ export default {
                 this.formErrorMessage = "请添加设备";
                 return;
             }
-            // console.log('handleOk', this.currentRow, this.param)
+
+            // bms ls 配置命令，拼接好参数后，用透传命令发送
+            let subCommand = this.currentRow.sub_command;
+            if (this.customRow.command === "0x8900" &&
+                (this.customRow.sub_command === "0x29" ||
+                    this.customRow.sub_command === "0x28" ||
+                    this.customRow.sub_command === "0x2C" ||
+                    this.customRow.sub_command === "0x2D" ||
+                    this.customRow.sub_command === "0x31" ||
+                    this.customRow.sub_command === "0x2F" ||
+                    this.customRow.sub_command === "0x30" ||
+                    this.customRow.sub_command === "0x2E")
+            ) {
+                    subCommand = "0xff";
+            }
             let arg = {
                 id: (new Date()).getTime(), // current timestamp in milliseconds
                 name: this.currentRow.name,
                 command: this.currentRow.command,
-                subCommand: this.currentRow.sub_command,
+                subCommand: subCommand,
                 param: this.param,
                 enableOfflineMessage: this.enableOfflineMessage,
                 offlineMessageTtl: this.offlineMessageTtl
@@ -311,6 +861,79 @@ export default {
             else {
                 return `${seconds} 秒`;
             }
+        },
+        handleParamChange(index) {
+            console.log("handleParamChange", index, this.params[index]);
+            this.param = ""
+            // check if the param is valid after changed after 3 seconds
+            if (this.params_check_timer[index]) {
+                clearTimeout(this.params_check_timer[index]);
+            }
+            this.params_check_timer[index] = setTimeout(() => {
+                console.log("check param", index, this.params[index])
+                this.$set(this.params_errors, index, "")
+                // check 0 ~ index -1 params
+                console.log("params", this.params)
+                for (let i = 0; i < index; i++) {
+                    console.log("params[", i, "]", this.params[i])
+                    this.$set(this.params_errors, i, "")
+                    if (this.params[i] === undefined || this.params[i] === null || this.params[i] === "") {
+                        this.$set(this.params_errors, i, "参数不能为空");
+                        break;
+                    }
+                }
+                if (this.params[index] !== "") {
+                    // check if the param is valid
+                    const param = this.params[index].split(" ");
+                    if (param.length !== 2) {
+                        this.$set(this.params_errors, index, "参数格式错误")
+                    } else {
+                        const low = parseInt(param[0], 16);
+                        const high = parseInt(param[1], 16);
+                        if (isNaN(low) || isNaN(high)) {
+                            this.$set(this.params_errors, index, "参数格式错误")
+                        }
+                    }
+                }
+                console.log("params_errors", this.params_errors);
+
+                // if there is no params_errors
+                if (this.params_errors.filter(item => item !== "").length === 0) {
+                    // calculate the param
+                    const param = this.params.join(" ");
+                    const param_len = param.split(" ").length;
+                    const param_len_hex = param_len.toString(16).padStart(2, "0");
+                    let command = this.currentRow.sub_command;
+                    // remove leading 0x
+                    if (command.startsWith("0x")) {
+                        command = command.substring(2);
+                    }
+                    this.param = '3A 7D 02 01 00 ' + command + ' ' + param_len_hex + ' ' + param;
+                    // calculate the checksum, add every byte and take the last 2 digits
+                    let checksum = 0;
+                    this.param.split(" ").forEach(item => {
+                        checksum += parseInt(item, 16);
+                        checksum = checksum & 0xff;
+                    });
+                    checksum = checksum.toString(16).padStart(2, "0")
+                    this.param += ' ' + checksum;
+                }
+            }, 1000);
+        },
+        helpInputParams() {
+            const help_param = this.help_param.replace(/[^0-9a-fA-F]/g, '');
+            console.log('helpInputParams', help_param)
+            // read 2 characters and add a space, then read 2 characters
+            // then assign to this.params
+            for (let i = 0; i < help_param.length / 4; i += 1) {
+                const j = i * 4;
+                const low = help_param.substring(j, j + 2);
+                const high = help_param.substring(j + 2, j + 4);
+                console.log('low', low, 'high', high)
+                this.params[i] = low + ' ' + high;
+            }
+
+            this.handleParamChange(this.params.length - 1);
         }
     },
     components: { SelectDeviceIds }
