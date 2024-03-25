@@ -166,6 +166,7 @@ export default {
             params: [],
             params_errors: [],
             params_check_timer: [],
+            decimal_params_check_timer: [],
             help_param: '',
             showHexEdit: false,
             showAddDevice: false,
@@ -249,7 +250,6 @@ B1-A0-7E
                         type: "uint16",
                         description: "单体电压过低保护",
                         unit: "mV",
-                        formula: "function(x) { return x; }"
                     },
                     {
                         name: "单体电压过低保护恢复",
@@ -267,22 +267,22 @@ B1-A0-7E
                         name: "单体电压过低保护延时",
                         type: "uint16",
                         description: "单体电压过低保护延时",
-                        unit: "100ms",
-                        formula: "function(x) { return x * 100; }"
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "单体电压过低保护恢复延时",
                         type: "uint16",
                         description: "单体电压过低保护恢复延时",
-                        unit: "100ms",
-                        formula: "function(x) { return x * 100; }"
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "单体电压过低报警延时",
                         type: "uint16",
                         description: "单体电压过低报警延时",
-                        unit: "100ms",
-                        formula: "function(x) { return x * 100; }"
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "单体电压欠压保护使能标志",
@@ -302,8 +302,27 @@ B1-A0-7E
                 ]
             });
             /*
-            单体电压过高保护 低字节 单体电压过高保护 高字节 单体电压过高保护恢复 低字节 单体电压过高保护恢复 高字节 单体电压过高报警 低字节 单体电压过高报警 高字节
-            单体电压过高保护延时 低字节 单体电压过高保护延时 高字节 单体电压过高保护恢复延时 低字节 单体电压过高保护恢复延时 高字节 单体电压过高报警延时 低字节 单体电压过高报警延时 高字节 单体电压过压保护使能标志低字节 单体电压过压保护使能标志高字节
+单体电压过高保护 低字节
+1mV/bit 偏移量： 0
+单体电压过高保护 高字节
+单体电压过高保护恢复 低字节
+1mV/bit 偏移量： 0
+单体电压过高保护恢复 高字节
+单体电压过高报警 低字节
+1mV/bit 偏移量： 0
+单体电压过高报警 高字节
+单体电压过高保护延时 低字节
+100ms/bit
+单体电压过高保护延时 高字节
+单体电压过高保护恢复延时 低字节
+100ms/bit
+单体电压过高保护恢复延时 高字节
+单体电压过高报警延时 低字节
+100ms/bit
+单体电压过高报警延时 高字节
+单体电压过压保护使能标志低字节
+0： 屏蔽保护 1： 使能
+单体电压过压保护使能标志高字节
             */
             this.sendCommandList.push({
                 name_cn: "BMS LS 单体过压",
@@ -316,43 +335,76 @@ B1-A0-7E
                     {
                         name: "单体电压过高保护",
                         type: "uint16",
-                        description: "单体电压过高保护"
+                        description: "单体电压过高保护",
+                        unit: "mV",
                     },
                     {
                         name: "单体电压过高保护恢复",
                         type: "uint16",
-                        description: "单体电压过高保护恢复"
+                        description: "单体电压过高保护恢复",
+                        unit: "mV"
                     },
                     {
                         name: "单体电压过高报警",
                         type: "uint16",
-                        description: "单体电压过高报警"
+                        description: "单体电压过高报警",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "单体电压过高保护延时",
                         type: "uint16",
-                        description: "单体电压过高保护延时"
+                        description: "单体电压过高保护延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "单体电压过高保护恢复延时",
                         type: "uint16",
-                        description: "单体电压过高保护恢复延时"
+                        description: "单体电压过高保护恢复延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "单体电压过高报警延时",
                         type: "uint16",
-                        description: "单体电压过高报警延时"
+                        description: "单体电压过高报警延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "单体电压过压保护使能标志",
                         type: "uint16",
-                        description: "单体电压过压保护使能标志"
+                        description: "单体电压过压保护使能标志",
+                        options: [
+                            {
+                                value: 0,
+                                label: "屏蔽保护"
+                            },
+                            {
+                                value: 1,
+                                label: "使能"
+                            }
+                        ]
                     }
                 ]
             });
             /*
-            放电电流过高保护 低字节 放电电流过高保护 高字节 放电电流过高保护恢复 低字节 放电电流过高保护恢复 高字节 放电电流过高报警 低字节 放电电流过高报警 高字节
-            放电电流过高保护延时 低字节 放电电流过高保护延时 高字节 放电电流过高保护恢复延时 低字节 放电电流过高保护恢复延时 高字节 放电电流过高报警延时 低字节 放电电流过高报警延时 高字节 放电电流过高保护使能标志低字节 放电电流过高保护使能标志高字节
+            放电电流过高保护 低字节 0.1A/bit 偏移量： 0
+放电电流过高保护 高字节
+放电电流过高保护恢复 低字节 0.1A/bit 偏移量： 0
+放电电流过高保护恢复 高字节
+放电电流过高报警 低字节 0.1A/bit 偏移量： 0
+放电电流过高报警 高字节
+放电电流过高保护延时 低字节 100ms/bit
+放电电流过高保护延时 高字节
+放电电流过高保护恢复延时 低字节 100ms/bit
+放电电流过高保护恢复延时 高字节
+放电电流过高报警延时 低字节
+100ms/bit
+放电电流过高报警延时 高字节
+放电电流过高保护使能标志低字节
+0： 屏蔽保护 1： 使能 放电电流过高保护使能标志高字节
             */
             this.sendCommandList.push({
                 name_cn: "BMS LS 放电过流",
@@ -365,37 +417,59 @@ B1-A0-7E
                     {
                         name: "放电电流过高保护",
                         type: "uint16",
-                        description: "放电电流过高保护"
+                        description: "放电电流过高保护",
+                        unit: "A",
+                        formula: "return value * 10"
                     },
                     {
                         name: "放电电流过高保护恢复",
                         type: "uint16",
-                        description: "放电电流过高保护恢复"
+                        description: "放电电流过高保护恢复",
+                        unit: "A",
+                        formula: "return value * 10"
                     },
                     {
                         name: "放电电流过高报警",
                         type: "uint16",
-                        description: "放电电流过高报警"
+                        description: "放电电流过高报警",
+                        unit: "A",
+                        formula: "return value * 10"
                     },
                     {
                         name: "放电电流过高保护延时",
                         type: "uint16",
-                        description: "放电电流过高保护延时"
+                        description: "放电电流过高保护延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "放电电流过高保护恢复延时",
                         type: "uint16",
-                        description: "放电电流过高保护恢复延时"
+                        description: "放电电流过高保护恢复延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "放电电流过高报警延时",
                         type: "uint16",
-                        description: "放电电流过高报警延时"
+                        description: "放电电流过高报警延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "放电电流过高保护使能标志",
                         type: "uint16",
-                        description: "放电电流过高保护使能标志"
+                        description: "放电电流过高保护使能标志",
+                        options: [
+                            {
+                                value: 0,
+                                label: "屏蔽保护"
+                            },
+                            {
+                                value: 1,
+                                label: "使能"
+                            }
+                        ]
                     }
                 ]
             });
@@ -432,37 +506,59 @@ B1-A0-7E
                     {
                         name: "充电电流过高保护",
                         type: "uint16",
-                        description: "充电电流过高保护"
+                        description: "充电电流过高保护",
+                        unit: "A",
+                        formula: "return value * 10"
                     },
                     {
                         name: "充电电流过高保护恢复",
                         type: "uint16",
-                        description: "充电电流过高保护恢复"
+                        description: "充电电流过高保护恢复",
+                        unit: "A",
+                        formula: "return value * 10"
                     },
                     {
                         name: "充电电流过高报警",
                         type: "uint16",
-                        description: "充电电流过高报警"
+                        description: "充电电流过高报警",
+                        unit: "A",
+                        formula: "return value * 10"
                     },
                     {
                         name: "充电电流过高保护延时",
                         type: "uint16",
-                        description: "充电电流过高保护延时"
+                        description: "充电电流过高保护延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "充电电流过高保护恢复延时",
                         type: "uint16",
-                        description: "充电电流过高保护恢复延时"
+                        description: "充电电流过高保护恢复延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "充电电流过高报警延时",
                         type: "uint16",
-                        description: "充电电流过高报警延时"
+                        description: "充电电流过高报警延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "充电电流过高保护使能标志",
                         type: "uint16",
-                        description: "充电电流过高保护使能标志"
+                        description: "充电电流过高保护使能标志",
+                        options: [
+                            {
+                                value: 0,
+                                label: "屏蔽保护"
+                            },
+                            {
+                                value: 1,
+                                label: "使能"
+                            }
+                        ]
                     }
                 ]
             });
@@ -496,37 +592,59 @@ B1-A0-7E
                     {
                         name: "充电温度过低保护",
                         type: "uint16",
-                        description: "充电温度过低保护"
+                        description: "充电温度过低保护",
+                        unit: "摄氏度",
+                        formula: "return value * 10 + 2731"
                     },
                     {
                         name: "充电温度过低保护恢复",
                         type: "uint16",
-                        description: "充电温度过低保护恢复"
+                        description: "充电温度过低保护恢复",
+                        unit: "摄氏度",
+                        formula: "return value * 10 + 2731"
                     },
                     {
                         name: "充电温度过低报警",
                         type: "uint16",
-                        description: "充电温度过低报警"
+                        description: "充电温度过低报警",
+                        unit: "摄氏度",
+                        formula: "return value * 10 + 2731"
                     },
                     {
                         name: "充电温度过低保护延时",
                         type: "uint16",
-                        description: "充电温度过低保护延时"
+                        description: "充电温度过低保护延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "充电温度过低保护恢复延时",
                         type: "uint16",
-                        description: "充电温度过低保护恢复延时"
+                        description: "充电温度过低保护恢复延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "充电温度过低报警延时",
                         type: "uint16",
-                        description: "充电温度过低报警延时"
+                        description: "充电温度过低报警延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "充电温度过低保护使能标志",
                         type: "uint16",
-                        description: "充电温度过低保护使能标志"
+                        description: "充电温度过低保护使能标志",
+                        options: [
+                            {
+                                value: 0,
+                                label: "屏蔽保护"
+                            },
+                            {
+                                value: 1,
+                                label: "使能"
+                            }
+                        ]
                     }
                 ]
             });
@@ -560,37 +678,59 @@ B1-A0-7E
                     {
                         name: "充电温度过高保护",
                         type: "uint16",
-                        description: "充电温度过高保护"
+                        description: "充电温度过高保护",
+                        unit: "摄氏度",
+                        formula: "return value * 10 + 2731"
                     },
                     {
                         name: "充电温度过高保护恢复",
                         type: "uint16",
-                        description: "充电温度过高保护恢复"
+                        description: "充电温度过高保护恢复",
+                        unit: "摄氏度",
+                        formula: "return value * 10 + 2731"
                     },
                     {
                         name: "充电温度过高报警",
                         type: "uint16",
-                        description: "充电温度过高报警"
+                        description: "充电温度过高报警",
+                        unit: "摄氏度",
+                        formula: "return value * 10 + 2731"
                     },
                     {
                         name: "充电温度过高保护延时",
                         type: "uint16",
-                        description: "充电温度过高保护延时"
+                        description: "充电温度过高保护延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "充电温度过高保护恢复延时",
                         type: "uint16",
-                        description: "充电温度过高保护恢复延时"
+                        description: "充电温度过高保护恢复延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "充电温度过高报警延时",
                         type: "uint16",
-                        description: "充电温度过高报警延时"
+                        description: "充电温度过高报警延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "充电温度过高保护使能标志",
                         type: "uint16",
-                        description: "充电温度过高保护使能标志"
+                        description: "充电温度过高保护使能标志",
+                        options: [
+                            {
+                                value: 0,
+                                label: "屏蔽保护"
+                            },
+                            {
+                                value: 1,
+                                label: "使能"
+                            }
+                        ]
                     }
                 ]
             });
@@ -625,37 +765,59 @@ B1-A0-7E
                     {
                         name: "放电温度过低保护",
                         type: "uint16",
-                        description: "放电温度过低保护"
+                        description: "放电温度过低保护",
+                        unit: "摄氏度",
+                        formula: "return value * 10 + 2731"
                     },
                     {
                         name: "放电温度过低保护恢复",
                         type: "uint16",
-                        description: "放电温度过低保护恢复"
+                        description: "放电温度过低保护恢复",
+                        unit: "摄氏度",
+                        formula: "return value * 10 + 2731"
                     },
                     {
                         name: "放电温度过低报警",
                         type: "uint16",
-                        description: "放电温度过低报警"
+                        description: "放电温度过低报警",
+                        unit: "摄氏度",
+                        formula: "return value * 10 + 2731"
                     },
                     {
                         name: "放电温度过低保护延时",
                         type: "uint16",
-                        description: "放电温度过低保护延时"
+                        description: "放电温度过低保护延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "放电温度过低保护恢复延时",
                         type: "uint16",
-                        description: "放电温度过低保护恢复延时"
+                        description: "放电温度过低保护恢复延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "放电温度过低报警延时",
                         type: "uint16",
-                        description: "放电温度过低报警延时"
+                        description: "放电温度过低报警延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "放电温度过低保护使能标志",
                         type: "uint16",
-                        description: "放电温度过低保护使能标志"
+                        description: "放电温度过低保护使能标志",
+                        options: [
+                            {
+                                value: 0,
+                                label: "屏蔽保护"
+                            },
+                            {
+                                value: 1,
+                                label: "使能"
+                            }
+                        ]
                     }
                 ]
             });
@@ -689,37 +851,59 @@ B1-A0-7E
                     {
                         name: "放电温度过高保护",
                         type: "uint16",
-                        description: "放电温度过高保护"
+                        description: "放电温度过高保护",
+                        unit: "摄氏度",
+                        formula: "return value * 10 + 2731"
                     },
                     {
                         name: "放电温度过高保护恢复",
                         type: "uint16",
-                        description: "放电温度过高保护恢复"
+                        description: "放电温度过高保护恢复",
+                        unit: "摄氏度",
+                        formula: "return value * 10 + 2731"
                     },
                     {
                         name: "放电温度过高报警",
                         type: "uint16",
-                        description: "放电温度过高报警"
+                        description: "放电温度过高报警",
+                        unit: "摄氏度",
+                        formula: "return value * 10 + 2731"
                     },
                     {
                         name: "放电温度过高保护延时",
                         type: "uint16",
-                        description: "放电温度过高保护延时"
+                        description: "放电温度过高保护延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "放电温度过高保护恢复延时",
                         type: "uint16",
-                        description: "放电温度过高保护恢复延时"
+                        description: "放电温度过高保护恢复延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "放电温度过高报警延时",
                         type: "uint16",
-                        description: "放电温度过高报警延时"
+                        description: "放电温度过高报警延时",
+                        unit: "ms",
+                        formula: "return value / 100"
                     },
                     {
                         name: "放电温度过高保护使能标志",
                         type: "uint16",
-                        description: "放电温度过高保护使能标志"
+                        description: "放电温度过高保护使能标志",
+                        options: [
+                            {
+                                value: 0,
+                                label: "屏蔽保护"
+                            },
+                            {
+                                value: 1,
+                                label: "使能"
+                            }
+                        ]
                     }
                 ]
             });
@@ -737,6 +921,7 @@ B1-A0-7E
                         console.log("row click", record);
                         this.currentRow = record;
                         this.param = "";
+                        this.decimal_params = [];
                         this.params = [];
                         this.help_param = "";
                     }
@@ -944,21 +1129,39 @@ B1-A0-7E
                 this.$set(this.params_errors, i, "")
             }
 
-            // convert the decimal to hex
-            const param_int = parseInt(this.decimal_params[index]);
-            if (isNaN(param_int)) {
-                this.$set(this.params, index, "");
-                return;
+            if (this.decimal_params_check_timer[index]) {
+                clearTimeout(this.decimal_params_check_timer[index]);
             }
-            // little endian
-            const param_hex = param_int.toString(16).padStart(4, "0");
-            // const param_hex = param_int.toString(16).padStart(4, "0");
-            console.log("param_hex", param_hex);
-            const little_endian_hex = this.intToLittleEndianHexString(param_int);
-            console.log("little_endian_hex", little_endian_hex);
-            // split the hex into 2 bytes
-            this.$set(this.params, index, param_hex.substring(2) + " " + param_hex.substring(0, 2));
-            this.handleParamChange(index);
+
+            this.decimal_params_check_timer = setTimeout(() => {
+                // convert the decimal to hex
+                let param_int = parseFloat(this.decimal_params[index]);
+                if (isNaN(param_int)) {
+                    console.log("param is not a number");
+                    this.$set(this.params, index, "");
+                    return;
+                }
+                console.log("param_int", param_int);
+                // eval the formula
+                const formula = this.currentRow.params[index].formula;
+                console.log("formula", formula);
+                if (formula) {
+                    // eslint-disable-next-line no-new-func
+                    const formula_func = new Function('value', formula);
+                    const param = formula_func(param_int);
+                    console.log("param after formula applied", param);
+                    param_int = param
+                }
+                // little endian
+                const param_hex = param_int.toString(16).padStart(4, "0");
+                // const param_hex = param_int.toString(16).padStart(4, "0");
+                console.log("param_hex", param_hex);
+                const little_endian_hex = this.intToLittleEndianHexString(param_int);
+                console.log("little_endian_hex", little_endian_hex);
+                // split the hex into 2 bytes
+                this.$set(this.params, index, param_hex.substring(2) + " " + param_hex.substring(0, 2));
+                this.handleParamChange(index);
+            }, 1000)
         },
         handleParamChange(index) {
             console.log("handleParamChange", index, this.params[index]);
