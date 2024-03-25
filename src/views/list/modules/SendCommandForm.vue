@@ -24,9 +24,9 @@
     >
       <!-- create a a-input for each currentRow.params -->
       <!-- loop with index -->
-        <!-- https://stackoverflow.com/questions/44351978/vue-js-v-for-loop-with-index -->
-        <p>字符串辅助填写</p>
+        <p v-if="showHexEdit">字符串辅助填写</p>
         <a-input
+            v-if="showHexEdit"
             v-model='help_param'
             placeholder="16进制字符串自动拆分填充"
             @change="helpInputParams"
@@ -41,11 +41,29 @@
             <p v-if="params_errors[i]" class="error">
                 {{ params_errors[i] }}
             </p>
-            <p>16进制格式：00 00 （低字节 高字节)</p>
+            <a-row :gutter="48">
+                <a-col :md="12" :sm="24">
+                    <a-input
+                        v-model='decimal_params[i]'
+                        placeholder="输入参数"
+                        @change="handleDecimalParamChange(i)"
+                    ></a-input>
+                </a-col>
+                <a-col :md="4" :sm="12">
+                    <span>{{ p.unit }}</span>
+                </a-col>
+                <a-col v-if="p.options" :md="12" :sm="24">
+                    <span v-for="(option, index) in p.options" :key="index">
+                        {{ option.value }}: {{ option.label }}
+                    </span>
+                </a-col>
+            </a-row>
+            <p v-if="showHexEdit">16进制格式：00 00 （低字节 高字节)</p>
             <a-input
-              v-model='params[i]'
-              placeholder="00 00"
-              @change="handleParamChange(i)"
+                v-if="showHexEdit"
+                v-model='params[i]'
+                placeholder="00 00"
+                @change="handleParamChange(i)"
             ></a-input>
         </a-form-item>
       <p v-if="currentRow.params">根据上面的参数拼接的结果：</p>
@@ -59,6 +77,9 @@
         v-model:checked="enableOfflineMessage"
         @change="handleSaveOfflineMessageChange"
       >离线设备自动重发</a-checkbox>
+        <a-checkbox
+            v-model="showHexEdit"
+        >16进制编辑</a-checkbox>
     </a-form-item>
     <a-form-item v-if="enableOfflineMessage">
       <a-date-picker
@@ -141,10 +162,12 @@ export default {
             ],
             currentRow: null,
             param: null,
+            decimal_params: [],
             params: [],
             params_errors: [],
             params_check_timer: [],
             help_param: '',
+            showHexEdit: false,
             showAddDevice: false,
             activeTab: "singleDeviceId",
             deviceIdNew: null,
@@ -192,7 +215,26 @@ B1-A0-7E
 7E-89-00-00-1C-05-22-30-10-01-11-24-E6-EC-00-00-00-1C-00-15-3A-7D-02-01-00-2E-0E-35-0D-D1-0C-D1-0C-E8-03-E8-03-E8-03-00-00-B2-A1-7E
 */
 /*
-单体电压过低保护 低字节 单体电压过低保护 高字节 单体电压过低保护恢复 低字节 单体电压过低保护恢复 高字节 单体电压过低报警 低字节 单体电压过低报警 高字节 单体电压过低保护延时 低字节 单体电压过低保护延时 高字节 单体电压过低保护恢复延时 低字节 单体电压过低保护恢复延时 高字节 单体电压过低报警延时 低字节 单体电压过低报警延时 高字节 单体电压欠压保护使能标志低字节 单体电压欠压保护使能标志高字节
+单体电压过低保护 低字节
+1mV/bit 偏移量： 0
+单体电压过低保护 高字节
+单体电压过低保护恢复 低字节
+1mV/bit 偏移量： 0
+单体电压过低保护恢复 高字节
+单体电压过低报警 低字节
+1mV/bit 偏移量： 0
+单体电压过低报警 高字节
+单体电压过低保护延时 低字节
+100ms/bit
+单体电压过低保护延时 高字节
+单体电压过低保护恢复延时 低字节
+100ms/bit
+单体电压过低保护恢复延时 高字节
+单体电压过低报警延时 低字节
+100ms/bit
+单体电压过低报警延时 高字节
+单体电压欠压保护使能标志低字节 0： 屏蔽保护 1： 使能
+单体电压欠压保护使能标志高字节
 */
             this.sendCommandList.push({
                 name_cn: "BMS LS 单体欠压",
@@ -205,37 +247,57 @@ B1-A0-7E
                     {
                         name: "单体电压过低保护",
                         type: "uint16",
-                        description: "单体电压过低保护"
+                        description: "单体电压过低保护",
+                        unit: "mV",
+                        formula: "function(x) { return x; }"
                     },
                     {
                         name: "单体电压过低保护恢复",
                         type: "uint16",
-                        description: "单体电压过低保护恢复"
+                        description: "单体电压过低保护恢复",
+                        unit: "mV"
                     },
                     {
                         name: "单体电压过低报警",
                         type: "uint16",
-                        description: "单体电压过低报警"
+                        description: "单体电压过低报警",
+                        unit: "mV"
                     },
                     {
                         name: "单体电压过低保护延时",
                         type: "uint16",
-                        description: "单体电压过低保护延时"
+                        description: "单体电压过低保护延时",
+                        unit: "100ms",
+                        formula: "function(x) { return x * 100; }"
                     },
                     {
                         name: "单体电压过低保护恢复延时",
                         type: "uint16",
-                        description: "单体电压过低保护恢复延时"
+                        description: "单体电压过低保护恢复延时",
+                        unit: "100ms",
+                        formula: "function(x) { return x * 100; }"
                     },
                     {
                         name: "单体电压过低报警延时",
                         type: "uint16",
-                        description: "单体电压过低报警延时"
+                        description: "单体电压过低报警延时",
+                        unit: "100ms",
+                        formula: "function(x) { return x * 100; }"
                     },
                     {
                         name: "单体电压欠压保护使能标志",
                         type: "uint16",
-                        description: "单体电压欠压保护使能标志"
+                        description: "单体电压欠压保护使能标志",
+                        options: [
+                            {
+                                value: 0,
+                                label: "屏蔽保护"
+                            },
+                            {
+                                value: 1,
+                                label: "使能"
+                            }
+                        ]
                     }
                 ]
             });
@@ -862,8 +924,48 @@ B1-A0-7E
                 return `${seconds} 秒`;
             }
         },
+        intToLittleEndianHexString(num) {
+            // Convert the number to a hexadecimal string
+            let hexString = num.toString(16);
+            // Pad the string with leading zeros so it's a full byte sequence
+            while (hexString.length % 8 !== 0) {
+                hexString = '0' + hexString;
+            }
+            // Split the string into pairs of characters (bytes in big-endian)
+            const hexPairs = hexString.match(/.{1,2}/g);
+            // Reverse the order of the bytes for little-endian format
+            const littleEndianHexString = hexPairs.reverse().join('');
+            return littleEndianHexString;
+        },
+        handleDecimalParamChange(index) {
+            console.log("handleDecimalParamChange", index, this.decimal_params[index]);
+            // clear errors
+            for (let i = 0; i < this.params_errors.length; i++) {
+                this.$set(this.params_errors, i, "")
+            }
+
+            // convert the decimal to hex
+            const param_int = parseInt(this.decimal_params[index]);
+            if (isNaN(param_int)) {
+                this.$set(this.params, index, "");
+                return;
+            }
+            // little endian
+            const param_hex = param_int.toString(16).padStart(4, "0");
+            // const param_hex = param_int.toString(16).padStart(4, "0");
+            console.log("param_hex", param_hex);
+            const little_endian_hex = this.intToLittleEndianHexString(param_int);
+            console.log("little_endian_hex", little_endian_hex);
+            // split the hex into 2 bytes
+            this.$set(this.params, index, param_hex.substring(2) + " " + param_hex.substring(0, 2));
+            this.handleParamChange(index);
+        },
         handleParamChange(index) {
             console.log("handleParamChange", index, this.params[index]);
+            // clear errors
+            for (let i = 0; i < this.params_errors.length; i++) {
+                this.$set(this.params_errors, i, "")
+            }
             this.param = ""
             // check if the param is valid after changed after 3 seconds
             if (this.params_check_timer[index]) {
