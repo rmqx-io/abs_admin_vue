@@ -150,7 +150,7 @@
 
         <span slot="bms_info" slot-scope="text, record">
           <template>
-            SOC: <span>{{ record.bms_soc }}</span>
+            SOC: <span>{{ record.bms_soc / 50 }}</span>
             <br />
             SOH: <span>{{ record.bms_soh }}</span>
             <br />
@@ -179,6 +179,10 @@
         <span slot='location_time' slot-scope='text, record'>
           <template>
             {{ record.location_time ? localTime(record.location_time) : '' }}
+            <br />
+            信号强度: <span>{{ record.signal }}</span>
+            <br />
+            卫星: <span>{{ record.satellites }}</span>
           </template>
         </span>
 
