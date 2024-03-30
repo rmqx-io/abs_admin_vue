@@ -886,10 +886,10 @@ export default {
               }
             }
             if (res.data && res.data.logs && res.data.logs.length === 0) {
-              // refresh after 3 seconds
-              setTimeout(() => {
-                this.refresh()
-              }, 3000)
+              // // refresh after 10 seconds
+              // setTimeout(() => {
+              //   this.refresh()
+              // }, 10000)
             }
             if (res.data && res.data.device_bms_config) {
               if (res.data.device_bms_config.battery_capacity_config) {
@@ -901,10 +901,6 @@ export default {
         })
       }).catch(err => {
         console.log('bms type', err)
-        // refresh after 3 seconds
-        setTimeout(() => {
-          this.refresh()
-        }, 3000)
       })
       if (this.dataListBMS.length === 0) {
         setTimeout(() => {
