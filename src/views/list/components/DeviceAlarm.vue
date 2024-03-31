@@ -236,9 +236,11 @@ export default {
     },
     alarm_name (alarm) {
       let alarmName = ''
-      // if alarm & 0x01 == 1, add alarm_type[0] alarm name
-      for (let i = 0; i < 16; i++) {
-        if (alarm & (0x01 << i)) {
+      for (let i = 0; i < 64; i++) {
+        if (this.alarm_types[i] === undefined) {
+          break
+        }
+        if (alarm & (1 << i)) {
           alarmName += this.alarm_types[i] + ','
         }
       }
@@ -251,7 +253,9 @@ export default {
       return alarmName
     },
     get_alarm_name () {
-      getDeviceAlarmTypes(227)
+      // 227 fm
+      // 236 ls
+      getDeviceAlarmTypes(236)
         .then(res => {
           console.log('alarm type', res)
           if (res.data && res.data.cn) {
