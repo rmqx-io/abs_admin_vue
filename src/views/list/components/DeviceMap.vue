@@ -2,6 +2,7 @@
   <div
     id="map"
     style="width: 100%; height: 100%"
+    ref="deviceMap"
   >
     <div
       v-if="isGettingDeviceLocation"
@@ -75,11 +76,17 @@ export default {
         gridSize: 100,
         averageCenter: true,
         zoomOnClick: true
-      }
+      },
+      observer: null,
+      isVisible: false
     }
   },
   mounted () {
+    this.createObserver();
     this.refreshMap()
+  },
+  beforeDestroy() {
+    this.destroyObserver();
   },
   methods: {
     refreshMap () {
@@ -113,7 +120,7 @@ export default {
             if (item.last_location_lng !== null && item.last_location_lat !== null) {
               this.markersFound += 1
               const gcj02 = wgs84togcj02(item.last_location_lng, item.last_location_lat)
-              console.log('gcj02', gcj02)
+              // console.log('gcj02', gcj02)
               this.deviceMarkers.push({
                 lnglat: gcj02,
                 title: item.code
@@ -132,9 +139,35 @@ export default {
               }
             )
           } else {
-            this.getDeviceLocation(arg, page_no + 1)
+            if (this.isVisible) {
+              this.getDeviceLocation(arg, page_no + 1)
+            }
           }
         })
+    },
+    createObserver() {
+      console.log('DeviceMap create');
+      const options = {
+        root: null, // Relative to the viewport
+        rootMargin: '0px',
+        threshold: 1.0 // Adjust this value based on what % should be visible
+      };
+
+      this.observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          // Each entry describes an intersection change for one observed
+          // target element:
+          this.isVisible = entry.isIntersecting;
+        });
+      }, options);
+
+      this.observer.observe(this.$refs.deviceMap);
+    },
+    destroyObserver() {
+      if (this.observer) {
+        this.observer.disconnect();
+      }
+      console.log('DeviceMap destroy');
     }
   }
 }
