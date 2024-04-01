@@ -155,12 +155,16 @@
             SOH: <span>{{ record.bms_soh }}</span>
             <br />
             循环次数: <span>{{ record.bms_battery_cycle}}</span>
+            <br />
+            软件版本: <span>{{ record.bms_software_version }}</span>
+            <br />
+            硬件版本: <span>{{ record.bms_hardware_version }}</span>
           </template>
         </span>
 
         <span slot="model_info" slot-scope="text, record">
           <template>
-            电池型号: <span>{{ record.battery_name }}</span>
+            电池型号: <span>{{ record.bms_product_no}}</span>
             <br />
             设备型号: <span>{{ record.model_name }}</span>
             <br />
