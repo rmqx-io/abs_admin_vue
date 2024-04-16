@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import request_no_timeout from '@/utils/request'
 
 const prefix = '/admin'
 
@@ -119,7 +120,7 @@ export function exportDeviceList (arg) {
 }
 
 export function getExportDeviceList (parameters) {
-  return request({
+  return request_no_timeout({
     url: api.device_export,
     method: 'get',
     params: parameters

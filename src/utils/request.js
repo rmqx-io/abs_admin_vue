@@ -13,6 +13,12 @@ const request = axios.create({
   timeout: 30000 // 请求超时时间
 })
 
+const request_no_timeout = axios.create({
+  // API 请求的默认前缀
+  baseURL: process.env.VUE_APP_API_BASE_URL,
+  timeout: 0 // 请求超时时间
+})
+
 // 异常拦截处理器
 const errorHandler = (error) => {
   if (error.response) {
@@ -76,5 +82,5 @@ export default request
 
 export {
   installer as VueAxios,
-  request as axios
+  request_no_timeout,
 }
