@@ -800,6 +800,7 @@ export default {
       this.batteryType = this.bms_type === "bms_details" ? "fm/jk" : this.bms_type
     },
     controlMos(mos, on_off) {
+      console.log('control mos', mos, on_off)
       var mos_address;
       if (mos === 'charge') {
         mos_address = 0xab;
@@ -810,10 +811,15 @@ export default {
         return;
       }
 
-      const arg = {
+      var arg = {
         command: mos_address,
         bms_type: this.bms_type,
         param: on_off
+      }
+      if (this.bms_type === 'bms_ls') {
+        arg.command = 0x01
+        arg.param = this.form_ls_control_param(mos, on_off)
+        console.log('bms_ls', arg)
       }
       this.$message.info("设置 MOS")
       sendFmBmsCommand(this.deviceId, arg)
@@ -823,6 +829,31 @@ export default {
       }).catch(() => {
         this.$message.error("设置 MOS 失败")
       })
+    },
+    form_ls_control_param(mos, on_off) {
+      // 4、命令数据对照表(只写)
+      // 功能码 数据定义 数据格式
+      // 60
+      // (0x3C)
+      // 休眠 0：不休眠 1：休眠 ( 0xFF:无效值 )
+      // 放电 MOS 0：断开 1：闭合 ( 0xFF:无效值 )
+      // 充电 MOS 0：断开 1：闭合 ( 0xFF:无效值 )
+      // 复位 MCU 0：关闭； 1：开启 ( 0xFF:无效值 )
+      // 仓储模式 0： 关闭； 1： 开启 ( 0xFF:无效值 )
+      var param_vec = ['255'] // 休眠
+      if (mos === 'discharge') {
+        param_vec.push(on_off)
+      } else {
+        param_vec.push('255')
+      }
+      if (mos === 'charge') {
+        param_vec.push(on_off)
+      } else {
+        param_vec.push('255')
+      }
+      param_vec.push('255') // 复位
+      param_vec.push('255') // 仓储
+      return param_vec.join(',')
     },
     refresh () {
       this.$message.info("刷新")
