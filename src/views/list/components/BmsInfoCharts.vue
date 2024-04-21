@@ -870,7 +870,11 @@ export default {
               this.gps_battery_voltage = res.data.vehicle_detail_vo.gps_battery_voltage
               this.rssi = res.data.vehicle_detail_vo.rssi
               this.gnss = res.data.vehicle_detail_vo.gnss
-              this.gps_location = res.data.vehicle_detail_vo.gps_location
+              // this.gps_location = res.data.vehicle_detail_vo.gps_location
+              // vehicle_detail_vo.status 第1位为定位状态
+              this.gps_location = (res.data.vehicle_detail_vo.status & 0x02) >> 1
+              // vehicle_detail_vo.status 第0位为运动状态
+              this.mACCON = (res.data.vehicle_detail_vo.status & 0x01) === 1
               this.gps_location_time = moment(res.data.vehicle_detail_vo.time_tracking).format('YYYY-MM-DD HH:mm:ss')
               this.receive_time = moment(res.data.vehicle_detail_vo.receive_time).format('YYYY-MM-DD HH:mm:ss')
             }
