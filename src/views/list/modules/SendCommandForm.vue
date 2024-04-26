@@ -912,7 +912,13 @@ B1-A0-7E
                 // append res.data to this.sendCommandList
                 console.log(res);
                 this.sendCommandList = this.sendCommandList.concat(res.data);
-            })
+            }).catch(err => {
+                console.error(err);
+                // retry after 3 seconds
+                setTimeout(() => {
+                    this.getSendCommandList();
+                }, 3000);
+            });
         },
         customRow(record) {
             return {
