@@ -91,7 +91,7 @@
             </el-descriptions-item>
             <el-descriptions-item label="均衡开关" span="1">
               <el-switch
-                v-model="isMosDis"
+                v-model="isBalanceOn"
                 disabled
                 active-color="#41b584"
                 inactive-color="#f34d37"
@@ -478,6 +478,7 @@ export default {
       mCurSn: '',
       isMosRec: false,
       isMosDis: false,
+      isBalanceOn: false,
       isEleLink: false,
       isRec: false,
       socImg: 1,
@@ -795,6 +796,7 @@ export default {
     getBatteryInfoLatestJx(bmsInfo) {
       this.isMosRec = bmsInfo.battery_status_charging_mos
       this.isMosDis = bmsInfo.battery_status_discharging_mos
+      this.isBalanceOn = bmsInfo.battery_status_balance
       this.battery_capacity_config = bmsInfo.battery_capacity_config
       this.batteryVer = "100"
       this.batteryType = this.bms_type === "bms_details" ? "fm/jk" : this.bms_type
@@ -891,6 +893,7 @@ export default {
               this.battery_currency = bmsInfo.battery_currency
               this.isMosRec = bmsInfo.battery_status_charging_mos
               this.isMosDis = bmsInfo.battery_status_discharging_mos
+              this.isBalanceOn = bmsInfo.battery_status_balance
               this.battery_charging_cycle = bmsInfo.battery_charging_cycle
               this.humidity = bmsInfo.humidity
 
