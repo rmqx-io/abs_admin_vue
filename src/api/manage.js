@@ -310,15 +310,6 @@ export function getBmsType(deviceId) {
   });
 }
 
-export function getBmsTypeInt(deviceId) {
-  return request({
-    url: api.bms_type + '/' + deviceId + '/int',
-    method: 'get'
-  }).then(res => {
-    return res;
-  });
-}
-
 export function getLocation (deviceId, arg) {
   return request({
     url: api.location + '/' + deviceId,
