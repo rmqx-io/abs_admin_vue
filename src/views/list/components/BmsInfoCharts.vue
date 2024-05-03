@@ -109,7 +109,7 @@
               <el-tag size="small">{{ battery_voltage }} V</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="当前功率" span="1">
-              <el-tag size="small">{{ battery_voltage * battery_currency }} W</el-tag>
+              <el-tag size="small">{{ (battery_voltage * battery_currency).toFixed(2) }} W</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="标称容量" span="1">
               <el-tag size="small">{{ battery_capacity_config }} Ah</el-tag>
@@ -425,6 +425,7 @@ import ChartBmsMore from '@/views/history/bms_history/components/ChartBmsMore.vu
 import {
   getBatteryInfo, getBatteryInfoLatest,
   getBmsType,
+  getBmsTypeInt,
   sendFmBmsCommand
 } from '@/api/manage'
 import moment from 'moment/moment'
@@ -922,6 +923,17 @@ export default {
               ) {
                 this.getBatteryInfoLatestJx(bmsInfo)
               }
+              // get bms type int, adjust the values for different bms
+              getBmsTypeInt(this.deviceId)
+                .then(res => {
+                  console.log('bms type int', res)
+                  if (res.data) {
+                    // bms type 227(0xe3) is fm
+                    if (res.data === 227) {
+                      this.battery_currency = (bmsInfo.battery_currency / 100).toFixed(2)
+                    }
+                  }
+                })
             }
             if (res.data && res.data.logs && res.data.logs.length === 0) {
               // // refresh after 10 seconds
