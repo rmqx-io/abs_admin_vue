@@ -891,7 +891,7 @@ export default {
               this.tempList = this.form_temperature_array_for_display(bmsInfo)
               // console.log('battery list', this.batteryList)
               // single_battery_voltage_arr
-              this.battery_currency = bmsInfo.battery_currency
+              this.battery_currency = bmsInfo.battery_currency // 服务器返回的值单位为 A
               this.isMosRec = bmsInfo.battery_status_charging_mos
               this.isMosDis = bmsInfo.battery_status_discharging_mos
               this.isBalanceOn = bmsInfo.battery_status_balance
@@ -930,7 +930,19 @@ export default {
                   if (res.data) {
                     // bms type 227(0xe3) is fm
                     if (res.data === 227) {
-                      this.battery_currency = (bmsInfo.battery_currency / 100).toFixed(2)
+                      // 之前平台把电流按照 jk 的格式解析（最高位为符号位，0为负，1为正，后面的为数据）
+                      // 这回造成 fm 格式的电流会出现负数，所以这里需要转换一下
+                      // fm 格式的电流解析已经修改，以后也不会再出现负数的情况
+                      if (bmsInfo.battery_currency < 0) {
+                        this.battery_currency = -bmsInfo.battery_currency
+                      }
+                      // 0X84
+                      // 电流数据 2 HEX 
+                      // 10000（10000-11000）*0.01=-10.00a（放电）（10000-9500）¥0.01=5.00a（充电）精度10MA单位：
+                      // 参考上图协议说明，10000减数据，负数是放电，正数是充电，精度10ma，除100单位就是安
+                      // 服务器返回的值已经除以100，单位为 A
+                      // 所以这里计算公式应该是 (10000/100) - battery_currency
+                      this.battery_currency = ((10000.0 / 100.0) - this.battery_currency).toFixed(2)
                     }
                   }
                 })
