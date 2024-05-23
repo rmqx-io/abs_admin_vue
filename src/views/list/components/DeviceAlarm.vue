@@ -68,6 +68,7 @@
       </a-row>
     </a-form>
     <s-table
+      v-if="table_visible"
       ref="alarmtable"
       :columns="columns"
       :data='loadData'
@@ -86,12 +87,29 @@
           <span>{{ alarm_name(record.bms_alarm) }}</span>
         </template>
       </span>
+      <span slot="organization_name" slot-scope="text, record">
+        <template>
+          <span>{{ record.organization_name }}</span>
+        </template>
+      </span>
       <span slot='bms_alarm_timestamp' slot-scope="text, record">
         <template>
           <span>{{ localTime(record.bms_alarm_timestamp) }}</span>
         </template>
       </span>
+      <span slot='operation' slot-scope="text, record">
+        <a @click="handleBatteryInfo(record)">电池详情</a>
+      </span>
     </s-table>
+
+    <battery-info
+      v-if="battery_detail_visible"
+      ref="batteryInfo"
+      :device-id="device_id"
+      :bms-bt="bms_bt"
+      @cancel="handleBatteryInfoCancel"
+      @ok="handleBatteryInfoOk"
+    />
   </div>
 </template>
 
@@ -99,11 +117,13 @@
 import moment from 'moment/moment'
 import { STable } from '@/components'
 import { getDeviceAlarm, getDeviceAlarmTypes } from '@/api/manage'
+import BatteryInfo from '@/views/list/components/BatteryInfo'
 
 export default {
   name: 'DeviceAlarm',
   components: {
-    STable
+    STable,
+    BatteryInfo,
   },
   props: {
     deviceId: {
@@ -121,6 +141,10 @@ export default {
   },
   data () {
     return {
+      table_visible: true,
+      battery_detail_visible: false,
+      device_id: null,
+      bms_bt: null,
       showMoreParam: false,
       bms_type: '0',
       alarm_types: ['Item 1', 'Item 2', 'Item 3', 'Item 4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'],
@@ -146,9 +170,20 @@ export default {
           scopedSlots: { customRender: 'bms_alarm' }
         },
         {
+          title: '组织',
+          dataIndex: 'organization_name',
+          scopedSlots: { customRender: 'organization_name' }
+        },
+        {
           title: '时间',
           dataIndex: 'bms_alarm_timestamp',
           scopedSlots: { customRender: 'bms_alarm_timestamp' }
+        },
+        {
+          title: '操作',
+          dataIndex: 'operation',
+          scopedSlots: { customRender: 'operation' },
+          fixed: 'right',
         }
       ],
       loading: false,
@@ -278,6 +313,26 @@ export default {
     },
     localTime (time) {
       return moment.utc(time).local().format('YYYY-MM-DD HH:mm:ss')
+    },
+    handleBatteryInfo(record) {
+      console.log('record', record)
+      console.log('record.code', record.code)
+      this.device_id = record.code
+      this.bms_bt = record.bms_bt
+      this.battery_detail_visible = true
+      this.table_visible = false
+      this.$nextTick(() => {
+        console.log('record.code', record.code)
+        this.$refs.batteryInfo.getBatteryInfoHandle(record.code)
+      })
+    },
+    handleBatteryInfoCancel() {
+      this.battery_detail_visible = false
+      this.table_visible = true
+    },
+    handleBatteryInfoOk() {
+      this.battery_detail_visible = false
+      this.table_visible = true
     }
   },
   created () {
