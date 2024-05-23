@@ -653,32 +653,37 @@ export default {
               res.data.forEach(item => {
                 const timestamp = moment(item.time_tracking).format('YYYY-MM-DD HH:mm:ss')
                 console.log('timestamp', timestamp)
-                bmsList.push([
-                  {
-                    value: item.battery_voltage,
-                    date: timestamp
-                  },
-                  {
-                    value: item.battery_currency,
-                    date: timestamp
-                  },
-                  {
-                    value: item.battery_capacity_soc,
-                    date: timestamp
-                  },
-                  {
-                    value: item.power_transistor_temperature,
-                    date: timestamp
-                  },
-                  {
-                    value: item.battery_temperature,
-                    date: timestamp
-                  },
-                  {
-                    value: item.battery_box_temperature,
-                    date: timestamp
-                  }
-                ])
+                // 至少要有一个温度大于 -273，否则不显示
+                if (item.battery_temperature > -273 ||
+                  item.battery_box_temperature > -273 ||
+                  item.power_transistor_temperature > -273) {
+                  bmsList.push([
+                    {
+                      value: item.battery_voltage,
+                      date: timestamp
+                    },
+                    {
+                      value: item.battery_currency,
+                      date: timestamp
+                    },
+                    {
+                      value: item.battery_capacity_soc,
+                      date: timestamp
+                    },
+                    {
+                      value: item.power_transistor_temperature,
+                      date: timestamp
+                    },
+                    {
+                      value: item.battery_temperature,
+                      date: timestamp
+                    },
+                    {
+                      value: item.battery_box_temperature,
+                      date: timestamp
+                    }
+                  ])
+                }
               })
             }
             // if the result is empty, add a empty data
