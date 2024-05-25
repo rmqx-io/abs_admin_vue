@@ -1,18 +1,28 @@
+//监控中心路由行↓
+
 // eslint-disable-next-line
-import { UserLayout, BasicLayout, BlankLayout,PageView } from '@/layouts'
-import { bxAnaalyse } from '@/core/icons'
+import {
+  UserLayout,
+  BasicLayout,
+  BlankLayout,
+  PageView
+} from '@/layouts'
+import {
+  bxAnaalyse
+} from '@/core/icons'
 
 const RouteView = {
   name: 'RouteView',
   render: h => h('router-view')
 }
 
-export const asyncRouterMap = [
-  {
+export const asyncRouterMap = [{
     path: '/',
     name: 'index',
     component: BasicLayout,
-    meta: { title: 'menu.home' },
+    meta: {
+      title: 'menu.home'
+    },
     redirect: '/dashboard/dashboard',
     children: [
       // dashboard
@@ -21,7 +31,12 @@ export const asyncRouterMap = [
         name: 'dashboard',
         redirect: '/dashboard/dashboard',
         component: RouteView,
-        meta: { title: 'menu.dashboard', keepAlive: true, icon: bxAnaalyse, permission: ['dashboard'] },
+        meta: {
+          title: 'menu.dashboard',
+          keepAlive: true,
+          icon: bxAnaalyse,
+          permission: ['dashboard']
+        },
         children: [
           // {
           //   path: '/dashboard/analysis/:pageNo([1-9]\\d*)?',
@@ -33,9 +48,32 @@ export const asyncRouterMap = [
             path: '/dashboard/dashboard',
             name: 'Dashboard',
             component: () => import('@/views/dashboard/Dashboard'),
-            meta: { title: 'menu.dashboard.analysis', keepAlive: true, permission: ['dashboard'] }
+            meta: {
+              title: 'menu.dashboard.analysis',
+              keepAlive: true,
+              permission: ['dashboard']
+            }
           }
         ]
+      },
+      {
+        path: '/monitor ',
+        name: 'monitor ',
+        meta: {
+          title: '监控中心',
+          icon: 'eye',
+          permission: ['table']
+        },
+        component: () => import("@/views/monitor/monitor.vue"),
+        children: [{
+          path: '/monitorlist',
+          name: 'monitorlist',
+          meta: {
+            title: '监控中心',
+            keepAlive: true,
+            permission: ['table']
+          }
+        }]
       },
       // list
       {
@@ -43,16 +81,22 @@ export const asyncRouterMap = [
         name: 'list',
         component: RouteView,
         redirect: '/list/device-list',
-        meta: { title: 'menu.device', icon: 'bars', permission: ['table'] },
-        children: [
-          {
+        meta: {
+          title: 'menu.device',
+          icon: 'bars',
+          permission: ['table']
+        },
+        children: [{
             path: '/list/device-list/:page_no([1-9]\\d*)?',
             name: 'TableListWrapper',
             hideChildrenInMenu: true, // 强制显示 MenuItem 而不是 SubMenu
             component: () => import('@/views/list/DeviceList'),
-            meta: { title: '设备列表', keepAlive: true, permission: ['table'] },
-            children: [
-            ]
+            meta: {
+              title: '设备列表',
+              keepAlive: true,
+              permission: ['table']
+            },
+            children: []
           },
           // {
           //   path: '/list/device-list/map',
@@ -70,7 +114,11 @@ export const asyncRouterMap = [
             // component: () => import('@/views/profile/basic'),
             name: 'Info',
             component: () => import('@/views/list/components/BatteryInfo'),
-            meta: { title: '电池详情', keepAlive: true, permission: ['table'] }
+            meta: {
+              title: '电池详情',
+              keepAlive: true,
+              permission: ['table']
+            }
           }
         ]
       },
@@ -96,26 +144,41 @@ export const asyncRouterMap = [
         name: 'org',
         component: RouteView,
         redirect: '/org/org',
-        meta: { title: 'menu.org', icon: 'team', permission: ['table'] },
-        children: [
-          {
+        meta: {
+          title: 'menu.org',
+          icon: 'team',
+          permission: ['table']
+        },
+        children: [{
             path: '/org/org/:page_no([1-9]\\d*)?',
             name: 'OrgList',
             hideChildrenInMenu: true,
             component: () => import('@/views/org/OrgList'),
-            meta: { title: 'menu.org', keepAlive: true, permission: ['table'] }
+            meta: {
+              title: 'menu.org',
+              keepAlive: true,
+              permission: ['table']
+            }
           },
           {
             path: '/setting/user',
             name: 'setting_user',
             component: () => import('@/views/setting/User'),
-            meta: { title: '账号管理', keepAlive: true, permission: ['table'] }
+            meta: {
+              title: '账号管理',
+              keepAlive: true,
+              permission: ['table']
+            }
           },
           {
             path: '/setting/app_user',
             name: 'app_user',
             component: () => import('@/views/setting/AppUser'),
-            meta: { title: 'App 账号管理', keepAlive: true, permission: ['table'] }
+            meta: {
+              title: 'App 账号管理',
+              keepAlive: true,
+              permission: ['table']
+            }
           }
         ]
       },
@@ -125,21 +188,32 @@ export const asyncRouterMap = [
         name: 'model',
         component: RouteView,
         redirect: '/model/device-model',
-        meta: { title: 'menu.model', icon: 'profile', permission: ['table'] },
-        children: [
-          {
+        meta: {
+          title: 'menu.model',
+          icon: 'profile',
+          permission: ['table']
+        },
+        children: [{
             path: '/model/device-model/:page_no([1-9]\\d*)?',
             name: 'DeviceList',
             hideChildrenInMenu: true,
             component: () => import('@/views/model/DeviceList'),
-            meta: { title: 'menu.device-model', keepAlive: true, permission: ['table'] }
+            meta: {
+              title: 'menu.device-model',
+              keepAlive: true,
+              permission: ['table']
+            }
           },
           {
             path: '/model/battery-model/:page_no([1-9]\\d*)?',
             name: 'BatteryList',
             hideChildrenInMenu: true,
             component: () => import('@/views/model/BatteryList'),
-            meta: { title: 'menu.battery-model', keepAlive: true, permission: ['table'] }
+            meta: {
+              title: 'menu.battery-model',
+              keepAlive: true,
+              permission: ['table']
+            }
           }
         ]
       },
@@ -149,7 +223,12 @@ export const asyncRouterMap = [
         component: RouteView,
         redirect: '/account/settings',
         name: 'account',
-        meta: { title: 'menu.account', icon: 'user', keepAlive: true, permission: ['user'] },
+        meta: {
+          title: 'menu.account',
+          icon: 'user',
+          keepAlive: true,
+          permission: ['user']
+        },
         children: [
           // {
           //   path: '/account/center',
@@ -161,15 +240,22 @@ export const asyncRouterMap = [
             path: '/account/settings',
             name: 'settings',
             component: () => import('@/views/account/settings/Index'),
-            meta: { title: 'menu.account.settings', hideHeader: true, permission: ['user'] },
+            meta: {
+              title: 'menu.account.settings',
+              hideHeader: true,
+              permission: ['user']
+            },
             redirect: '/account/settings/basic',
             hideChildrenInMenu: true,
-            children: [
-              {
+            children: [{
                 path: '/account/settings/basic',
                 name: 'BasicSettings',
                 component: () => import('@/views/account/settings/BasicSetting'),
-                meta: { title: 'account.settings.menuMap.basic', hidden: true, permission: ['user'] }
+                meta: {
+                  title: 'account.settings.menuMap.basic',
+                  hidden: true,
+                  permission: ['user']
+                }
               },
               {
                 path: '/account/settings/security',
@@ -186,13 +272,23 @@ export const asyncRouterMap = [
                 path: '/account/settings/custom',
                 name: 'CustomSettings',
                 component: () => import('@/views/account/settings/Custom'),
-                meta: { title: 'account.settings.menuMap.custom', hidden: true, keepAlive: true, permission: ['user'] }
+                meta: {
+                  title: 'account.settings.menuMap.custom',
+                  hidden: true,
+                  keepAlive: true,
+                  permission: ['user']
+                }
               },
               {
                 path: '/account/settings/binding',
                 name: 'BindingSettings',
                 component: () => import('@/views/account/settings/Binding'),
-                meta: { title: 'account.settings.menuMap.binding', hidden: true, keepAlive: true, permission: ['user'] }
+                meta: {
+                  title: 'account.settings.menuMap.binding',
+                  hidden: true,
+                  keepAlive: true,
+                  permission: ['user']
+                }
               },
               {
                 path: '/account/settings/notification',
@@ -275,25 +371,41 @@ export const asyncRouterMap = [
         component: RouteView,
         redirect: '/setting/user',
         name: 'setting',
-        meta: { title: '设置', icon: 'setting', keepAlive: true, permission: ['setting'] },
-        children: [
-          {
+        meta: {
+          title: '设置',
+          icon: 'setting',
+          keepAlive: true,
+          permission: ['setting']
+        },
+        children: [{
             path: '/setting/user',
             name: 'setting_user',
             component: () => import('@/views/setting/User'),
-            meta: { title: '账号管理', keepAlive: true, permission: ['setting'] }
+            meta: {
+              title: '账号管理',
+              keepAlive: true,
+              permission: ['setting']
+            }
           },
           {
             path: '/setting/role',
             name: 'setting_role',
             component: () => import('@/views/setting/Role'),
-            meta: { title: '角色管理', keepAlive: true, permission: ['setting'] }
+            meta: {
+              title: '角色管理',
+              keepAlive: true,
+              permission: ['setting']
+            }
           },
           {
             path: '/setting/res',
             name: 'setting_res',
             component: () => import('@/views/setting/Res'),
-            meta: { title: '权限管理', keepAlive: true, permission: ['setting'] }
+            meta: {
+              title: '权限管理',
+              keepAlive: true,
+              permission: ['setting']
+            }
           }
           // ,{
           //   path: '/setting/dict',
@@ -308,20 +420,23 @@ export const asyncRouterMap = [
         component: RouteView,
         redirect: '/tools/',
         name: 'tools',
-        meta: { title: '工具', icon: 'tool', keepAlive: true, permission: ['setting'] },
-        children: [
-          {
-            path: '/tools/bms',
-            name: 'tools_bms',
-            component: () => import('@/views/tools/Bms'),
-            meta: {
-              title: 'account.settings.menuMap.security',
-              hidden: false,
-              keepAlive: true,
-              permission: ['setting']
-            }
+        meta: {
+          title: '工具',
+          icon: 'tool',
+          keepAlive: true,
+          permission: ['setting']
+        },
+        children: [{
+          path: '/tools/bms',
+          name: 'tools_bms',
+          component: () => import('@/views/tools/Bms'),
+          meta: {
+            title: 'account.settings.menuMap.security',
+            hidden: false,
+            keepAlive: true,
+            permission: ['setting']
           }
-        ]
+        }]
       }
     ]
   },
@@ -336,27 +451,25 @@ export const asyncRouterMap = [
  * 基础路由
  * @type { *[] }
  */
-export const constantRouterMap = [
-  {
+export const constantRouterMap = [{
     path: '/user',
     component: UserLayout,
     redirect: '/user/login',
     hidden: true,
-    children: [
-      {
+    children: [{
         path: 'login',
         name: 'login',
-        component: () => import(/* webpackChunkName: "user" */ '@/views/user/Login')
+        component: () => import( /* webpackChunkName: "user" */ '@/views/user/Login')
       },
       {
         path: 'register',
         name: 'register',
-        component: () => import(/* webpackChunkName: "user" */ '@/views/user/Register')
+        component: () => import( /* webpackChunkName: "user" */ '@/views/user/Register')
       },
       {
         path: 'register-result',
         name: 'registerResult',
-        component: () => import(/* webpackChunkName: "user" */ '@/views/user/RegisterResult')
+        component: () => import( /* webpackChunkName: "user" */ '@/views/user/RegisterResult')
       },
       {
         path: 'recover',
@@ -368,6 +481,6 @@ export const constantRouterMap = [
 
   {
     path: '/404',
-    component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404')
+    component: () => import( /* webpackChunkName: "fail" */ '@/views/exception/404')
   }
 ]
