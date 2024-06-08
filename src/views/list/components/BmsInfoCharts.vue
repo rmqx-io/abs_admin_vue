@@ -25,9 +25,9 @@
             <br />
             更新时间：{{ this.time_tracking }}
             <el-tag
-              :type="this.battery_currency === 0 ? 'info' : this.battery_currency > 0 ? 'warning' : 'danger'"
+              :type=this.battery_charging_status_style
             >
-              {{ this.battery_currency === 0 ? '搁置中' : this.battery_currency > 0 ? '充电中' : '放电中' }}
+              {{ this.battery_charging_status }}
             </el-tag>
           </span>
         </div>
@@ -100,7 +100,7 @@
             <el-descriptions-item label="当前电流" span="1">
               <el-tag
                 size="small"
-                :type="battery_currency === 0 ? 'info' : battery_currency > 0 ? 'warning' : 'danger'"
+                :type=this.battery_charging_status_style
               >
                 {{ battery_currency }} A
               </el-tag>
@@ -383,10 +383,10 @@
             {{ mACCON ? '运动中' : '静止' }}
           </el-tag>
           <el-tag
-            :type="battery_currency === 0 ? 'info' : battery_currency > 0 ? 'warning' : 'danger'"
+            :type=this.battery_charging_status_style
             size="mini"
           >
-            {{ battery_currency === 0 ? '搁置中' : battery_currency > 0 ? '充电中' : '放电中' }}
+            {{ this.battery_charging_status }}
           </el-tag>
         <!-- <el-tag size="mini">油电开</el-tag> -->
         </el-descriptions-item>
@@ -484,6 +484,8 @@ export default {
       isRec: false,
       socImg: 1,
       battery_currency: '-',
+      battery_charging_status: '-',
+      battery_charging_status_style: '-',
       battery_voltage: '-',
       humidity: '-',
       battery_capacity_soc: '-',
@@ -574,7 +576,8 @@ export default {
       mChargeSwitch: '-',
       mDischargeSwitch: '-',
       mLowSOCAlarmValue: '-',
-      bms_type: ''
+      bms_type: '',
+      bms_type_int: null,
     }
   },
   methods: {
@@ -663,7 +666,7 @@ export default {
                       date: timestamp
                     },
                     {
-                      value: item.battery_currency,
+                      value: this.adjust_battery_currency(this.bms_type_int, item.battery_currency),
                       date: timestamp
                     },
                     {
@@ -865,6 +868,13 @@ export default {
     },
     refresh () {
       this.$message.info("刷新")
+      getBmsTypeInt(this.deviceId)
+        .then(res => {
+          console.log('bms type int', res)
+          if (res.data) {
+            this.bms_type_int = res.data
+          }
+        })
       getBmsType(this.deviceId).then(res => {
         console.log('bms type', res.data.bms_type)
         this.bms_type = res.data.bms_type
@@ -896,7 +906,10 @@ export default {
               this.tempList = this.form_temperature_array_for_display(bmsInfo)
               // console.log('battery list', this.batteryList)
               // single_battery_voltage_arr
+              console.log('update battery_currency', bmsInfo.battery_currency)
               this.battery_currency = bmsInfo.battery_currency // 服务器返回的值单位为 A
+              this.update_battery_charging_status(this.battery_currency)
+              this.update_battery_charging_status_style(this.battery_currency)
               this.isMosRec = bmsInfo.battery_status_charging_mos
               this.isMosDis = bmsInfo.battery_status_discharging_mos
               this.isBalanceOn = bmsInfo.battery_status_balance
@@ -933,22 +946,9 @@ export default {
                 .then(res => {
                   console.log('bms type int', res)
                   if (res.data) {
-                    // bms type 227(0xe3) is fm
-                    if (res.data === 227) {
-                      // 之前平台把电流按照 jk 的格式解析（最高位为符号位，0为负，1为正，后面的为数据）
-                      // 这回造成 fm 格式的电流会出现负数，所以这里需要转换一下
-                      // fm 格式的电流解析已经修改，以后也不会再出现负数的情况
-                      if (bmsInfo.battery_currency < 0) {
-                        this.battery_currency = -bmsInfo.battery_currency
-                      }
-                      // 0X84
-                      // 电流数据 2 HEX 
-                      // 10000（10000-11000）*0.01=-10.00a（放电）（10000-9500）¥0.01=5.00a（充电）精度10MA单位：
-                      // 参考上图协议说明，10000减数据，负数是放电，正数是充电，精度10ma，除100单位就是安
-                      // 服务器返回的值已经除以100，单位为 A
-                      // 所以这里计算公式应该是 (10000/100) - battery_currency
-                      this.battery_currency = ((10000.0 / 100.0) - this.battery_currency).toFixed(2)
-                    }
+                    this.battery_currency = this.adjust_battery_currency(res.data, bmsInfo.battery_currency);
+                    this.update_battery_charging_status(this.battery_currency)
+                    this.update_battery_charging_status_style(this.battery_currency)
                   }
                 })
             }
@@ -975,7 +975,53 @@ export default {
         }, 1000)
         // this.getBmsHis(this.mCurSn, 227, 6)
       }
-    }
+    },
+    adjust_battery_currency(bms_type, battery_currency) {
+      let new_battery_currency = battery_currency
+      // bms type 227(0xe3) is fm
+      if (bms_type === 227) {
+        // 0X84
+        // 电流数据 2 HEX 
+        // 10000（10000-11000）*0.01=-10.00a（放电）（10000-9500）¥0.01=5.00a（充电）精度10MA单位：
+        // 参考上图协议说明，10000减数据，负数是放电，正数是充电，精度10ma，除100单位就是安
+        // 服务器返回的值已经除以100，单位为 A
+        // 所以这里计算公式应该是 (10000/100) - battery_currency
+        new_battery_currency = ((10000.0 / 100.0) - new_battery_currency).toFixed(2)
+      }
+      console.log('adjust battery currency', bms_type, battery_currency, new_battery_currency)
+      return new_battery_currency;
+    },
+    update_battery_charging_status(battery_currency) {
+      console.log('battery status charging', battery_currency)
+      // if battery_currency is string, convert it to float
+      if (typeof battery_currency === 'string') {
+        battery_currency = parseFloat(battery_currency)
+      }
+      // next tick to update the status
+      this.$nextTick(() => {
+        if (battery_currency === 0.00) {
+          this.battery_charging_status = '搁置中'
+        } else if (battery_currency > 0) {
+          this.battery_charging_status = '充电中'
+        } else {
+          this.battery_charging_status = '放电中'
+        }
+        console.log('battery status charging', this.battery_charging_status)
+      })
+    },
+    update_battery_charging_status_style(battery_currency) {
+      // if battery_currency is string, convert it to float
+      if (typeof battery_currency === 'string') {
+        battery_currency = parseFloat(battery_currency)
+      }
+      if (battery_currency === 0.00) {
+        this.battery_charging_status_style = 'info'
+      } else if (battery_currency > 0) {
+        this.battery_charging_status_style = 'warning'
+      } else {
+        this.battery_charging_status_style = 'danger'
+      }
+    },
   }
 }
 </script>
