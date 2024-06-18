@@ -1,5 +1,6 @@
 import request from '@/utils/request'
 import request_no_timeout from '@/utils/request'
+import { method } from 'lodash'
 
 const prefix = '/admin'
 
@@ -32,6 +33,7 @@ const api = {
   role: `${prefix}/role`,
   service: `${prefix}/service`,
   device: `${prefix}/device`,
+  app_user_device_bind: `${prefix}/app_user/device/bind`,
   device_export: `${prefix}/device/export`,
   device_alarm: `${prefix}/device/alarm`,
   bms_alarm_count: `${prefix}/device/alarm/bms/count`,
@@ -108,6 +110,14 @@ export function getDeviceList (arg) {
     url: api.device,
     method: 'post',
     data: arg
+  })
+}
+
+export function getAppUserDeviceBind (arg) {
+  return request({
+    url: api.app_user_device_bind,
+    method: 'get',
+    params: arg
   })
 }
 

@@ -40,6 +40,8 @@
 </template>
 
 <script>
+import { getAppUserDeviceBind } from '@/api/manage'
+
 const columns = [
   {
     title: 'id',
@@ -47,11 +49,11 @@ const columns = [
   },
   {
     title: '用户名',
-    dataIndex: 'username'
+    dataIndex: 'account'
   },
   {
     title: '设备编号',
-    dataIndex: 'deviceNo'
+    dataIndex: 'device_id'
   },
   {
     title: '操作',
@@ -69,7 +71,7 @@ export default {
       data: [],
       pagination: {
         current: 1,
-        pageSize: 10,
+        pageSize: 100,
         total: 0
       },
       loading: false,
@@ -85,22 +87,17 @@ export default {
     fetch () {
       // fetch app user / devices binding data from server
       this.loading = true
-      setTimeout(() => {
+      getAppUserDeviceBind({
+        page_no: this.pagination.current,
+        page_size: this.pagination.pageSize,
+        ...this.queryParam
+      }).then(res => {
         this.loading = false
-        this.data = [
-          {
-            id: 1,
-            username: 'admin',
-            deviceNo: '1234567890'
-          },
-          {
-            id: 2,
-            username: 'user',
-            deviceNo: '0987654321'
-          }
-        ]
-        this.pagination.total = 2
-      }, 1000)
+        this.data = res.data
+        this.pagination.total = res.total
+      }).catch(() => {
+        this.loading = false
+      })
     },
     handleEdit (record) {
       console.log('TODO: edit', record)
