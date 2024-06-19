@@ -56,6 +56,10 @@ const columns = [
     dataIndex: 'device_id'
   },
   {
+    title: '绑定时间',
+    dataIndex: 'create_date'
+  },
+  {
     title: '操作',
     dataIndex: 'action',
     scopedSlots: { customRender: 'action' }
