@@ -9,10 +9,10 @@
         <!-- query form -->
         <a-form layout="inline" :form="queryParam">
           <a-form-item label="用户名">
-            <a-input v-model="queryParam.username" placeholder="请输入用户名" />
+            <a-input v-model="queryParam.account" placeholder="请输入用户名" />
           </a-form-item>
           <a-form-item label="设备编号">
-            <a-input v-model="queryParam.deviceNo" placeholder="请输入设备编号" />
+            <a-input v-model="queryParam.device_id" placeholder="请输入设备编号" />
           </a-form-item>
           <a-form-item>
             <a-button type="primary" @click="handleSearch">查询</a-button>
@@ -94,7 +94,7 @@ export default {
       }).then(res => {
         this.loading = false
         this.data = res.data
-        this.pagination.total = res.total
+        // this.pagination.total = res.total
       }).catch(() => {
         this.loading = false
       })
@@ -106,7 +106,7 @@ export default {
       console.log('TODO: delete', record)
     },
     handleSearch () {
-      console.log('TODO: search')
+      this.fetch()
     }
   }
 }
