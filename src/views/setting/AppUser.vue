@@ -97,7 +97,7 @@ export default {
         ...this.queryParam
       }).then(res => {
         this.loading = false
-        this.data = res.data
+        this.data = res.data.records
         // this.pagination.total = res.total
       }).catch(() => {
         this.loading = false
