@@ -34,6 +34,7 @@ const api = {
   service: `${prefix}/service`,
   device: `${prefix}/device`,
   app_user_device_bind: `${prefix}/app_user/device/bind`,
+  app_user_device_unbind: `${prefix}/app_user/device/unbind`,
   device_export: `${prefix}/device/export`,
   device_alarm: `${prefix}/device/alarm`,
   bms_alarm_count: `${prefix}/device/alarm/bms/count`,
@@ -116,6 +117,14 @@ export function getDeviceList (arg) {
 export function getAppUserDeviceBind (arg) {
   return request({
     url: api.app_user_device_bind,
+    method: 'get',
+    params: arg
+  })
+}
+
+export function unbindAppUserDevice (arg) {
+  return request({
+    url: api.app_user_device_unbind,
     method: 'get',
     params: arg
   })

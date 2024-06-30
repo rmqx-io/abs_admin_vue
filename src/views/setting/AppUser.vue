@@ -29,9 +29,9 @@
           @change="handleTableChange"
         >
           <template slot='action' slot-scope="text, record">
-            <a-button type="link" @click="handleEdit(record)">编辑</a-button>
-            <a-divider type="vertical" />
-            <a-button type="link" @click="handleDelete(record)">删除</a-button>
+            <!-- <a-button type="link" @click="handleEdit(record)">编辑</a-button>
+            <a-divider type="vertical" /> -->
+            <a-button type="link" @click="handleUnbind(record)">解除绑定</a-button>
           </template>
         </a-table>
       </div>
@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { getAppUserDeviceBind } from '@/api/manage'
+import { getAppUserDeviceBind, unbindAppUserDevice } from '@/api/manage'
 
 const columns = [
   {
@@ -111,6 +111,17 @@ export default {
     },
     handleSearch () {
       this.fetch()
+    },
+    handleUnbind (record) {
+      console.log('unbind', record)
+      // unbind app user and device by id
+      const params = {
+        id: record.id
+      }
+      unbindAppUserDevice(params).then(() => {
+        this.$message.info('解绑成功')
+        this.fetch()
+      })
     }
   }
 }
