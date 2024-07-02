@@ -91,6 +91,7 @@
       <div v-if="table_visible" class="table-operator">
         <a-button type='primary' icon='plus' @click='handleAdd'>添加/修改</a-button>
         <a-button type='primary' @click='handleBatchCommandManager'>下发指令管理</a-button>
+        <a-button type='primary' @click='handleSelectParams'>生产测试</a-button>
         <a-button type='primary' @click='handleExport'>导出</a-button>
         <a-button type='primary' @click='handleImport'>导入</a-button>
         <a-button type='primary' @click='handleSendBtCode'>下发 BT 码</a-button>
@@ -174,9 +175,9 @@
 
         <span slot="version_info" slot-scope="text, record">
           <template>
-            软件: <span>{{ record.s_ver }}</span>
+            硬件: <span>{{ record.s_ver }}</span>
             <br />
-            硬件: <span>{{ record.h_ver }}</span>
+            软件: <span>{{ record.h_ver }}</span>
           </template>
         </span>
 
@@ -266,6 +267,9 @@
         @cancel="handleSendBtCodeCancel"
         @ok="handleSendBtCodeOk"
       />
+      <SelectParams :visible="select_params" :loading="false" @cancel="handleSelectParamsCancel"
+        @ok="handleSelectParamsOk">
+      </SelectParams>
 
       <send-command-manager-devices
         ref="sendCommandManagerDevices"
@@ -471,6 +475,7 @@ import {
 
 import StepByStepModal from './modules/StepByStepModal'
 import CreateForm from './modules/CreateForm'
+import SelectParams from './modules/SelectParams'
 import SendCommandForm from '@/views/list/modules/SendCommandForm'
 import SendCommandManager from '@/views/list/modules/SendCommandManager'
 import SendBtCode from '@/views/list/modules/SendBtCode'
@@ -606,6 +611,7 @@ const statusMap = {
 export default {
   name: 'TableList',
   components: {
+      SelectParams,
     SendCommandManager,
     SendBtCode,
     SendCommandManagerDevices,
@@ -679,6 +685,7 @@ export default {
       showTableTab: true,
       showAlarm: false,
       send_command_form_visible: false,
+        select_params: false,
       send_bt_code_visible: false,
       packet_log_visible: false,
       battery_detail_visible: false,
@@ -816,6 +823,9 @@ export default {
         this.$refs.sendCommandManager.refresh()
       }, 100)
     },
+      handleSelectParams() {
+        this.select_params = true
+      },
     handleSendBtCode () {
       console.log('handleSendBtCode')
       this.send_bt_code_visible = true
@@ -967,6 +977,12 @@ export default {
     handleSendCommandFormCancel() {
       this.send_command_form_visible = false
     },
+      handleSelectParamsCancel() {
+        this.select_params = false;
+      },
+      handleSelectParamsOk() {
+        this.select_params = false;
+      },
     handleSendCommandFormOk(id) {
       console.log('handleSendCommandFormOk', id)
       this.send_command_form_visible = false
