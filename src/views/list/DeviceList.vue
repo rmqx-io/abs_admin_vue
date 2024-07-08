@@ -69,7 +69,7 @@
           </div>
         </a-row>
         <a-row>
-          <a-col v-if="!showAlarm" :md="!advanced && 8 || 12" :sm="12">
+          <a-col v-if="!showAlarm" :md="!advanced && 2 || 12" :sm="12">
             <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
               <a-button type="primary" @click="refreshTable(true)">查询</a-button>
               <!--                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>-->
@@ -78,6 +78,12 @@
               <!--                <a-icon :type="advanced ? 'up' : 'down'"/>-->
               <!--              </a>-->
             </span>
+          </a-col>
+          <!-- checkbox for contains_search -->
+          <a-col :md="2" :sm="12">
+            <a-form-item>
+              <a-checkbox v-model="queryData.contains_search">模糊搜索</a-checkbox>
+            </a-form-item>
           </a-col>
           <!--          <a-col :md="8" :sm="24">-->
           <!--            <a-checkbox v-model="showMap" @change="onMapChange">显示地图</a-checkbox>-->
@@ -720,7 +726,8 @@ export default {
         iccid: null,
         soh: null,
         soc: null,
-        alarm: null
+        alarm: null,
+        contains_search: false
       },
       showMoreParam: false,
       showExporting: false,
