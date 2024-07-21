@@ -69,7 +69,7 @@
           </div>
         </a-row>
         <a-row>
-          <a-col v-if="!showAlarm" :md="!advanced && 2 || 12" :sm="12">
+          <a-col v-if="!showAlarm" :md="!advanced && 4 || 12" :sm="12">
             <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
               <a-button type="primary" @click="refreshTable(true)">查询</a-button>
               <!--                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>-->
@@ -80,7 +80,7 @@
             </span>
           </a-col>
           <!-- checkbox for contains_search -->
-          <a-col :md="2" :sm="12">
+          <a-col :md="4" :sm="12">
             <a-form-item>
               <a-checkbox v-model="queryData.contains_search">模糊搜索</a-checkbox>
             </a-form-item>
