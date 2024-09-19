@@ -372,9 +372,6 @@
           </amap-circle-marker>
         </amap>
       </div>
-      <div>
-        <p @click='handleRefreshOnlineStatusAll'>.</p>
-      </div>
     </div>
 
     <div v-if='packet_log_visible'>
