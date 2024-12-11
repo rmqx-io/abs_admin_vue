@@ -1388,9 +1388,8 @@ export default {
   max-height: 90vh;
 }
 .ant-modal-content {
-  width: 90vw;
-  max-height: 90vh;
-  top: 5vh;
+  max-width: 90vw;
+  margin: auto;
   overflow: auto;
 }
 .ant-modal-centered::before {
