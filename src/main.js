@@ -61,7 +61,8 @@ AmapVue.config.version = '2.0' // 默认2.0，这里可以不修改
 // AmapVue.config.key = 'c5329a28ee7609e3832c02bb6317aff8'
 // AmapVue.config.key = 'e13456422e8fe93451cf2201f4db84bd'
 // AmapVue.config.key = '977ce14bef9c9121ce037c5dfaa2db42'
-AmapVue.config.key = '52801cfc6e49d22cbc6840ac07d9d6c4'
+// AmapVue.config.key = '52801cfc6e49d22cbc6840ac07d9d6c4'
+AmapVue.config.key = '2d85775ac434c8a887c3123f27d14b19'
 AmapVue.config.plugins = [
   'AMap.Autocomplete',
   'AMap.PlaceSearch',
