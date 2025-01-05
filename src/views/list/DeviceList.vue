@@ -273,9 +273,12 @@
         @cancel="handleSendBtCodeCancel"
         @ok="handleSendBtCodeOk"
       />
-      <SelectParams :visible="select_params" :loading="false" @cancel="handleSelectParamsCancel"
-        @ok="handleSelectParamsOk">
-      </SelectParams>
+      <SelectParams
+        :visible="select_params"
+        :loading="false"
+        @cancel="handleSelectParamsCancel"
+        @ok="handleSelectParamsOk"
+      />
 
       <send-command-manager-devices
         ref="sendCommandManagerDevices"
@@ -284,16 +287,6 @@
         @ok="() => { showBatchCommandManagerDevices = false }"
         @cancel="() => { showBatchCommandManagerDevices = false }"
       />
-
-
-<!--      <protocol-log-->
-<!--        ref="protocolLog"-->
-<!--        :visible="protocol_log_visible"-->
-<!--        :loading="false"-->
-<!--        :devcie-id="device_id"-->
-<!--        @cancel="handleProtocolLogCancel"-->
-<!--        @ok="handleProtocolLogOk"-->
-<!--      />-->
 
       <step-by-step-modal v-if="table_visible" ref="modal" @ok="handleCreateFormOk"/>
 
@@ -1347,12 +1340,17 @@ export default {
 }
 .custom-marker {
   background-color: hsla(180, 100%, 50%, 0.7);
-  height: 24px;
-  width: 24px;
-  border: 1px solid hsl(180, 100%, 40%);
-  border-radius: 12px;
-  box-shadow: hsl(180, 100%, 50%) 0px 0px 1px;
+  height: 28px;
+  width: 28px;
+  border: 2px solid hsl(180, 100%, 40%);
+  border-radius: 50%;
+  box-shadow: 0 0 4px hsla(180, 100%, 50%, 0.5);
   text-align: center;
+  transition: all 0.3s ease;
+}
+.custom-marker:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 8px hsla(180, 100%, 50%, 0.7);
 }
 .fullscreen-modal {
   width: 95%;
@@ -1391,8 +1389,125 @@ export default {
   max-width: 90vw;
   margin: auto;
   overflow: auto;
+  border-radius: 8px;
 }
 .ant-modal-centered::before {
   content: unset;
+}
+
+/* Enhanced UI Styles */
+.table-page-search-wrapper {
+  padding: 24px 24px 0;
+  background: #fff;
+  margin-bottom: 16px;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.table-operator {
+  margin-bottom: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.table-operator .ant-btn {
+  margin-right: 0;
+}
+
+.ant-card {
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.ant-tabs-nav {
+  margin-bottom: 16px;
+}
+
+.ant-form-item {
+  margin-bottom: 16px;
+}
+
+.ant-radio-group {
+  margin-bottom: 8px;
+}
+
+.ant-radio-button-wrapper {
+  min-width: 100px;
+  text-align: center;
+}
+
+.map-container {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.popup {
+  position: absolute;
+  z-index: 1;
+  background: white;
+  padding: 12px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.alarm-container {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.ant-modal {
+  height: -webkit-fill-available;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.ant-modal-content {
+  max-width: 90vw;
+  margin: auto;
+  overflow: auto;
+  border-radius: 8px;
+}
+
+.ant-table-wrapper {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ant-table {
+  border-radius: 8px;
+}
+
+.ant-table-thead > tr > th {
+  background: #fafafa;
+  font-weight: 600;
+}
+
+.ant-btn {
+  border-radius: 4px;
+  height: 32px;
+  padding: 0 16px;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ant-btn .anticon {
+  margin-right: 6px;
+}
+
+.ant-input,
+.ant-select,
+.ant-tree-select {
+  border-radius: 4px;
+}
+
+.ant-form-item-label {
+  font-weight: 500;
 }
 </style>
