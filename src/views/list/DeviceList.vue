@@ -877,12 +877,17 @@ export default {
       console.log("query data:", this.queryData);
 
       try {
-        const arg = {
-          page_no: this.queryData.page_no,
-          page_size: this.queryData.page_size,
-          location_only: false,
-          device_status: this.deviceStatus
-        }
+        const arg = Object.assign({}, this.queryData)
+        // remove all the keys which value is null
+        Object.keys(arg).forEach(key => {
+          if (arg[key] === null) {
+            delete arg[key]
+          }
+        })
+        delete arg.start_date
+        delete arg.start_time
+        arg.location_only = false
+        arg.device_status = this.deviceStatus
 
         // Build URL with query parameters
         const params = new URLSearchParams(arg)
