@@ -9,9 +9,11 @@
     </a-spin>
     <a-progress
       v-if="showExporting"
+      :style="{ width: '98%' }"
       :percent="exportProgress"
       status="active"
       :show-info="true"
+      :format="percent => `${percent.toFixed(2)}%`"
     />
     <div class="table-page-search-wrapper">
       <a-tabs
@@ -914,7 +916,7 @@ export default {
 
           csv += decoder.decode(value, { stream: true })
           const processedRows = (csv.match(/\n/g) || []).length
-          this.exportProgress = total > 0 ? Math.round((processedRows / total) * 100) : 0
+            this.exportProgress = total > 0 ? processedRows / total * 100 : 0
           if (processedRows >= total) break
         }
 
