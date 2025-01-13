@@ -896,8 +896,7 @@ export default {
             'Access-Token': storage.get(ACCESS_TOKEN),
             'Accept': 'text/csv',
             'Cache-Control': 'no-cache'
-          },
-          keepalive: true // Keep connection alive
+          }
         })
 
         if (!response.ok) {
@@ -908,39 +907,38 @@ export default {
         const reader = response.body.getReader()
         const decoder = new TextDecoder()
         let csv = ''
-        let retryCount = 0
-        const maxRetries = 3
 
         while (true) {
-          try {
-            const { done, value } = await reader.read()
-            if (done) break
+          const { done, value } = await reader.read()
+          if (done) break
 
-            csv += decoder.decode(value, { stream: true }) // Enable streaming mode
-            const processedRows = (csv.match(/\n/g) || []).length
-            this.exportProgress = total > 0 ? Math.round((processedRows / total) * 100) : 0
-            console.log('processedRows:', processedRows, 'total:', total, 'progress:', this.exportProgress)
-          } catch (streamError) {
-            if (retryCount >= maxRetries) throw streamError
-            retryCount++
-            console.warn(`Stream error, retrying (${retryCount}/${maxRetries})...`, streamError)
-            await new Promise(resolve => setTimeout(resolve, 1000)) // Wait before retry
-            continue
-          }
+          csv += decoder.decode(value, { stream: true })
+          const processedRows = (csv.match(/\n/g) || []).length
+          this.exportProgress = total > 0 ? Math.round((processedRows / total) * 100) : 0
+          if (processedRows >= total) break
         }
 
-        // Ensure final decode
-        csv += decoder.decode()
-
+        // Create blob and trigger download
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
         const downloadUrl = window.URL.createObjectURL(blob)
+
+        // Create and click link in a more reliable way
         const link = document.createElement('a')
+        link.style.display = 'none'
         link.href = downloadUrl
-        link.download = 'devices.csv'
+        link.download = `devices_${Date.now()}.csv` // Add timestamp to prevent caching
+        
+        // Ensure link is removed after download starts
+        link.addEventListener('click', () => {
+          setTimeout(() => {
+            console.log('remove link');
+            window.URL.revokeObjectURL(downloadUrl)
+            document.body.removeChild(link)
+          }, 1000)
+        })
+
         document.body.appendChild(link)
         link.click()
-        document.body.removeChild(link)
-        window.URL.revokeObjectURL(downloadUrl)
       } catch (err) {
         console.error('Export error:', err)
         this.$message.error('Export failed: ' + err.message)
