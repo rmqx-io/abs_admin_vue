@@ -874,11 +874,8 @@ export default {
       this.showExporting = true
       this.exportProgress = 0
 
-      console.log("query data:", this.queryData);
-
       try {
         const arg = Object.assign({}, this.queryData)
-        // remove all the keys which value is null
         Object.keys(arg).forEach(key => {
           if (arg[key] === null) {
             delete arg[key]
@@ -889,18 +886,17 @@ export default {
         arg.location_only = false
         arg.device_status = this.deviceStatus
 
-        // Build URL with query parameters
         const params = new URLSearchParams(arg)
         const url = `${api.device_export}?${params}`
 
-        console.log('url:', url)
-
-        // Fetch with proper headers
         const response = await fetch(url, {
           method: 'GET',
           headers: {
-            'Access-Token': storage.get(ACCESS_TOKEN)
-          }
+            'Access-Token': storage.get(ACCESS_TOKEN),
+            'Accept': 'text/csv',
+            'Cache-Control': 'no-cache'
+          },
+          keepalive: true // Keep connection alive
         })
 
         if (!response.ok) {
@@ -911,19 +907,30 @@ export default {
         const reader = response.body.getReader()
         const decoder = new TextDecoder()
         let csv = ''
+        let retryCount = 0
+        const maxRetries = 3
 
         while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
+          try {
+            const { done, value } = await reader.read()
+            if (done) break
 
-          csv += decoder.decode(value)
-          const processedRows = (csv.match(/\n/g) || []).length
-          this.exportProgress = total > 0 ? Math.round((processedRows / total) * 100) : 0
-          console.log('processedRows:', processedRows, 'total:', total, 'progress:', this.exportProgress)
+            csv += decoder.decode(value, { stream: true }) // Enable streaming mode
+            const processedRows = (csv.match(/\n/g) || []).length
+            this.exportProgress = total > 0 ? Math.round((processedRows / total) * 100) : 0
+          } catch (streamError) {
+            if (retryCount >= maxRetries) throw streamError
+            retryCount++
+            console.warn(`Stream error, retrying (${retryCount}/${maxRetries})...`, streamError)
+            await new Promise(resolve => setTimeout(resolve, 1000)) // Wait before retry
+            continue
+          }
         }
 
-        // Download CSV
-        const blob = new Blob([csv], { type: 'text/csv' })
+        // Ensure final decode
+        csv += decoder.decode()
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
         const downloadUrl = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
         link.href = downloadUrl
@@ -932,7 +939,6 @@ export default {
         link.click()
         document.body.removeChild(link)
         window.URL.revokeObjectURL(downloadUrl)
-
       } catch (err) {
         console.error('Export error:', err)
         this.$message.error('Export failed: ' + err.message)
