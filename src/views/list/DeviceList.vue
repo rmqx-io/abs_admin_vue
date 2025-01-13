@@ -7,6 +7,12 @@
         description="导出选中的设备"
       ></a-alert>
     </a-spin>
+    <a-progress
+      v-if="showExporting"
+      :percent="exportProgress"
+      status="active"
+      :show-info="true"
+    />
     <div class="table-page-search-wrapper">
       <a-tabs
         v-model="activeTab"
@@ -460,13 +466,14 @@ import { STable, Ellipsis } from '@/components'
 import {
   addUpdateDeviceBatch,
   getAdminOrgTree,
-  getDeviceList, getExportDeviceList,
+  getDeviceList,
   getLocation,
   getStatusCount, refreshOnlineStatus,
   updateDevice,
   refreshDevicePage,
   refreshDeviceOnlineStatusAll,
-  wgs84togcj02
+  wgs84togcj02,
+  api
 } from '@/api/manage'
 
 import StepByStepModal from './modules/StepByStepModal'
@@ -481,6 +488,7 @@ import storage from 'store'
 import { ROLE } from '@/store/mutation-types'
 import DeviceAlarm from '@/views/list/components/DeviceAlarm'
 import PacketLog from '@/views/list/components/PacketLog'
+import { ACCESS_TOKEN } from '@/store/mutation-types'
 
 function interpolate(u, begin, end) {
   if (u < 0) u = 0
@@ -758,6 +766,7 @@ export default {
       showBatchCommandManager: false,
       showBatchCommandManagerDevices: false,
       currentBatchSendCommandId: 0,
+      exportProgress: 0
     }
   },
   filters: {
@@ -860,34 +869,72 @@ export default {
         this.$message.error(err.msg)
       })
     },
-    handleExport () {
+    async handleExport() {
       console.log('handleExport')
-      const arg = Object.assign({}, this.queryData)
-      arg.page_no = arg.pageNo
-      arg.page_size = arg.pageSize
-      arg.location_only = false
-      delete arg.pageNo
-      delete arg.pageSize
-      if (this.deviceStatus) {
-        arg.device_status = this.deviceStatus
-      }
       this.showExporting = true
-      getExportDeviceList(arg).then(res => {
-        // console.log('exportDeviceList', res)
-        const url = window.URL.createObjectURL(new Blob([res]))
+      this.exportProgress = 0
+
+      console.log("query data:", this.queryData);
+
+      try {
+        const arg = {
+          page_no: this.queryData.page_no,
+          page_size: this.queryData.page_size,
+          location_only: false,
+          device_status: this.deviceStatus
+        }
+
+        // Build URL with query parameters
+        const params = new URLSearchParams(arg)
+        const url = `${api.device_export}?${params}`
+
+        console.log('url:', url)
+
+        // Fetch with proper headers
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Access-Token': storage.get(ACCESS_TOKEN)
+          }
+        })
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const total = parseInt(response.headers.get('x-total-count') || '0')
+        const reader = response.body.getReader()
+        const decoder = new TextDecoder()
+        let csv = ''
+
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          csv += decoder.decode(value)
+          const processedRows = (csv.match(/\n/g) || []).length
+          this.exportProgress = total > 0 ? Math.round((processedRows / total) * 100) : 0
+          console.log('processedRows:', processedRows, 'total:', total, 'progress:', this.exportProgress)
+        }
+
+        // Download CSV
+        const blob = new Blob([csv], { type: 'text/csv' })
+        const downloadUrl = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
-        link.style.display = 'none'
-        link.href = url
-        link.setAttribute('download', 'export.csv')
+        link.href = downloadUrl
+        link.download = 'devices.csv'
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
-      }).catch(err => {
-        console.log('exportDeviceList', err)
-        this.$message.error(err.data.message)
-      }).finally(() => {
+        window.URL.revokeObjectURL(downloadUrl)
+
+      } catch (err) {
+        console.error('Export error:', err)
+        this.$message.error('Export failed: ' + err.message)
+      } finally {
         this.showExporting = false
-      })
+        this.exportProgress = 0
+      }
     },
     handleImport () {
       console.log('handleImport')

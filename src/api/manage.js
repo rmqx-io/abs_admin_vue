@@ -4,7 +4,7 @@ import { method } from 'lodash'
 
 const prefix = '/admin'
 
-const api = {
+export const api = {
   sys_dict_page: `${prefix}/sys_dict_page`,
   sys_dict_layer_top: `${prefix}/sys_dict_layer_top`,
   sys_dict_add: `${prefix}/sys_dict_add`,
@@ -79,8 +79,6 @@ const api = {
   permissionNoPager: '/permission/no-pager',
   orgTree: '/org/tree'
 }
-
-export default api
 
 export function getUserList (parameter) {
   return request({
