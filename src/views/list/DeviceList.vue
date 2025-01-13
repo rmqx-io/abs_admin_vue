@@ -885,6 +885,7 @@ export default {
         delete arg.start_time
         arg.location_only = false
         arg.device_status = this.deviceStatus
+        arg.page_size = 1000
 
         const params = new URLSearchParams(arg)
         const url = `${api.device_export}?${params}`
@@ -918,6 +919,7 @@ export default {
             csv += decoder.decode(value, { stream: true }) // Enable streaming mode
             const processedRows = (csv.match(/\n/g) || []).length
             this.exportProgress = total > 0 ? Math.round((processedRows / total) * 100) : 0
+            console.log('processedRows:', processedRows, 'total:', total, 'progress:', this.exportProgress)
           } catch (streamError) {
             if (retryCount >= maxRetries) throw streamError
             retryCount++
