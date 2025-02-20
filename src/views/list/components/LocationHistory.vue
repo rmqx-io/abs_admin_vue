@@ -50,6 +50,12 @@
       <template slot="gpsCoordinates" slot-scope="text, record">
         {{ record.longitude.toFixed(6) }}, {{ record.latitude.toFixed(6) }}
       </template>
+      <template slot="speed" slot-scope="text, record">
+        {{ record.speed / 10 }}
+      </template>
+      <template slot="mileage" slot-scope="text, record">
+        {{ record.mileage / 10 }}
+      </template>
     </a-table>
   </a-spin>
 </template>
@@ -77,8 +83,8 @@ export default {
         { title: '时间', dataIndex: 'location_time', scopedSlots: { customRender: 'time' } },
         { title: '火星坐标', scopedSlots: { customRender: 'coordinates' } },
         { title: 'GPS坐标', scopedSlots: { customRender: 'gpsCoordinates' } },
-        { title: '速度 (km/h)', dataIndex: 'speed' },
-        { title: '里程', dataIndex: 'mileage' },
+        { title: '速度 (Km/h)', dataIndex: 'speed', scopedSlots: { customRender: 'speed' } },
+        { title: '里程 (Km)', dataIndex: 'mileage', scopedSlots: { customRender: 'mileage' } },
         { title: '卫星数', dataIndex: 'rssi' }
       ],
       startDate: defaultStart.format('YYYY-MM-DD HH:mm:ss'),
