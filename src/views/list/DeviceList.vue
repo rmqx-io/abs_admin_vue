@@ -43,7 +43,15 @@
               </a-radio-group>
             </a-form-item>
           </a-col>
-          <a-col :md="4" :sm="12"><a-form-item :label="$t('No')"><a-input v-model="queryData.device_id" placeholder=""/></a-form-item></a-col>
+          <a-col :md="4" :sm="12">
+            <a-form-item :label="$t('No')">
+              <a-input
+                v-model="queryData.device_id"
+                placeholder=""
+                @keyup.enter.native="refreshTable(true)"
+              />
+            </a-form-item>
+          </a-col>
           <a-col :md="4" :sm="12">
             <a-form-item :label="$t('Organization')">
               <a-tree-select
