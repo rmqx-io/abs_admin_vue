@@ -232,6 +232,9 @@
                   <a @click="handleMap(record)">历史行程</a>
                 </a-menu-item>
                 <a-menu-item>
+                  <a @click="handleLocationHistory(record)">历史里程</a>
+                </a-menu-item>
+                <a-menu-item>
                   <a @click="handleSendCommand(record)">下发指令</a>
                 </a-menu-item>
                 <a-menu-item>
@@ -457,6 +460,19 @@
       >
       </device-alarm>
     </div>
+
+    <a-modal
+      title="历史里程记录"
+      width="90%"
+      :visible="locationHistoryVisible"
+      @cancel="locationHistoryVisible = false"
+      @ok="locationHistoryVisible = false"
+    >
+      <location-history
+        v-if="locationHistoryVisible"
+        :device-id="selectedDeviceId"
+      />
+    </a-modal>
   </a-card>
 <!--  </page-header-wrapper>-->
 </template>
@@ -487,10 +503,10 @@ import SendBtCode from '@/views/list/modules/SendBtCode'
 import SendCommandManagerDevices from './modules/SendCommandManagerDevices.vue'
 import BatteryInfo from '@/views/list/components/BatteryInfo'
 import storage from 'store'
-import { ROLE } from '@/store/mutation-types'
+import { ROLE, ACCESS_TOKEN } from '@/store/mutation-types'
 import DeviceAlarm from '@/views/list/components/DeviceAlarm'
 import PacketLog from '@/views/list/components/PacketLog'
-import { ACCESS_TOKEN } from '@/store/mutation-types'
+import LocationHistory from '@/views/list/components/LocationHistory'
 
 function interpolate(u, begin, end) {
   if (u < 0) u = 0
@@ -628,7 +644,8 @@ export default {
     SendCommandForm,
     StepByStepModal,
     BatteryInfo,
-    PacketLog
+    PacketLog,
+    LocationHistory
   },
   data() {
     this.columns = columns
@@ -768,7 +785,9 @@ export default {
       showBatchCommandManager: false,
       showBatchCommandManagerDevices: false,
       currentBatchSendCommandId: 0,
-      exportProgress: 0
+      exportProgress: 0,
+      locationHistoryVisible: false,
+      selectedDeviceId: null
     }
   },
   filters: {
@@ -1388,6 +1407,10 @@ export default {
     },
     localTimePlus8(time) {
       return moment.utc(time).local().add(8, 'hours').format('YYYY-MM-DD HH:mm:ss')
+    },
+    handleLocationHistory(record) {
+      this.selectedDeviceId = record.code
+      this.locationHistoryVisible = true
     }
   }
 }
