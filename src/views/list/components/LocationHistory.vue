@@ -51,10 +51,10 @@
         {{ record.longitude.toFixed(6) }}, {{ record.latitude.toFixed(6) }}
       </template>
       <template slot="speed" slot-scope="text, record">
-        {{ record.speed / 10 }}
+        {{ (record.speed / 10).toFixed(1) }}
       </template>
       <template slot="mileage" slot-scope="text, record">
-        {{ record.mileage / 10 }}
+        {{ (record.mileage / 10).toFixed(1) }}
       </template>
     </a-table>
   </a-spin>
