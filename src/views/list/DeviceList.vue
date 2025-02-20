@@ -787,7 +787,8 @@ export default {
       currentBatchSendCommandId: 0,
       exportProgress: 0,
       locationHistoryVisible: false,
-      selectedDeviceId: null
+      selectedDeviceId: null,
+      isSyncingFromRoute: false,
     }
   },
   filters: {
@@ -807,13 +808,7 @@ export default {
     }
   },
   mounted() {
-    // console.log('mounted', this.$route)
-    if (this.$route.query.device_id) {
-      this.queryData.device_id = this.$route.query.device_id
-      // this.$refs.table.refresh(true)
-      this.refreshTable(true)
-    }
-
+    this.syncFormFromRouteQuery()
     this.getStatusCount()
     this.getAdminOrgList()
   },
@@ -1411,6 +1406,46 @@ export default {
     handleLocationHistory(record) {
       this.selectedDeviceId = record.code
       this.locationHistoryVisible = true
+    },
+    syncFormFromRouteQuery() {
+      this.isSyncingFromRoute = true
+      const query = this.$route.query
+
+      // Update form fields from URL
+      this.deviceStatus = query.deviceStatus || 'online'
+      this.queryData.device_id = query.device_id || ''
+      this.queryData.organization_id = query.organization_id || null
+
+      this.isSyncingFromRoute = false
+    },
+    updateRouteQuery() {
+      const query = {
+        ...this.$route.query,
+        deviceStatus: this.deviceStatus !== 'online' ? this.deviceStatus : undefined,
+        device_id: this.queryData.device_id || undefined,
+        organization_id: this.queryData.organization_id || undefined
+      }
+
+      // Clean undefined values
+      Object.keys(query).forEach(key => query[key] === undefined && delete query[key])
+
+      this.$router.replace({ query }).catch(err => {
+        if (err.name !== 'NavigationDuplicated') throw err
+      })
+    }
+  },
+  watch: {
+    deviceStatus(newVal) {
+      if (!this.isSyncingFromRoute) this.updateRouteQuery()
+    },
+    'queryData.device_id'(newVal) {
+      if (!this.isSyncingFromRoute) this.updateRouteQuery()
+    },
+    'queryData.organization_id'(newVal) {
+      if (!this.isSyncingFromRoute) this.updateRouteQuery()
+    },
+    $route() {
+      this.syncFormFromRouteQuery()
     }
   }
 }
@@ -1509,6 +1544,15 @@ export default {
 
 .ant-form-item {
   margin-bottom: 16px;
+}
+
+.ant-radio-group {
+  margin-bottom: 8px;
+}
+
+.ant-radio-button-wrapper {
+  min-width: 100px;
+  text-align: center;
 }
 
 .ant-radio-group {
