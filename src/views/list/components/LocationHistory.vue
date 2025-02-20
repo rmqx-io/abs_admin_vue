@@ -41,11 +41,14 @@
       :pagination="pagination"
       @change="handleTableChange"
     >
-      <template slot="time" slot-scope="text">
-        {{ localTime(text) }}
+      <template slot="time" slot-scope="text, record">
+        {{ localTime(record.time_tracking) }}
       </template>
       <template slot="coordinates" slot-scope="text, record">
         {{ record.mars_longitude.toFixed(6) }}, {{ record.mars_latitude.toFixed(6) }}
+      </template>
+      <template slot="gpsCoordinates" slot-scope="text, record">
+        {{ record.longitude.toFixed(6) }}, {{ record.latitude.toFixed(6) }}
       </template>
     </a-table>
   </a-spin>
@@ -57,11 +60,11 @@ import moment from 'moment'
 
 export default {
   name: 'LocationHistory',
+  // eslint-disable-next-line vue/require-prop-types
   props: ['deviceId'],
   data() {
     const defaultStart = moment().subtract(24, 'hours')
     const defaultEnd = moment()
-    
     return {
       loading: false,
       locationRecords: [],
@@ -72,11 +75,11 @@ export default {
       },
       columns: [
         { title: '时间', dataIndex: 'location_time', scopedSlots: { customRender: 'time' } },
-        { title: '坐标', scopedSlots: { customRender: 'coordinates' } },
+        { title: '火星坐标', scopedSlots: { customRender: 'coordinates' } },
+        { title: 'GPS坐标', scopedSlots: { customRender: 'gpsCoordinates' } },
         { title: '速度 (km/h)', dataIndex: 'speed' },
-        { title: '方向 (°)', dataIndex: 'direction' },
-        { title: '海拔 (m)', dataIndex: 'altitude' },
-        { title: '卫星数', dataIndex: 'satellites' }
+        { title: '里程', dataIndex: 'mileage' },
+        { title: '卫星数', dataIndex: 'rssi' }
       ],
       startDate: defaultStart.format('YYYY-MM-DD HH:mm:ss'),
       startTime: defaultStart.format('YYYY-MM-DD HH:mm:ss'),
@@ -89,6 +92,7 @@ export default {
   },
   methods: {
     localTime(time) {
+      console.log('time', time)
       return moment.utc(time).local().format('YYYY-MM-DD HH:mm:ss')
     },
     handleTableChange(pagination) {
