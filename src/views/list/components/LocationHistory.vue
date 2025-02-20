@@ -1,5 +1,40 @@
 <template>
   <a-spin :spinning="loading">
+    <div class="filter-container">
+      <a-row :gutter="16">
+        <a-col :span="8">
+          <a-form-item label="开始时间">
+            <a-date-picker
+              v-model="startDate"
+              format="YYYY-MM-DD"
+              @change="(date) => updateDateTime('start', date, startTime)"
+            />
+            <a-time-picker
+              v-model="startTime"
+              format="HH:mm:ss"
+              @change="(time) => updateDateTime('start', startDate, time)"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="8">
+          <a-form-item label="结束时间">
+            <a-date-picker
+              v-model="endDate"
+              format="YYYY-MM-DD"
+              @change="(date) => updateDateTime('end', date, endTime)"
+            />
+            <a-time-picker
+              v-model="endTime"
+              format="HH:mm:ss"
+              @change="(time) => updateDateTime('end', endDate, time)"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="4">
+          <a-button type="primary" @click="fetchLocationData">查询</a-button>
+        </a-col>
+      </a-row>
+    </div>
     <a-table
       :columns="columns"
       :data-source="locationRecords"
@@ -24,6 +59,9 @@ export default {
   name: 'LocationHistory',
   props: ['deviceId'],
   data() {
+    const defaultStart = moment().subtract(24, 'hours')
+    const defaultEnd = moment()
+    
     return {
       loading: false,
       locationRecords: [],
@@ -39,7 +77,11 @@ export default {
         { title: '方向 (°)', dataIndex: 'direction' },
         { title: '海拔 (m)', dataIndex: 'altitude' },
         { title: '卫星数', dataIndex: 'satellites' }
-      ]
+      ],
+      startDate: defaultStart.format('YYYY-MM-DD HH:mm:ss'),
+      startTime: defaultStart.format('YYYY-MM-DD HH:mm:ss'),
+      endDate: defaultEnd.format('YYYY-MM-DD HH:mm:ss'),
+      endTime: defaultEnd.format('YYYY-MM-DD HH:mm:ss'),
     }
   },
   mounted() {
@@ -53,12 +95,24 @@ export default {
       this.pagination.current = pagination.current
       this.fetchLocationData()
     },
+    updateDateTime(type, date, time) {
+      if (date) {
+        this[`${type}Date`] = date.format('YYYY-MM-DD HH:mm:ss')
+      }
+      if (time) {
+        this[`${type}Time`] = time.format('YYYY-MM-DD HH:mm:ss')
+      }
+    },
     async fetchLocationData() {
       this.loading = true
       try {
         const params = {
           page_no: this.pagination.current,
           page_size: this.pagination.pageSize,
+          start_date: this.startDate,
+          start_time: this.startTime,
+          end_date: this.endDate,
+          end_time: this.endTime
         }
         const response = await getLocation(this.deviceId, params)
         console.log('response', response)
@@ -78,5 +132,11 @@ export default {
 <style scoped>
 .ant-table {
   margin-top: 16px;
+}
+.filter-container {
+  margin-bottom: 20px;
+}
+.ant-calendar-picker {
+  margin-right: 8px;
 }
 </style>
