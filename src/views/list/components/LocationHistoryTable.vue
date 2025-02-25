@@ -1,5 +1,41 @@
 <template>
   <div>
+    <div class="filter-container">
+      <a-row :gutter="16">
+        <a-col :span="8">
+          <a-form-item label="开始时间">
+            <a-date-picker
+              v-model="startDate"
+              format="YYYY-MM-DD"
+              @change="(date) => updateDateTime('start', date, startTime)"
+            />
+            <a-time-picker
+              v-model="startTime"
+              format="HH:mm:ss"
+              @change="(time) => updateDateTime('start', startDate, time)"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="8">
+          <a-form-item label="结束时间">
+            <a-date-picker
+              v-model="endDate"
+              format="YYYY-MM-DD"
+              @change="(date) => updateDateTime('end', date, endTime)"
+            />
+            <a-time-picker
+              v-model="endTime"
+              format="HH:mm:ss"
+              @change="(time) => updateDateTime('end', endDate, time)"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="4">
+          <a-button type="primary" @click="refresh(true)">查询</a-button>
+        </a-col>
+      </a-row>
+    </div>
+
     <s-table
       ref="table"
       size="default"
@@ -43,6 +79,7 @@
 <script>
 import { STable } from '@/components'
 import { getDeviceList } from '@/api/manage'
+import moment from 'moment'
 
 const columns = [
   {
@@ -78,8 +115,14 @@ export default {
     STable
   },
   data () {
+    const defaultStart = moment().subtract(24, 'hours')
+    const defaultEnd = moment()
     return {
       columns,
+      startDate: defaultStart,
+      startTime: defaultStart,
+      endDate: defaultEnd,
+      endTime: defaultEnd,
       loadData: parameter => {
         // 合并查询参数
         const params = {
@@ -88,7 +131,11 @@ export default {
           device_id: this.queryParams.device_id,
           organization_id: this.queryParams.organization_id,
           bt_code: this.queryParams.bt_code,
-          iccid: this.queryParams.iccid
+          iccid: this.queryParams.iccid,
+          start_date: this.startDate?.format('YYYY-MM-DD'),
+          start_time: this.startTime?.format('HH:mm:ss'),
+          end_date: this.endDate?.format('YYYY-MM-DD'),
+          end_time: this.endTime?.format('HH:mm:ss')
         }
 
         // 移除空值
@@ -118,6 +165,14 @@ export default {
       if (this.$refs.table) {
         this.$refs.table.refresh(force)
       }
+    },
+    updateDateTime(type, date, time) {
+      if (date) {
+        this[`${type}Date`] = date
+      }
+      if (time) {
+        this[`${type}Time`] = time
+      }
     }
   },
   watch: {
@@ -133,3 +188,12 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.filter-container {
+  margin-bottom: 20px;
+}
+.ant-calendar-picker {
+  margin-right: 8px;
+}
+</style>
