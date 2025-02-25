@@ -487,6 +487,8 @@
 
     <location-history-table
       v-if="showLocationHistory"
+      :device-status="deviceStatus"
+      :query-params="queryData"
       @view-history="handleLocationHistory"
     />
   </a-card>
@@ -1441,7 +1443,7 @@ export default {
       // Update form fields from URL
       this.deviceStatus = query.deviceStatus || 'online'
       this.queryData.device_id = query.device_id || ''
-      this.queryData.organization_id = query.organization_id || null
+      this.queryData.organization_id = query.organization_id ? parseInt(query.organization_id) : null
 
       this.isSyncingFromRoute = false
     },
