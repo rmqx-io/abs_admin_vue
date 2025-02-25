@@ -36,12 +36,6 @@
           循环次数: <span>{{ record.bms_charging_cycle || '-' }}</span>
         </template>
       </span>
-
-      <span slot="action" slot-scope="text, record">
-        <template>
-          <a @click="handleViewHistory(record)">查看历史</a>
-        </template>
-      </span>
     </s-table>
   </div>
 </template>
@@ -65,12 +59,6 @@ const columns = [
     title: '电池信息',
     dataIndex: 'battery',
     scopedSlots: { customRender: 'battery_info' }
-  },
-  {
-    title: '操作',
-    dataIndex: 'action',
-    scopedSlots: { customRender: 'action' },
-    width: '150px'
   }
 ]
 
