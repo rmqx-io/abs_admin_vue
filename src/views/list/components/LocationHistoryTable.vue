@@ -66,10 +66,6 @@
       <span slot="battery_info" slot-scope="text, record">
         <template>
           里程: <span>{{ record.mileage || '-' }} km</span>
-          <br />
-          速度: <span>{{ record.speed || '-' }} km/h</span>
-          <br />
-          循环次数: <span>{{ record.bms_charging_cycle || '-' }}</span>
         </template>
       </span>
     </s-table>
@@ -78,7 +74,7 @@
 
 <script>
 import { STable } from '@/components'
-import { getDeviceList } from '@/api/manage'
+import { getDeviceList, getLocation } from '@/api/manage'
 import moment from 'moment'
 
 const columns = [
@@ -123,8 +119,8 @@ export default {
       startTime: defaultStart,
       endDate: defaultEnd,
       endTime: defaultEnd,
+      deviceLocations: new Map(), // 存储设备位置信息
       loadData: parameter => {
-        // 合并查询参数
         const params = {
           ...parameter,
           device_status: this.deviceStatus,
@@ -132,10 +128,6 @@ export default {
           organization_id: this.queryParams.organization_id,
           bt_code: this.queryParams.bt_code,
           iccid: this.queryParams.iccid,
-          start_date: this.startDate?.format('YYYY-MM-DD'),
-          start_time: this.startTime?.format('HH:mm:ss'),
-          end_date: this.endDate?.format('YYYY-MM-DD'),
-          end_time: this.endTime?.format('HH:mm:ss')
         }
 
         // 移除空值
@@ -146,12 +138,30 @@ export default {
         })
 
         return getDeviceList(params)
-          .then(res => {
+          .then(async res => {
+            // 获取每个设备的位置信息
+            const devices = res.data.records
+            await this.fetchDeviceLocations(devices)
+
+            // 使用位置信息更新设备数据
+            const updatedDevices = devices.map(device => {
+              const locationData = this.deviceLocations.get(device.code)
+              if (locationData) {
+                return {
+                  ...device,
+                  mileage: locationData.mileage / 10, // 转换为km
+                  speed: locationData.speed / 10, // 转换为km/h
+                  // 其他字段保持不变
+                }
+              }
+              return device
+            })
+
             return {
               pageSize: res.data.page_size,
               pageNo: res.data.page_no,
               totalCount: res.data.total,
-              data: res.data.records
+              data: updatedDevices
             }
           })
       }
@@ -173,6 +183,31 @@ export default {
       if (time) {
         this[`${type}Time`] = time
       }
+    },
+    async fetchDeviceLocations(devices) {
+      const locationPromises = devices.map(device => {
+        const params = {
+          page_no: 1,
+          page_size: 1, // 只需要最新的一条记录
+          start_date: this.startDate?.format('YYYY-MM-DD HH:mm:ss'),
+          start_time: this.startTime?.format('YYYY-MM-DD HH:mm:ss'),
+          end_date: this.endDate?.format('YYYY-MM-DD HH:mm:ss'),
+          end_time: this.endTime?.format('YYYY-MM-DD HH:mm:ss')
+        }
+        
+        console.log('device.code "' + device.code + '"')
+        return getLocation(device.code, params)
+          .then(response => {
+            if (response.data && response.data.length > 0) {
+              this.deviceLocations.set(device.code, response.data[0])
+            }
+          })
+          .catch(error => {
+            console.error(`Error fetching location for device ${device.code}:`, error)
+          })
+      })
+
+      await Promise.all(locationPromises)
     }
   },
   watch: {
@@ -184,6 +219,18 @@ export default {
         this.refresh(true)
       },
       deep: true
+    },
+    startDate() {
+      this.refresh(true)
+    },
+    startTime() {
+      this.refresh(true)
+    },
+    endDate() {
+      this.refresh(true)
+    },
+    endTime() {
+      this.refresh(true)
     }
   }
 }
