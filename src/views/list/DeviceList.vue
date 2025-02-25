@@ -29,6 +29,9 @@
         <a-tab-pane key="alarm">
           <template #tab><a-icon type="warning" /><span>告警</span></template>
         </a-tab-pane>
+        <a-tab-pane key="location-history">
+          <template #tab><a-icon type="history" /><span>历史里程</span></template>
+        </a-tab-pane>
       </a-tabs>
 
       <a-form>
@@ -481,6 +484,11 @@
         :device-id="selectedDeviceId"
       />
     </a-modal>
+
+    <location-history-table
+      v-if="showLocationHistory"
+      @view-history="handleLocationHistory"
+    />
   </a-card>
 <!--  </page-header-wrapper>-->
 </template>
@@ -515,6 +523,7 @@ import { ROLE, ACCESS_TOKEN } from '@/store/mutation-types'
 import DeviceAlarm from '@/views/list/components/DeviceAlarm'
 import PacketLog from '@/views/list/components/PacketLog'
 import LocationHistory from '@/views/list/components/LocationHistory'
+import LocationHistoryTable from './components/LocationHistoryTable'
 
 function interpolate(u, begin, end) {
   if (u < 0) u = 0
@@ -653,7 +662,8 @@ export default {
     StepByStepModal,
     BatteryInfo,
     PacketLog,
-    LocationHistory
+    LocationHistory,
+    LocationHistoryTable
   },
   data() {
     this.columns = columns
@@ -715,6 +725,7 @@ export default {
       showMarkers: false,
       showTableTab: true,
       showAlarm: false,
+      showLocationHistory: false,
       send_command_form_visible: false,
         select_params: false,
       send_bt_code_visible: false,
@@ -1334,6 +1345,7 @@ export default {
         console.log('show map')
         this.showTableTab = false
         this.showAlarm = false
+        this.showLocationHistory = false
         this.showMap = true
         this.showMarkers = true
         if (this.deviceMarkers.length === 0) {
@@ -1350,13 +1362,20 @@ export default {
         this.showTableTab = false
         this.showMap = false
         this.showMarkers = false
+        this.showLocationHistory = false
         this.showAlarm = true
+      } else if (tab === 'location-history') {
+        this.showTableTab = false
+        this.showMap = false
+        this.showAlarm = false
+        this.showLocationHistory = true
       } else {
         console.log('show table')
         this.showTableTab = true
         this.showMap = false
         this.showMarkers = false
         this.showAlarm = false
+        this.showLocationHistory = false
       }
     },
     getClusterStyle(context) {
