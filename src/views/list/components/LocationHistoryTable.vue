@@ -66,6 +66,8 @@
       <span slot="battery_info" slot-scope="text, record">
         <template>
           里程: <span>{{ record.mileage || '-' }} km</span>
+          <br />
+          总里程: <span>{{ record.total_mileage || '-' }} km</span>
         </template>
       </span>
     </s-table>
@@ -119,7 +121,8 @@ export default {
       startTime: defaultStart,
       endDate: defaultEnd,
       endTime: defaultEnd,
-      deviceLocations: new Map(), // 存储设备位置信息
+      deviceLocationsFirst: new Map(), // 存储设备位置信息
+      deviceLocationsLast: new Map(), // 存储设备位置信息
       loadData: parameter => {
         const params = {
           ...parameter,
@@ -145,12 +148,17 @@ export default {
 
             // 使用位置信息更新设备数据
             const updatedDevices = devices.map(device => {
-              const locationData = this.deviceLocations.get(device.code)
-              if (locationData) {
+              const locationDataFirst = this.deviceLocationsFirst.get(device.code)
+              const locationDataLast = this.deviceLocationsLast.get(device.code)
+              console.log('locationDataFirst "' + locationDataFirst + '"')
+              console.log('locationDataLast "' + locationDataLast + '"')
+              if (locationDataFirst && locationDataLast) {
+                console.log('locationDataFirst.mileage "' + locationDataFirst.mileage + '"')
+                console.log('locationDataLast.mileage "' + locationDataLast.mileage + '"')
                 return {
                   ...device,
-                  mileage: locationData.mileage / 10, // 转换为km
-                  speed: locationData.speed / 10, // 转换为km/h
+                  total_mileage: (locationDataLast.mileage / 10).toFixed(1), // 转换为km
+                  mileage: (locationDataLast.mileage / 10 - locationDataFirst.mileage / 10).toFixed(1), // 转换为km
                   // 其他字段保持不变
                 }
               }
@@ -188,18 +196,18 @@ export default {
       const locationPromises = devices.map(device => {
         const params = {
           page_no: 1,
-          page_size: 1, // 只需要最新的一条记录
+          page_size: 1, // page_size 实际没有被使用
           start_date: this.startDate?.format('YYYY-MM-DD HH:mm:ss'),
           start_time: this.startTime?.format('YYYY-MM-DD HH:mm:ss'),
           end_date: this.endDate?.format('YYYY-MM-DD HH:mm:ss'),
           end_time: this.endTime?.format('YYYY-MM-DD HH:mm:ss')
         }
-        
         console.log('device.code "' + device.code + '"')
         return getLocation(device.code, params)
           .then(response => {
             if (response.data && response.data.length > 0) {
-              this.deviceLocations.set(device.code, response.data[0])
+              this.deviceLocationsFirst.set(device.code, response.data[0])
+              this.deviceLocationsLast.set(device.code, response.data[response.data.length - 1])
             }
           })
           .catch(error => {
