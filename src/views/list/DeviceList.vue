@@ -964,7 +964,7 @@ export default {
         link.style.display = 'none'
         link.href = downloadUrl
         link.download = `devices_${Date.now()}.csv` // Add timestamp to prevent caching
-        
+
         // Ensure link is removed after download starts
         link.addEventListener('click', () => {
           setTimeout(() => {
