@@ -19,6 +19,24 @@
         </template>
       </span>
 
+      <span slot="organization_info" slot-scope="text, record">
+        <template>
+          组织: <span>{{ record.organization_name }}</span>
+          <br />
+          仓库: <span>{{ record.storehouse_name }}</span>
+        </template>
+      </span>
+
+      <span slot="battery_info" slot-scope="text, record">
+        <template>
+          里程: <span>{{ record.mileage || '-' }} km</span>
+          <br />
+          速度: <span>{{ record.speed || '-' }} km/h</span>
+          <br />
+          循环次数: <span>{{ record.bms_charging_cycle || '-' }}</span>
+        </template>
+      </span>
+
       <span slot="action" slot-scope="text, record">
         <template>
           <a @click="handleViewHistory(record)">查看历史</a>
@@ -37,6 +55,16 @@ const columns = [
     title: '设备信息',
     dataIndex: 'code',
     scopedSlots: { customRender: 'device_info' }
+  },
+  {
+    title: '组织信息',
+    dataIndex: 'organization_name',
+    scopedSlots: { customRender: 'organization_info' }
+  },
+  {
+    title: '电池信息',
+    dataIndex: 'battery',
+    scopedSlots: { customRender: 'battery_info' }
   },
   {
     title: '操作',
