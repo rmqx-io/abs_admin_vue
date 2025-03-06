@@ -911,6 +911,41 @@ export default {
       this.showExporting = true
       this.exportProgress = 0
 
+      // Check if there's a previous failed export
+      const lastExportState = localStorage.getItem('deviceExportState')
+      let lastDeviceId = null
+      let resumeExport = false
+
+      if (lastExportState) {
+        try {
+          const exportState = JSON.parse(lastExportState)
+          if (exportState.timestamp && (Date.now() - exportState.timestamp < 24 * 60 * 60 * 1000)) {
+            // Only offer to resume if the export was within the last 24 hours
+            lastDeviceId = exportState.lastDeviceId
+            // We check if the device status matches but don't need to use it directly
+            // const deviceStatus = exportState.deviceStatus
+            const totalCount = exportState.totalCount
+            const exportedCount = exportState.exportedCount
+
+            if (lastDeviceId && totalCount > 0) {
+              resumeExport = await new Promise(resolve => {
+                this.$confirm({
+                  title: '恢复导出',
+                  content: `发现未完成的导出任务 (${exportedCount}/${totalCount}). 是否从上次中断处继续?`,
+                  okText: '继续',
+                  cancelText: '重新开始',
+                  onOk: () => resolve(true),
+                  onCancel: () => resolve(false)
+                })
+              })
+            }
+          }
+        } catch (e) {
+          console.error('Error parsing last export state', e)
+          localStorage.removeItem('deviceExportState')
+        }
+      }
+
       try {
         const arg = Object.assign({}, this.queryData)
         Object.keys(arg).forEach(key => {
@@ -922,41 +957,137 @@ export default {
         delete arg.start_time
         arg.location_only = false
         arg.device_status = this.deviceStatus
-        arg.page_size = 1000
 
-        const params = new URLSearchParams(arg)
-        const url = `${api.device_export}?${params}`
+        // First, get the total count to calculate slices
+        const countParams = new URLSearchParams(arg)
+        countParams.set('count_only', 'true')
+        countParams.set('page_size', '1')
 
-        const response = await fetch(url, {
+        const countResponse = await fetch(`${api.device_export}?${countParams}`, {
           method: 'GET',
           headers: {
             'Access-Token': storage.get(ACCESS_TOKEN),
-            'Accept': 'text/csv',
+            'Accept': 'application/json',
             'Cache-Control': 'no-cache'
           }
         })
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+        if (!countResponse.ok) {
+          throw new Error(`HTTP error! status: ${countResponse.status}`)
         }
 
-        const total = parseInt(response.headers.get('x-total-count') || '0')
-        const reader = response.body.getReader()
-        const decoder = new TextDecoder()
-        let csv = ''
+        const countData = await countResponse.json()
+        console.log('countData', countData)
+        const totalCount = countData.data.total || 0
 
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
+        if (totalCount === 0) {
+          this.$message.info('没有符合条件的设备可导出')
+          return
+        }
 
-          csv += decoder.decode(value, { stream: true })
-          const processedRows = (csv.match(/\n/g) || []).length
-            this.exportProgress = total > 0 ? processedRows / total * 100 : 0
-          if (processedRows >= total) break
+        // Set up for sliced export
+        const SLICE_SIZE = 1000
+        const totalSlices = Math.ceil(totalCount / SLICE_SIZE)
+        let currentSlice = 1
+        let exportedCount = 0
+        let csvContent = ''
+        let csvHeaders = ''
+
+        // If resuming, adjust the starting point
+        if (resumeExport && lastDeviceId) {
+          arg.after_device_id = lastDeviceId
+          exportedCount = parseInt(localStorage.getItem('deviceExportCount') || '0')
+
+          // Get the headers from storage
+          csvHeaders = localStorage.getItem('deviceExportHeaders') || ''
+
+          // If we have headers, we can skip the first request for headers
+          if (csvHeaders) {
+            csvContent = csvHeaders
+            currentSlice = Math.floor(exportedCount / SLICE_SIZE) + 1
+          }
+        }
+
+        // Update progress display
+        this.$message.info(`开始导出 ${totalCount} 条记录，分 ${totalSlices} 批处理`)
+
+        // Process each slice
+        while (currentSlice <= totalSlices) {
+          const sliceArg = { ...arg, page_size: SLICE_SIZE, page_no: currentSlice }
+          const sliceParams = new URLSearchParams(sliceArg)
+
+          this.$message.info(`正在处理第 ${currentSlice}/${totalSlices} 批`)
+
+          const sliceResponse = await fetch(`${api.device_export}?${sliceParams}`, {
+            method: 'GET',
+            headers: {
+              'Access-Token': storage.get(ACCESS_TOKEN),
+              'Accept': 'text/csv',
+              'Cache-Control': 'no-cache'
+            }
+          })
+
+          if (!sliceResponse.ok) {
+            throw new Error(`HTTP error in slice ${currentSlice}! status: ${sliceResponse.status}`)
+          }
+
+          const sliceText = await sliceResponse.text()
+
+          // For the first slice, keep the headers
+          if (currentSlice === 1 || csvContent === '') {
+            csvContent = sliceText
+
+            // Extract headers (first line) and save them
+            const headerEndIndex = csvContent.indexOf('\n') + 1
+            if (headerEndIndex > 0) {
+              csvHeaders = csvContent.substring(0, headerEndIndex)
+              localStorage.setItem('deviceExportHeaders', csvHeaders)
+            }
+          } else {
+            // For subsequent slices, skip the header row
+            const dataStartIndex = sliceText.indexOf('\n') + 1
+            if (dataStartIndex > 0 && dataStartIndex < sliceText.length) {
+              csvContent += sliceText.substring(dataStartIndex)
+            }
+          }
+
+          // Count rows in this slice
+          const rowsInSlice = (sliceText.match(/\n/g) || []).length - 1 // Subtract 1 for header
+          exportedCount += rowsInSlice
+
+          // Update progress
+          this.exportProgress = Math.min((exportedCount / totalCount) * 100, 99.9)
+
+          // Save state after each successful slice
+          if (sliceText && sliceText.length > 0) {
+            // Get the last device ID from the last line
+            const lines = sliceText.trim().split('\n')
+            if (lines.length > 1) {
+              const lastLine = lines[lines.length - 1]
+              const fields = lastLine.split(',')
+              if (fields.length > 0) {
+                // Assuming device ID is in the first column - adjust if needed
+                lastDeviceId = fields[0].replace(/"/g, '')
+
+                // Save export state
+                const exportState = {
+                  lastDeviceId,
+                  deviceStatus: this.deviceStatus,
+                  totalCount,
+                  exportedCount,
+                  timestamp: Date.now()
+                }
+                localStorage.setItem('deviceExportState', JSON.stringify(exportState))
+                localStorage.setItem('deviceExportCount', exportedCount.toString())
+              }
+            }
+          }
+
+          currentSlice++
         }
 
         // Create blob and trigger download
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' })
         const downloadUrl = window.URL.createObjectURL(blob)
 
         // Create and click link in a more reliable way
@@ -968,7 +1099,7 @@ export default {
         // Ensure link is removed after download starts
         link.addEventListener('click', () => {
           setTimeout(() => {
-            console.log('remove link');
+            console.log('remove link')
             window.URL.revokeObjectURL(downloadUrl)
             document.body.removeChild(link)
           }, 1000)
@@ -976,12 +1107,23 @@ export default {
 
         document.body.appendChild(link)
         link.click()
+
+        // Clear export state on successful completion
+        localStorage.removeItem('deviceExportState')
+        localStorage.removeItem('deviceExportCount')
+        localStorage.removeItem('deviceExportHeaders')
+
+        this.$message.success(`成功导出 ${exportedCount} 条记录`)
+        this.exportProgress = 100
       } catch (err) {
         console.error('Export error:', err)
-        this.$message.error('Export failed: ' + err.message)
+        this.$message.error('导出失败: ' + err.message)
+        this.$message.info('您可以稍后点击导出按钮继续未完成的导出')
       } finally {
-        this.showExporting = false
-        this.exportProgress = 0
+        setTimeout(() => {
+          this.showExporting = false
+          this.exportProgress = 0
+        }, 2000)
       }
     },
     handleImport () {
