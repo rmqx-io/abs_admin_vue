@@ -77,24 +77,24 @@
       rowKey="id"
       @change="handleTableChange"
     >
-      <span slot="bms_type" slot-scope="text, record">
+      <span slot="device_type" slot-scope="text, record">
         <template>
-          <span>{{ device_type_name(record.bms_type) }}</span>
+          <span>{{ device_type_name(record.device_type) }}</span>
         </template>
       </span>
-      <span slot="bms_alarm" slot-scope="text, record">
+      <span slot="alarm" slot-scope="text, record">
         <template>
-          <span>{{ alarm_name(record.bms_alarm) }}</span>
+          <span>{{ alarm_name(record.alarm) }}</span>
         </template>
       </span>
-      <span slot="organization_name" slot-scope="text, record">
+      <span slot="organization_id" slot-scope="text, record">
         <template>
-          <span>{{ record.organization_name }}</span>
+          <span>{{ record.organization_id }}</span>
         </template>
       </span>
-      <span slot='bms_alarm_timestamp' slot-scope="text, record">
+      <span slot='timestamp' slot-scope="text, record">
         <template>
-          <span>{{ localTime(record.bms_alarm_timestamp) }}</span>
+          <span>{{ localTime(record.timestamp) }}</span>
         </template>
       </span>
       <span slot='operation' slot-scope="text, record">
@@ -157,27 +157,22 @@ export default {
         },
         {
           title: '设备编号',
-          dataIndex: 'code'
+          dataIndex: 'device_id'
         },
         {
           title: '类型',
-          dataIndex: 'bms_type',
-          scopedSlots: { customRender: 'bms_type' }
+          dataIndex: 'device_type',
+          scopedSlots: { customRender: 'device_type' }
         },
         {
           title: '告警',
-          dataIndex: 'bms_alarm',
-          scopedSlots: { customRender: 'bms_alarm' }
-        },
-        {
-          title: '组织',
-          dataIndex: 'organization_name',
-          scopedSlots: { customRender: 'organization_name' }
+          dataIndex: 'alarm',
+          scopedSlots: { customRender: 'alarm' }
         },
         {
           title: '时间',
-          dataIndex: 'bms_alarm_timestamp',
-          scopedSlots: { customRender: 'bms_alarm_timestamp' }
+          dataIndex: 'timestamp',
+          scopedSlots: { customRender: 'timestamp' }
         },
         {
           title: '操作',
