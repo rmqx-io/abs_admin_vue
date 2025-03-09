@@ -928,16 +928,11 @@ export default {
             const exportedCount = exportState.exportedCount
 
             if (lastDeviceId && totalCount > 0) {
-              resumeExport = await new Promise(resolve => {
-                this.$confirm({
-                  title: '恢复导出',
-                  content: `发现未完成的导出任务 (${exportedCount}/${totalCount}). 是否从上次中断处继续?`,
-                  okText: '继续',
-                  cancelText: '重新开始',
-                  onOk: () => resolve(true),
-                  onCancel: () => resolve(false)
-                })
-              })
+              // 使用Promise和await确保代码等待用户响应
+              // the confirm dialog does not work yet,
+              // set resumeExport to false currently,
+              // TODO: fix the confirm dialog
+              resumeExport = false
             }
           }
         } catch (e) {
@@ -986,7 +981,7 @@ export default {
         }
 
         // Set up for sliced export
-        const SLICE_SIZE = 1000
+        const SLICE_SIZE = 100
         const totalSlices = Math.ceil(totalCount / SLICE_SIZE)
         let currentSlice = 1
         let exportedCount = 0
@@ -1809,3 +1804,4 @@ export default {
   font-weight: 500;
 }
 </style>
+
