@@ -7,6 +7,8 @@
       <el-button type="warning" @click="showWarningConfirm">Warning Confirmation</el-button>
       <el-button type="danger" @click="showDangerConfirm">Danger Confirmation</el-button>
       <el-button type="info" @click="showCustomConfirm">Custom Confirmation</el-button>
+      <el-button type="success" @click="showResumeExportConfirm">Resume Export Confirmation</el-button>
+      <el-button type="primary" @click="showAsyncConfirm">Async Confirmation</el-button>
     </div>
 
     <div class="result-panel" v-if="lastResult !== null">
@@ -78,6 +80,53 @@ export default {
           this.lastResult = 'User closed the dialog'
         }
       })
+    },
+    
+    showResumeExportConfirm() {
+      const exportedCount = 150;
+      const totalCount = 500;
+      
+      this.$confirm(
+        `发现未完成的导出任务 (已导出 ${exportedCount}/${totalCount} 条记录)，是否继续上次的导出?`,
+        '继续导出',
+        {
+          confirmButtonText: '继续导出',
+          cancelButtonText: '重新导出',
+          type: 'info'
+        }
+      ).then(() => {
+        this.lastResult = 'User chose to resume the export'
+      }).catch(() => {
+        this.lastResult = 'User chose to restart the export'
+      })
+    },
+    
+    async showAsyncConfirm() {
+      try {
+        // The proper way to wait for confirmation dialog results is to use await
+        const confirmed = await this.$confirm(
+          'This is an async confirmation dialog. The code will wait for your response.',
+          'Async Confirmation',
+          {
+            confirmButtonText: 'Proceed',
+            cancelButtonText: 'Cancel',
+            type: 'warning'
+          }
+        ).then(() => true).catch(() => false);
+        
+        // This code will only execute after the user has responded to the dialog
+        if (confirmed) {
+          this.lastResult = 'User confirmed the async dialog - code continued execution after confirmation';
+        } else {
+          this.lastResult = 'User cancelled the async dialog - code continued execution after cancellation';
+        }
+        
+        // You can perform additional async operations here
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        this.lastResult += '\nAdditional async operations completed';
+      } catch (error) {
+        this.lastResult = `Error in async confirmation: ${error.message}`;
+      }
     }
   }
 }

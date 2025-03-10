@@ -322,6 +322,21 @@ export const asyncRouterMap = [
             }
           }
         ]
+      },
+      {
+        path: '/test',
+        name: 'test',
+        component: RouteView,
+        redirect: '/test/confirm-dialog',
+        meta: { title: '测试', icon: 'experiment', permission: ['setting'] },
+        children: [
+          {
+            path: '/test/confirm-dialog',
+            name: 'TestConfirmDialog',
+            component: () => import('@/views/TestConfirmDialog'),
+            meta: { title: 'Confirm Dialog Test', keepAlive: true, permission: ['setting'] }
+          }
+        ]
       }
     ]
   },
