@@ -1,21 +1,38 @@
 <template>
   <!--  <page-header-wrapper>-->
   <a-card :bordered="false" :bodyStyle="{ padding: '16px 16px', height: '100%' }" :style="{ height: '100%' }">
-    <a-spin v-if='showExporting' tip="导出中...">
+    <div v-if='showExporting'>
       <a-alert
-        message="导出设备"
-        description="导出选中的设备"
-      ></a-alert>
-      <div> {{ lastExportedDeviceId }} </div>
-    </a-spin>
-    <a-progress
-      v-if="showExporting"
-      :style="{ width: '98%' }"
-      :percent="exportProgress"
-      status="active"
-      :show-info="true"
-      :format="percent => `${percent.toFixed(2)}%`"
-    />
+        :message="exportError ? '导出失败' : '导出设备'"
+        :description="exportError ? `导出过程中发生错误: ${exportError}` : '导出选中的设备'"
+        :type="exportError ? 'error' : 'info'"
+        show-icon
+      >
+      </a-alert>
+
+      <!-- 添加独立的错误提示和恢复按钮 -->
+      <div v-if="exportError" class="export-error-actions">
+        <a-button type="primary" @click="resumeExporting">
+          恢复导出
+        </a-button>
+      </div>
+
+      <div v-if="lastExportedDeviceId" class="export-status">
+        <span>最后导出设备ID: {{ lastExportedDeviceId }}</span>
+        <span v-if="exportedCount && totalExportCount">
+          (已导出 {{ exportedCount }}/{{ totalExportCount }} 条记录)
+        </span>
+      </div>
+
+      <a-progress
+        v-if="showExporting"
+        :style="{ width: '98%' }"
+        :percent="exportProgress"
+        status="active"
+        :show-info="true"
+        :format="percent => `${percent.toFixed(2)}%`"
+      />
+    </div>
     <div class="table-page-search-wrapper">
       <a-tabs
         v-model="activeTab"
@@ -813,6 +830,9 @@ export default {
       isSyncingFromRoute: false,
       lastExportedDeviceId: null,
       csvContent: null,
+      exportError: null,
+      exportedCount: null,
+      totalExportCount: null,
     }
   },
   filters: {
@@ -913,6 +933,7 @@ export default {
       console.log('handleExport')
       this.showExporting = true
       this.exportProgress = 0
+      this.exportError = null
 
       // Check if there's a previous failed export
       const lastExportState = localStorage.getItem('deviceExportState')
@@ -929,6 +950,8 @@ export default {
             this.showExporting = true
             const totalCount = exportState.totalCount
             const exportedCount = exportState.exportedCount
+            this.exportedCount = exportedCount
+            this.totalExportCount = totalCount
 
             if (lastDeviceId && totalCount > 0) {
               // Ask user if they want to resume the export using the extracted method
@@ -943,17 +966,23 @@ export default {
 
       try {
         await this.processExport(resumeExport, lastDeviceId)
+        // 导出成功后清除错误状态
+        this.exportError = null
       } catch (err) {
         console.error('Export error:', err)
-        this.$message.error('导出失败: ' + err.message)
-        this.$message.info('您可以稍后点击导出按钮继续未完成的导出')
+        // 设置错误状态
+        this.exportError = err.message
+        console.log('设置exportError:', this.exportError) // 添加日志
+        this.$message.info('您可以点击"恢复导出"按钮继续未完成的导出')
       } finally {
         setTimeout(() => {
+          // 不再自动隐藏导出状态，让用户可以看到错误信息和恢复按钮
           // this.showExporting = false
           // this.exportProgress = 0
           console.log('deviceExportState', localStorage.getItem('deviceExportState'))
           console.log('deviceExportCount', localStorage.getItem('deviceExportCount'))
           console.log('deviceExportHeaders', localStorage.getItem('deviceExportHeaders'))
+          console.log('exportError状态:', this.exportError) // 添加日志
         }, 2000)
       }
     },
@@ -1169,9 +1198,6 @@ export default {
             this.polyline.markers = []
             this.center = [res.data[0].mars_longitude, res.data[0].mars_latitude]
             res.data.forEach((item, index) => {
-              // console.log('mars_lng', item.mars_longitude)
-              // console.log('mars_lat', item.mars_latitude)
-              // console.log('push', [item.mars_longitude, item.mars_latitude])
               this.polyline.path.push([item.mars_longitude, item.mars_latitude])
               this.polyline.markers.push([item.mars_longitude, item.mars_latitude])
             })
@@ -1495,6 +1521,7 @@ export default {
       const countData = await countResponse.json()
       console.log('countData', countData)
       const totalCount = countData.data.total || 0
+      this.totalExportCount = totalCount
 
       if (totalCount === 0) {
         this.$message.info('没有符合条件的设备可导出')
@@ -1512,6 +1539,7 @@ export default {
       if (resumeExport && lastDeviceId) {
         // arg.after_device_id = lastDeviceId
         exportedCount = parseInt(localStorage.getItem('deviceExportCount') || '0')
+        this.exportedCount = exportedCount
 
         // Get the headers from storage
         csvHeaders = localStorage.getItem('deviceExportHeaders') || ''
@@ -1523,14 +1551,14 @@ export default {
       }
 
       // Update progress display
-      this.$message.info(`开始导出 ${totalCount} 条记录，分 ${totalSlices} 批处理`)
+      // this.$message.info(`开始导出 ${totalCount} 条记录，分 ${totalSlices} 批处理`)
 
       // Process each slice
       while (currentSlice <= totalSlices) {
         const sliceArg = { ...arg, page_size: SLICE_SIZE, page_no: currentSlice }
         const sliceParams = new URLSearchParams(sliceArg)
 
-        this.$message.info(`正在处理第 ${currentSlice}/${totalSlices} 批`)
+        // this.$message.info(`正在处理第 ${currentSlice}/${totalSlices} 批`)
 
         const sliceResponse = await fetchWithTimeout(`${api.device_export}?${sliceParams}`, {
           method: 'GET',
@@ -1573,6 +1601,7 @@ export default {
         // Count rows in this slice
         const rowsInSlice = (sliceText.match(/\n/g) || []).length - 1 // Subtract 1 for header
         exportedCount += rowsInSlice
+        this.exportedCount = exportedCount
 
         // Update progress
         this.exportProgress = Math.min((exportedCount / totalCount) * 100, 99.9)
@@ -1635,6 +1664,15 @@ export default {
 
       this.$message.success(`成功导出 ${exportedCount} 条记录`)
       this.exportProgress = 100
+      
+      // 导出完成后，隐藏导出状态
+      setTimeout(() => {
+        this.showExporting = false
+        this.exportProgress = 0
+        this.exportedCount = null
+        this.totalExportCount = null
+        this.lastExportedDeviceId = null
+      }, 3000)
     },
     syncFormFromRouteQuery() {
       this.isSyncingFromRoute = true
@@ -1661,6 +1699,9 @@ export default {
       this.$router.replace({ query }).catch(err => {
         if (err.name !== 'NavigationDuplicated') throw err
       })
+    },
+    resumeExporting() {
+      this.handleExport()
     }
   },
   watch: {
@@ -1865,6 +1906,34 @@ export default {
 
 .ant-form-item-label {
   font-weight: 500;
+}
+
+.export-status {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #f8f8f8;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #666;
+  word-break: break-all;
+}
+
+.export-status span {
+  margin-right: 10px;
+}
+
+.export-error-actions {
+  margin: 10px 0;
+  padding: 8px 12px;
+  background-color: #fff1f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.export-error-actions .ant-btn {
+  margin-left: 10px;
 }
 </style>
 
