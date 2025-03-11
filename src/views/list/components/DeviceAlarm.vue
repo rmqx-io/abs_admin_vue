@@ -264,13 +264,19 @@ export default {
       //   return type
       // }
     },
-    alarm_name (alarm) {
+    alarm_name(alarm) {
+      console.log('alarm', alarm)
+      // convert alarm to binary string
+      const binaryString = alarm.toString(2).padStart(64, '0')
+      console.log('binaryString', binaryString)
       let alarmName = ''
       for (let i = 0; i < 64; i++) {
         if (this.alarm_types[i] === undefined) {
           break
         }
-        if (alarm & (1 << i)) {
+        // console.log('binaryString[', 63 - i, ']', binaryString[63 - i])
+        if (binaryString[63 - i] === '1') {
+          console.log('alarm', alarm, i, this.alarm_types[i])
           alarmName += this.alarm_types[i] + ','
         }
       }
