@@ -37,6 +37,7 @@ export const api = {
   app_user_device_unbind: `${prefix}/app_user/device/unbind`,
   device_export: `${prefix}/device/export`,
   device_alarm: `${prefix}/device/alarm`,
+  device_alarm_postgres: `${prefix}/device/alarm/postgres`,
   bms_alarm_count: `${prefix}/device/alarm/bms/count`,
   device_alarm_types: `${prefix}/device/alarm/type`,
   add_device: `${prefix}/device/add`,
@@ -147,6 +148,14 @@ export function getExportDeviceList (parameters) {
 export function getDeviceAlarm (arg) {
   return request({
     url: api.device_alarm,
+    method: 'post',
+    data: arg
+  })
+}
+
+export function getDeviceAlarmPostgres (arg) {
+  return request({
+    url: api.device_alarm_postgres,
     method: 'post',
     data: arg
   })

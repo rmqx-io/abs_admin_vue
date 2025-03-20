@@ -116,7 +116,11 @@
 <script>
 import moment from 'moment/moment'
 import { STable } from '@/components'
-import { getDeviceAlarm, getDeviceAlarmTypes } from '@/api/manage'
+import {
+  getDeviceAlarm,
+  getDeviceAlarmTypes,
+  getDeviceAlarmPostgres
+} from '@/api/manage'
 import BatteryInfo from '@/views/list/components/BatteryInfo'
 
 export default {
@@ -240,7 +244,7 @@ export default {
           })
         })
       }
-      return getDeviceAlarm(arg)
+      return getDeviceAlarmPostgres(arg)
         .then(res => {
           this.loading = false
           console.log('device alarm', res)
