@@ -271,7 +271,18 @@ export default {
     alarm_name(alarm) {
       console.log('alarm', alarm)
       // convert alarm to binary string
-      const binaryString = alarm.toString(2).padStart(64, '0')
+      // is alarm a number
+      let binaryString = ''
+      if (typeof alarm === 'number') {
+        console.log('alarm is a number')
+        binaryString = alarm.toString(2).padStart(64, '0')
+      } else if (typeof alarm === 'string') {
+        console.log('alarm is a string')
+        binaryString = alarm
+      } else {
+        console.log('alarm is not a number or string')
+        binaryString = '0'
+      }
       console.log('binaryString', binaryString)
       let alarmName = ''
       for (let i = 0; i < 64; i++) {
