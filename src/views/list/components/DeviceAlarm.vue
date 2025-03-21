@@ -94,7 +94,7 @@
       </span>
       <span slot='timestamp' slot-scope="text, record">
         <template>
-          <span>{{ record.timestamp }}</span>
+          <span>{{ localTime(record.timestamp) }}</span>
         </template>
       </span>
       <span slot='operation' slot-scope="text, record">
