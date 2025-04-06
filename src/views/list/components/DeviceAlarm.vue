@@ -1,116 +1,118 @@
 <template>
-  <div>
-    <a-form>
-      <div v-if='!showMoreParam' style='margin-bottom: 10px'>
-        <a-row :gutter='48'>
-          <a-col :md='8' :sm='24'>
-            <a class="ant-dropdown-link" @click='showMoreParam = true'>更多参数<a-icon type="down"/></a>
-          </a-col>
-        </a-row>
-      </div>
-      <div v-if='showMoreParam'>
-        <a-row :gutter='48'>
-          <a-col :md='8' :sm='8'>
-            <a class="ant-dropdown-link" @click='showMoreParam = false'>收起参数<a-icon type="up"/></a>
-          </a-col>
-        </a-row>
-        <a-row>
-          <a-col :md="4" :sm="24" v-if='false'>
-            <a-form-item label="来源类型">
-              <a-select v-model='bms_type'>
-                <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">808</a-select-option>
-                <a-select-option value="227">弗铭</a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :md='4' :sm='24'>
-            <a-form-item label="告警">
-              <div><span>{{ selectedItems.join(", ") }}</span></div>
-              <a-dropdown @visible-change="onVisibleChange">
-                <a-button>
-                  {{ selectedItems.length ? "选择了 " + selectedItems.length + " 种" : "所有告警" }}
-                  <a-icon type="down" />
-                </a-button>
-                <a-menu slot="overlay">
-                  <a-checkbox-group v-model="selectedItems">
-                    <a-menu-item v-for="(item, index) in alarm_types" :key="index">
-                      <a-checkbox :value="item">{{ item }}</a-checkbox>
-                    </a-menu-item>
-                  </a-checkbox-group>
-                  <a-menu-divider />
-                  <a-button type="primary" size="small" @click="saveSelectedItems">
-                    确定
+  <a-locale-provider :locale="locale">
+    <div>
+      <a-form>
+        <div v-if='!showMoreParam' style='margin-bottom: 10px'>
+          <a-row :gutter='48'>
+            <a-col :md='8' :sm='24'>
+              <a class="ant-dropdown-link" @click='showMoreParam = true'>更多参数<a-icon type="down"/></a>
+            </a-col>
+          </a-row>
+        </div>
+        <div v-if='showMoreParam'>
+          <a-row :gutter='48'>
+            <a-col :md='8' :sm='8'>
+              <a class="ant-dropdown-link" @click='showMoreParam = false'>收起参数<a-icon type="up"/></a>
+            </a-col>
+          </a-row>
+          <a-row>
+            <a-col :md="4" :sm="24" v-if='false'>
+              <a-form-item label="来源类型">
+                <a-select v-model='bms_type'>
+                  <a-select-option value="0">全部</a-select-option>
+                  <a-select-option value="1">808</a-select-option>
+                  <a-select-option value="227">弗铭</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :md='4' :sm='24'>
+              <a-form-item label="告警">
+                <div><span>{{ selectedItems.join(", ") }}</span></div>
+                <a-dropdown @visible-change="onVisibleChange">
+                  <a-button>
+                    {{ selectedItems.length ? "选择了 " + selectedItems.length + " 种" : "所有告警" }}
+                    <a-icon type="down" />
                   </a-button>
-                  <a-button type="cancel" size="small" @click="cancelSelectedItems">
-                    清除
-                  </a-button>
-                </a-menu>
-              </a-dropdown>
-            </a-form-item>
-          </a-col>
-          <a-col :md="8" :sm="12">
-            <a-form-item label='开始时间'>
-              <a-date-picker v-model="queryData.start_date" show-time format="YYYY-MM-DD HH:mm:ss" placeholder="起始时间"/>
-            </a-form-item>
-          </a-col>
-          <a-col :md="8" :sm="12">
-            <a-form-item label='结束时间'>
-              <a-date-picker v-model="queryData.end_date" show-time format="YYYY-MM-DD HH:mm:ss" placeholder="结束时间"/>
-            </a-form-item>
+                  <a-menu slot="overlay">
+                    <a-checkbox-group v-model="selectedItems">
+                      <a-menu-item v-for="(item, index) in alarm_types" :key="index">
+                        <a-checkbox :value="item">{{ item }}</a-checkbox>
+                      </a-menu-item>
+                    </a-checkbox-group>
+                    <a-menu-divider />
+                    <a-button type="primary" size="small" @click="saveSelectedItems">
+                      确定
+                    </a-button>
+                    <a-button type="cancel" size="small" @click="cancelSelectedItems">
+                      清除
+                    </a-button>
+                  </a-menu>
+                </a-dropdown>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="12">
+              <a-form-item label='开始时间'>
+                <a-date-picker v-model="queryData.start_date" show-time format="YYYY-MM-DD HH:mm:ss" placeholder="起始时间"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="12">
+              <a-form-item label='结束时间'>
+                <a-date-picker v-model="queryData.end_date" show-time format="YYYY-MM-DD HH:mm:ss" placeholder="结束时间"/>
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </div>
+        <a-row :gutter='48'>
+          <a-col :md="8" :sm="24">
+            <a-button type="primary" @click="$refs.alarmtable.refresh(true)">查询</a-button>
           </a-col>
         </a-row>
-      </div>
-      <a-row :gutter='48'>
-        <a-col :md="8" :sm="24">
-          <a-button type="primary" @click="$refs.alarmtable.refresh(true)">查询</a-button>
-        </a-col>
-      </a-row>
-    </a-form>
-    <s-table
-      v-if="table_visible"
-      ref="alarmtable"
-      :columns="columns"
-      :data='loadData'
-      showPagination="auto"
-      :loading="loading"
-      rowKey="id"
-      @change="handleTableChange"
-    >
-      <span slot="device_type" slot-scope="text, record">
-        <template>
-          <span>{{ device_type_name(record.device_type) }}</span>
-        </template>
-      </span>
-      <span slot="alarm" slot-scope="text, record">
-        <template>
-          <span>{{ alarm_name(record.alarm) }}</span>
-        </template>
-      </span>
-      <span slot="organization_id" slot-scope="text, record">
-        <template>
-          <span>{{ record.organization_id }}</span>
-        </template>
-      </span>
-      <span slot='timestamp' slot-scope="text, record">
-        <template>
-          <span>{{ localTime(record.timestamp) }}</span>
-        </template>
-      </span>
-      <span slot='operation' slot-scope="text, record">
-        <a @click="handleBatteryInfo(record)">电池详情</a>
-      </span>
-    </s-table>
+      </a-form>
+      <s-table
+        v-if="table_visible"
+        ref="alarmtable"
+        :columns="columns"
+        :data='loadData'
+        showPagination="auto"
+        :loading="loading"
+        rowKey="id"
+        @change="handleTableChange"
+      >
+        <span slot="device_type" slot-scope="text, record">
+          <template>
+            <span>{{ device_type_name(record.device_type) }}</span>
+          </template>
+        </span>
+        <span slot="alarm" slot-scope="text, record">
+          <template>
+            <span>{{ alarm_name(record.alarm) }}</span>
+          </template>
+        </span>
+        <span slot="organization_id" slot-scope="text, record">
+          <template>
+            <span>{{ record.organization_id }}</span>
+          </template>
+        </span>
+        <span slot='timestamp' slot-scope="text, record">
+          <template>
+            <span>{{ localTime(record.timestamp) }}</span>
+          </template>
+        </span>
+        <span slot='operation' slot-scope="text, record">
+          <a @click="handleBatteryInfo(record)">电池详情</a>
+        </span>
+      </s-table>
 
-    <battery-info
-      v-if="battery_detail_visible"
-      ref="batteryInfo"
-      :device-id="device_id"
-      :bms-bt="bms_bt"
-      @cancel="handleBatteryInfoCancel"
-      @ok="handleBatteryInfoOk"
-    />
-  </div>
+      <battery-info
+        v-if="battery_detail_visible"
+        ref="batteryInfo"
+        :device-id="device_id"
+        :bms-bt="bms_bt"
+        @cancel="handleBatteryInfoCancel"
+        @ok="handleBatteryInfoOk"
+      />
+    </div>
+  </a-locale-provider>
 </template>
 
 <script>
@@ -118,11 +120,11 @@ import moment from 'moment/moment'
 import 'moment/locale/zh-cn';
 import { STable } from '@/components'
 import {
-  getDeviceAlarm,
   getDeviceAlarmTypes,
   getDeviceAlarmPostgres
 } from '@/api/manage'
 import BatteryInfo from '@/views/list/components/BatteryInfo'
+import zhCN from 'ant-design-vue/lib/locale-provider/zh_CN'
 
 moment.locale('zh-cn');
 
@@ -148,6 +150,7 @@ export default {
   },
   data () {
     return {
+      locale: zhCN,
       table_visible: true,
       battery_detail_visible: false,
       device_id: null,
@@ -219,7 +222,7 @@ export default {
       console.log('parameter', parameter)
       console.log('queryData', this.queryData)
       console.log('start_date', this.queryData.start_date)
-      let arg = Object.assign(parameter, this.queryData)
+      const arg = Object.assign(parameter, this.queryData)
       arg.page_no = arg.pageNo
       arg.page_size = arg.pageSize
       delete arg.pageNo
