@@ -10,8 +10,10 @@
 import { domTitle, setDocumentTitle } from '@/utils/domUtil'
 import { i18nRender } from '@/locales'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
-import moment from 'moment'
+import moment from 'moment/moment'
 import 'moment/locale/zh-cn'
+
+moment.locale('zh-cn');
 
 export default {
   data () {
