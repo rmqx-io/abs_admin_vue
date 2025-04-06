@@ -115,6 +115,7 @@
 
 <script>
 import moment from 'moment/moment'
+import 'moment/locale/zh-cn';
 import { STable } from '@/components'
 import {
   getDeviceAlarm,
@@ -122,6 +123,8 @@ import {
   getDeviceAlarmPostgres
 } from '@/api/manage'
 import BatteryInfo from '@/views/list/components/BatteryInfo'
+
+moment.locale('zh-cn');
 
 export default {
   name: 'DeviceAlarm',
@@ -358,6 +361,25 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+/* Using alternative deep selector syntax for Ant Design components */
+.ant-calendar-ok-btn {
+  background-color: #1890ff !important;
+  border-color: #1890ff !important;
+  color: #fff !important;
+  border-radius: 4px !important;
+  font-weight: 500 !important;
+}
 
+.ant-calendar-ok-btn:hover,
+.ant-calendar-ok-btn:focus {
+  background-color: #40a9ff !important;
+  border-color: #40a9ff !important;
+  color: #fff !important;
+}
+
+.ant-calendar-ok-btn:active {
+  background-color: #096dd9 !important;
+  border-color: #096dd9 !important;
+}
 </style>
