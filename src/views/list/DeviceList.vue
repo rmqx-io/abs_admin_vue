@@ -1241,7 +1241,7 @@ export default {
               newMarkers.push([lon, lat]);
             });
             
-            // Set the polyline data
+            // Set the polyline data 
             this.polyline = {
               path: newPath,
               markers: newMarkers
@@ -1249,16 +1249,11 @@ export default {
             
             console.log('Path data prepared:', this.polyline.path);
             
-            // If map is already created, create polyline immediately
-            if (this.$refs.map) {
-              this.createPolyline();
-            } else {
-              // Otherwise, force map refresh
-              this.refresh_map = false;
-              this.$nextTick(() => {
-                this.refresh_map = true;
-              });
-            }
+            // Force map refresh to re-render components
+            this.refresh_map = false;
+            this.$nextTick(() => {
+              this.refresh_map = true;
+            });
           } catch (error) {
             console.error('Error processing location data:', error);
             this.$message.error('Error processing location data');
@@ -1379,82 +1374,6 @@ export default {
       console.log('Map loaded and ready');
       this.map_loading = false;
     },
-    
-    createPolyline() {
-      try {
-        // Get the map instance from ref
-        const mapRef = this.$refs.map;
-        if (!mapRef) {
-          console.error('Map reference not available');
-          return;
-        }
-        
-        // Get AMap instance - try different methods based on the component API
-        let mapInstance;
-        if (typeof mapRef.$$getInstance === 'function') {
-          mapInstance = mapRef.$$getInstance();
-        } else if (typeof mapRef.getMap === 'function') {
-          mapInstance = mapRef.getMap();
-        } else if (mapRef.$amap) {
-          mapInstance = mapRef.$amap;
-        } else {
-          console.error('Cannot access map instance through any known method');
-          return;
-        }
-        
-        if (!mapInstance) {
-          console.error('Map instance not available');
-          return;
-        }
-        
-        // Clear any existing overlays
-        mapInstance.clearMap();
-        
-        if (!this.polyline.path || this.polyline.path.length === 0) {
-          console.log('No polyline path data');
-          return;
-        }
-        
-        // Check if AMap global object is available
-        if (typeof AMap === 'undefined') {
-          console.error('AMap is not defined');
-          return;
-        }
-        
-        // Create AMap polyline directly using the AMap API
-        const polyline = new AMap.Polyline({
-          path: this.polyline.path,
-          strokeColor: '#3366FF',
-          strokeOpacity: 1,
-          strokeWeight: 6,
-          strokeStyle: 'solid',
-          lineJoin: 'round'
-        });
-        
-        // Add the polyline to the map
-        polyline.setMap(mapInstance);
-        
-        // Create markers for each point
-        this.polyline.markers.forEach((position, index) => {
-          const marker = new AMap.CircleMarker({
-            center: position,
-            radius: 5,
-            strokeColor: '#FF33FF',
-            strokeOpacity: 1,
-            strokeWeight: 2,
-            fillColor: '#FF99FF',
-            fillOpacity: 0.8,
-            zIndex: 10
-          });
-          marker.setMap(mapInstance);
-        });
-        
-        console.log('Polyline created successfully');
-      } catch (error) {
-        console.error('Error creating polyline:', error);
-      }
-    },
-    
     onMapChange() {
       console.log('map change', this.showMap);
       this.table_visible = !this.showMap;
@@ -1465,11 +1384,9 @@ export default {
         }
       }
     },
-    
     onAlarmChange() {
       console.log('alarm change', this.showAlarm);
     },
-    
     onDeviceStatusChange() {
       console.log('device status change', this.deviceStatus);
       this.refreshTable(true);
