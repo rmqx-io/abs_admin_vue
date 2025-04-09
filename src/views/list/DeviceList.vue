@@ -340,7 +340,7 @@
       />
 
       <div
-        v-if="map_visible"
+        v-if="map_visible && !table_visible"
         style="width: 100%"
       >
         <div><a @click="handleMapClose()"><< 返回</a></div>
