@@ -387,22 +387,34 @@
           </a-form>
         </a-spin>
         <amap
+          v-if="refresh_map"
+          ref="map"
           :zoom="zoom"
           :center="center"
           style='height: 70vh'
+          @complete="onMapComplete"
         >
-          <amap-polyline
+          <amap-polyline 
+            v-if="polyline.path && polyline.path.length > 0"
             :path="polyline.path"
+            stroke-color="#3366FF"
+            :stroke-opacity="1"
+            :stroke-weight="6"
+            stroke-style="solid"
             :line-join="'round'"
-          >
-          </amap-polyline>
+          />
           <amap-circle-marker
-            v-for="(marker,i) in polyline.markers"
+            v-for="(marker, index) in polyline.markers"
+            :key="index"
             :center="marker"
-            :key="i"
             :radius="5"
-          >
-          </amap-circle-marker>
+            stroke-color="#FF33FF"
+            :stroke-opacity="1"
+            :stroke-weight="2"
+            fill-color="#FF99FF"
+            :fill-opacity="0.8"
+            :z-index="10"
+          />
         </amap>
       </div>
     </div>
@@ -445,11 +457,9 @@
       </div>
       <!-- TODO: use device map component -->
       <amap
+        :zoom="zoom"
         :center="center2"
-        :zoom="4"
-        cache-key="marker-cluster-map"
-        async
-        v-if="refresh_map"
+        style='height: 70vh'
       >
         <!--        <template>-->
         <!--          <amap-marker-->
@@ -1184,39 +1194,81 @@ export default {
       this.send_command_form_visible = true
     },
     refreshMap(deviceId) {
-      this.polyline.path = []
-      this.polyline.markers = []
-
-      this.map_loading = true
-      const arg = Object.assign({}, this.queryData)
-      console.log('loadData request arg:', arg)
-      return getLocation(deviceId, arg)
+      // Reset polyline data
+      this.polyline = {
+        path: [],
+        markers: []
+      };
+      
+      this.map_loading = true;
+      const arg = Object.assign({}, this.queryData);
+      console.log('loadData request arg:', arg);
+      
+      getLocation(deviceId, arg)
         .then(res => {
-          this.map_loading = false
-          if (res.data.length > 0) {
-            this.polyline.path = []
-            this.polyline.markers = []
-            this.center = [res.data[0].mars_longitude, res.data[0].mars_latitude]
-            res.data.forEach((item, index) => {
-              this.polyline.path.push([item.mars_longitude, item.mars_latitude])
-              this.polyline.markers.push([item.mars_longitude, item.mars_latitude])
-            })
-            console.log('path', this.polyline.path)
-            this.refresh_map = false
-            this.$nextTick(() => {
-                this.refresh_map = true
-              }
-            )
+          this.map_loading = false;
+          
+          // Check if we have valid data
+          if (!res.data || res.data.length === 0) {
+            this.$message.info('No location data available for this device');
+            return;
           }
-        }).catch(err => {
-          console.log('get location data failed', err)
-          this.map_loading = false
-          this.refresh_map = false
-          this.$nextTick(() => {
-              this.refresh_map = true
+          
+          try {
+            // Filter for valid coordinates
+            const validLocations = res.data.filter(item => 
+              item.mars_longitude && item.mars_latitude && 
+              !isNaN(item.mars_longitude) && !isNaN(item.mars_latitude) &&
+              item.mars_longitude !== 0 && item.mars_latitude !== 0
+            );
+            
+            if (validLocations.length === 0) {
+              this.$message.info('No valid location data available for this device');
+              return;
             }
-          )
+            
+            // Set center point for the map
+            this.center = [validLocations[0].mars_longitude, validLocations[0].mars_latitude];
+            
+            // Process coordinates
+            const newPath = [];
+            const newMarkers = [];
+            
+            validLocations.forEach(item => {
+              const lon = parseFloat(item.mars_longitude);
+              const lat = parseFloat(item.mars_latitude);
+              newPath.push([lon, lat]);
+              newMarkers.push([lon, lat]);
+            });
+            
+            // Set the polyline data
+            this.polyline = {
+              path: newPath,
+              markers: newMarkers
+            };
+            
+            console.log('Path data prepared:', this.polyline.path);
+            
+            // If map is already created, create polyline immediately
+            if (this.$refs.map) {
+              this.createPolyline();
+            } else {
+              // Otherwise, force map refresh
+              this.refresh_map = false;
+              this.$nextTick(() => {
+                this.refresh_map = true;
+              });
+            }
+          } catch (error) {
+            console.error('Error processing location data:', error);
+            this.$message.error('Error processing location data');
+          }
         })
+        .catch(err => {
+          console.log('get location data failed', err);
+          this.map_loading = false;
+          this.$message.error('Failed to load location data: ' + (err.message || 'Unknown error'));
+        });
     },
     filterTreeNode(input, option) {
       return (
@@ -1323,22 +1375,104 @@ export default {
           this.statusCount = res.data
         })
     },
+    onMapComplete() {
+      console.log('Map loaded and ready');
+      this.map_loading = false;
+    },
+    
+    createPolyline() {
+      try {
+        // Get the map instance from ref
+        const mapRef = this.$refs.map;
+        if (!mapRef) {
+          console.error('Map reference not available');
+          return;
+        }
+        
+        // Get AMap instance - try different methods based on the component API
+        let mapInstance;
+        if (typeof mapRef.$$getInstance === 'function') {
+          mapInstance = mapRef.$$getInstance();
+        } else if (typeof mapRef.getMap === 'function') {
+          mapInstance = mapRef.getMap();
+        } else if (mapRef.$amap) {
+          mapInstance = mapRef.$amap;
+        } else {
+          console.error('Cannot access map instance through any known method');
+          return;
+        }
+        
+        if (!mapInstance) {
+          console.error('Map instance not available');
+          return;
+        }
+        
+        // Clear any existing overlays
+        mapInstance.clearMap();
+        
+        if (!this.polyline.path || this.polyline.path.length === 0) {
+          console.log('No polyline path data');
+          return;
+        }
+        
+        // Check if AMap global object is available
+        if (typeof AMap === 'undefined') {
+          console.error('AMap is not defined');
+          return;
+        }
+        
+        // Create AMap polyline directly using the AMap API
+        const polyline = new AMap.Polyline({
+          path: this.polyline.path,
+          strokeColor: '#3366FF',
+          strokeOpacity: 1,
+          strokeWeight: 6,
+          strokeStyle: 'solid',
+          lineJoin: 'round'
+        });
+        
+        // Add the polyline to the map
+        polyline.setMap(mapInstance);
+        
+        // Create markers for each point
+        this.polyline.markers.forEach((position, index) => {
+          const marker = new AMap.CircleMarker({
+            center: position,
+            radius: 5,
+            strokeColor: '#FF33FF',
+            strokeOpacity: 1,
+            strokeWeight: 2,
+            fillColor: '#FF99FF',
+            fillOpacity: 0.8,
+            zIndex: 10
+          });
+          marker.setMap(mapInstance);
+        });
+        
+        console.log('Polyline created successfully');
+      } catch (error) {
+        console.error('Error creating polyline:', error);
+      }
+    },
+    
     onMapChange() {
-      console.log('map change', this.showMap)
-      this.table_visible = !this.showMap
+      console.log('map change', this.showMap);
+      this.table_visible = !this.showMap;
       if (this.showMap) {
-        this.showMarkers = true
+        this.showMarkers = true;
         if (this.deviceMarkers.length === 0) {
-          this.refreshTable(true)
+          this.refreshTable(true);
         }
       }
     },
+    
     onAlarmChange() {
-      console.log('alarm change', this.showAlarm)
+      console.log('alarm change', this.showAlarm);
     },
+    
     onDeviceStatusChange() {
-      console.log('device status change', this.deviceStatus)
-      this.refreshTable(true)
+      console.log('device status change', this.deviceStatus);
+      this.refreshTable(true);
     },
     onTabChange(tab) {
       console.log('tab change', tab)
