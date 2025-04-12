@@ -85,7 +85,17 @@
           </span>
           <span slot='packet' slot-scope="text, record">
             <template>
-              {{ byteArrayToHexArray(record.packet).join(' ') }}
+              <div>{{ byteArrayToHexArray(record.packet).join(' ') }}</div>
+              <div v-if="record.packet_parse" style="margin-top: 8px;">
+                <a-collapse :bordered="false" class="packet-collapse">
+                  <a-collapse-panel key="1" header="解析结果">
+                    <pre style="max-height: 300px; overflow: auto;">{{ record.packet_parse }}</pre>
+                  </a-collapse-panel>
+                </a-collapse>
+              </div>
+              <div v-else style="margin-top: 4px; font-size: 12px; color: #999;">
+                点击查看解析结果
+              </div>
             </template>
           </span>
         </s-table>
@@ -155,7 +165,7 @@ export default {
     loadData (parameter) {
       console.log('packet log parameter', parameter)
       console.log('packet log queryData', this.queryData)
-      let arg = Object.assign(parameter, this.queryData)
+      const arg = Object.assign(parameter, this.queryData)
       arg.page_no = arg.pageNo
       arg.page_size = arg.pageSize
       if (this.cursor !== null) {
@@ -222,7 +232,7 @@ export default {
     },
     handlePreviousPage () {
       console.log('handlePreviousPage')
-      if (this.currentPage > 1)  {
+      if (this.currentPage > 1) {
         this.currentPage--
       }
     },
@@ -278,9 +288,11 @@ export default {
             // parse packet
             devicePacketParse(arg).then(res => {
               console.log('rowClick packet parse', res)
-              // show parse result in a popup view
+              // store parse result in the record
+              this.$set(record, 'packet_parse', res.data)
+              // still show parse result in a popup view
               this.packet_parse = res.data
-              this.packet_parse_visible = true
+              // this.packet_parse_visible = true
             }).catch(err => {
               console.log('rowClick packet parse err', err)
               this.$message.error(err)
@@ -300,6 +312,16 @@ export default {
 .vm {
   width: 100%;
   max-width: 100%;
+}
+.packet-collapse {
+  margin-bottom: 0;
+}
+.packet-collapse >>> .ant-collapse-header {
+  padding: 4px 16px !important;
+  font-size: 13px;
+}
+.packet-collapse >>> .ant-collapse-content-box {
+  padding: 8px !important;
 }
 .fullscreen-modal {
   width: 100%;
