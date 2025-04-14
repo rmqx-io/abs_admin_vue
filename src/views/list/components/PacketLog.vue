@@ -85,11 +85,11 @@
           </span>
           <span slot='packet' slot-scope="text, record">
             <template>
-              <div>{{ byteArrayToHexArray(record.packet).join(' ') }}</div>
+              <div class="packet-content">{{ byteArrayToHexArray(record.packet).join(' ') }}</div>
               <div v-if="record.packet_parse" style="margin-top: 8px;">
                 <a-collapse :bordered="false" class="packet-collapse">
                   <a-collapse-panel key="1" header="解析结果">
-                    <pre style="max-height: 300px; overflow: auto;">{{ record.packet_parse }}</pre>
+                    <div class="packet-parse-content">{{ record.packet_parse }}</div>
                   </a-collapse-panel>
                 </a-collapse>
               </div>
@@ -313,6 +313,18 @@ export default {
   width: 100%;
   max-width: 100%;
 }
+.packet-content {
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+.packet-parse-content {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-all;
+  max-height: 300px;
+  overflow: auto;
+}
 .packet-collapse {
   margin-bottom: 0;
 }
@@ -323,6 +335,13 @@ export default {
 .packet-collapse >>> .ant-collapse-content-box {
   padding: 8px !important;
 }
+
+/* 确保表格内容自动换行 */
+.s-table >>> .ant-table-tbody > tr > td {
+  white-space: normal;
+  word-break: break-word;
+}
+
 .fullscreen-modal {
   width: 100%;
   max-width: 100%;
