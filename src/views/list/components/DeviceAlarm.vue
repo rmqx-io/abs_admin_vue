@@ -121,6 +121,7 @@ import 'moment/locale/zh-cn';
 import { STable } from '@/components'
 import {
   getDeviceAlarmTypes,
+  getDeviceAlarm,
   getDeviceAlarmPostgres
 } from '@/api/manage'
 import BatteryInfo from '@/views/list/components/BatteryInfo'
@@ -250,7 +251,8 @@ export default {
           })
         })
       }
-      return getDeviceAlarmPostgres(arg)
+      // return getDeviceAlarmPostgres(arg)
+      return getDeviceAlarm(arg)
         .then(res => {
           this.loading = false
           console.log('device alarm', res)
