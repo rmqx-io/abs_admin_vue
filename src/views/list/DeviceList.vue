@@ -226,7 +226,7 @@
 
         <span slot='location_time' slot-scope='text, record'>
           <template>
-            {{ record.location_time ? record.location_time : '' }}
+            {{ record.location_time ? localTime(record.location_time) : '' }}
             <br />
             信号强度: <span>{{ record.signal }}</span>
             <br />
