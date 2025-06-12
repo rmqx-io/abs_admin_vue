@@ -194,7 +194,8 @@
 
         <span slot="bms_info" slot-scope="text, record">
           <template>
-            SOC: <span>{{ record.bms_type === 227 ? record.bms_soc : record.bms_soc / 50 }}</span>
+            <!-- SOC: <span>{{ record.bms_type === 227 ? record.bms_soc : record.bms_soc / 50 }}</span> -->
+             SOC: <span>{{ record.bms_type === 236 ? record.bms_soc / 50 : record.bms_soc }}</span>
             <br />
             SOH: <span>{{ record.bms_soh }}</span>
             <br />
