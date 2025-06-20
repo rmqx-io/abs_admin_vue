@@ -320,6 +320,17 @@ export const asyncRouterMap = [
               keepAlive: true,
               permission: ['setting']
             }
+          },
+          {
+            path: '/tools/alarm-config',
+            name: 'tools_alarm_config',
+            component: () => import('@/views/tools/AlarmConfig'),
+            meta: {
+              title: '告警配置',
+              hidden: false,
+              keepAlive: true,
+              permission: ['setting']
+            }
           }
         ]
       },

@@ -78,7 +78,10 @@ export const api = {
 
   permission: '/permission',
   permissionNoPager: '/permission/no-pager',
-  orgTree: '/org/tree'
+  orgTree: '/org/tree',
+
+  tools: `${prefix}/tools`,
+  tools_alarm_config: `${prefix}/tools/alarm_config`,
 }
 
 export function getUserList (parameter) {
