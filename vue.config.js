@@ -37,7 +37,8 @@ const assetsCDN = {
     // '//cdn.jsdelivr.net/npm/vue-router@3.1.3/dist/vue-router.min.js',
     '//lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/vue-router/3.1.3/vue-router.min.js',
     // '//cdn.jsdelivr.net/npm/vuex@3.1.1/dist/vuex.min.js',
-    '//lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/vuex/3.1.1/vuex.min.js',
+    // '//lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/vuex/3.1.1/vuex.min.js',
+    '//unpkg.com/vuex@3.1.1/dist/vuex.min.js',
     // '//cdn.jsdelivr.net/npm/axios@0.19.0/dist/axios.min.js'
     '//lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/axios/0.19.0/axios.min.js'
   ]
