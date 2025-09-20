@@ -71,6 +71,12 @@ export const asyncRouterMap = [
             name: 'Info',
             component: () => import('@/views/list/components/BatteryInfo'),
             meta: { title: '电池详情', keepAlive: true, permission: ['table'] }
+          },
+          {
+            path: '/list/smart-light',
+            name: 'SmartLightList',
+            component: () => import('@/views/smart_light/SmartLightList'),
+            meta: { title: '智能照明', keepAlive: true, permission: ['table'] }
           }
         ]
       },
