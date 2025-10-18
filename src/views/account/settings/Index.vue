@@ -20,6 +20,11 @@
                 {{ $t('account.settings.menuMap.security') }}
               </router-link>
             </a-menu-item>
+            <a-menu-item key="/profile/settings/change-password">
+              <router-link :to="{ name: 'ChangePassword' }">
+                修改密码
+              </router-link>
+            </a-menu-item>
             <a-menu-item key="/account/settings/custom">
               <router-link :to="{ name: 'CustomSettings' }">
                 {{ $t('account.settings.menuMap.custom') }}

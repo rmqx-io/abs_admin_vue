@@ -34,6 +34,12 @@ export const asyncRouterMap = [
             name: 'Dashboard',
             component: () => import('@/views/dashboard/Dashboard'),
             meta: { title: 'menu.dashboard.analysis', keepAlive: true, permission: ['dashboard'] }
+          },
+          {
+            path: '/dashboard/smart-light',
+            name: 'SmartLightDashboard',
+            component: () => import('@/views/dashboard/SmartLightDashboard'),
+            meta: { title: '智能照明看板', keepAlive: true, permission: ['dashboard'] }
           }
         ]
       },
@@ -77,6 +83,45 @@ export const asyncRouterMap = [
             name: 'SmartLightList',
             component: () => import('@/views/smart_light/SmartLightList'),
             meta: { title: '智能照明', keepAlive: true, permission: ['table'] }
+          },
+          {
+            path: '/list/installed-devices/:page_no([1-9]\\d*)?',
+            name: 'InstalledDeviceList',
+            hideChildrenInMenu: true,
+            component: () => import('@/views/device/InstalledDeviceList'),
+            meta: { title: '已安装设备', keepAlive: true, permission: ['table'] }
+          },
+          {
+            path: '/list/add-new-device',
+            name: 'AddNewDevice',
+            hideChildrenInMenu: true,
+            component: () => import('@/views/device/AddNewDevice'),
+            meta: { title: '新增设备', keepAlive: true, permission: ['table'] }
+          },
+          {
+            path: '/list/device-map',
+            name: 'DeviceMap',
+            hideChildrenInMenu: true,
+            component: () => import('@/views/map/SimpleMapView'),
+            meta: { title: '设备地图', keepAlive: true, permission: ['table'] }
+          },
+          {
+            path: '/list/repair-messages',
+            name: 'RepairMessageList',
+            component: () => import('@/views/repair/RepairMessageList'),
+            meta: { title: '报修消息', keepAlive: true, permission: ['table'] }
+          },
+          {
+            path: '/list/log-management',
+            name: 'LogManagement',
+            component: () => import('@/views/logs/LogManagement'),
+            meta: { title: '日志管理', keepAlive: true, permission: ['table'] }
+          },
+          {
+            path: '/list/system-config',
+            name: 'SystemConfig',
+            component: () => import('@/views/system/SystemConfig'),
+            meta: { title: '系统配置', keepAlive: true, permission: ['table'] }
           }
         ]
       },
@@ -127,6 +172,37 @@ export const asyncRouterMap = [
       },
 
       {
+        path: '/account',
+        name: 'account_management',
+        component: RouteView,
+        redirect: '/account/management',
+        meta: { title: '账号管理', icon: 'user', permission: ['admin'] },
+        children: [
+          {
+            path: '/account/management/:page_no([1-9]\\d*)?',
+            name: 'AccountManagement',
+            hideChildrenInMenu: true,
+            component: () => import('@/views/account/AccountManagement'),
+            meta: { title: '主账号管理', keepAlive: true, permission: ['admin'] }
+          },
+          {
+            path: '/account/enterprise/:id',
+            name: 'EnterpriseDetail',
+            hidden: true,
+            component: () => import('@/views/account/EnterpriseDetail'),
+            meta: { title: '企业账号详情', keepAlive: false, permission: ['admin'] }
+          },
+          {
+            path: '/account/personal/:id',
+            name: 'PersonalDetail',
+            hidden: true,
+            component: () => import('@/views/account/PersonalDetail'),
+            meta: { title: '个人账号详情', keepAlive: false, permission: ['admin'] }
+          }
+        ]
+      },
+
+      {
         path: '/model',
         name: 'model',
         component: RouteView,
@@ -146,39 +222,53 @@ export const asyncRouterMap = [
             hideChildrenInMenu: true,
             component: () => import('@/views/model/BatteryList'),
             meta: { title: 'menu.battery-model', keepAlive: true, permission: ['table'] }
+          },
+          {
+            path: '/model/smart-switch/:page_no([1-9]\\d*)?',
+            name: 'SmartSwitchList',
+            hideChildrenInMenu: true,
+            component: () => import('@/views/model/SmartSwitchList'),
+            meta: { title: '智能开关型号', keepAlive: true, permission: ['admin'] }
+          },
+          {
+            path: '/model/smart-light/:page_no([1-9]\\d*)?',
+            name: 'SmartLightModelList',
+            hideChildrenInMenu: true,
+            component: () => import('@/views/model/SmartLightList'),
+            meta: { title: '智能灯型号', keepAlive: true, permission: ['admin'] }
           }
         ]
       },
 
       {
-        path: '/account',
+        path: '/profile',
         component: RouteView,
-        redirect: '/account/settings',
-        name: 'account',
+        redirect: '/profile/settings',
+        name: 'profile',
         meta: { title: 'menu.account', icon: 'user', keepAlive: true, permission: ['user'] },
         children: [
           // {
-          //   path: '/account/center',
+          //   path: '/profile/center',
           //   name: 'center',
           //   component: () => import('@/views/account/center'),
           //   meta: { title: 'menu.account.center', keepAlive: true, permission: ['user'] }
           // },
           {
-            path: '/account/settings',
+            path: '/profile/settings',
             name: 'settings',
             component: () => import('@/views/account/settings/Index'),
             meta: { title: 'menu.account.settings', hideHeader: true, permission: ['user'] },
-            redirect: '/account/settings/basic',
+            redirect: '/profile/settings/basic',
             hideChildrenInMenu: true,
             children: [
               {
-                path: '/account/settings/basic',
+                path: '/profile/settings/basic',
                 name: 'BasicSettings',
                 component: () => import('@/views/account/settings/BasicSetting'),
                 meta: { title: 'account.settings.menuMap.basic', hidden: true, permission: ['user'] }
               },
               {
-                path: '/account/settings/security',
+                path: '/profile/settings/security',
                 name: 'SecuritySettings',
                 component: () => import('@/views/account/settings/Security'),
                 meta: {
@@ -189,19 +279,30 @@ export const asyncRouterMap = [
                 }
               },
               {
-                path: '/account/settings/custom',
+                path: '/profile/settings/change-password',
+                name: 'ChangePassword',
+                component: () => import('@/views/account/ChangePasswordSimple'),
+                meta: {
+                  title: '修改密码',
+                  hidden: true,
+                  keepAlive: false,
+                  permission: ['user']
+                }
+              },
+              {
+                path: '/profile/settings/custom',
                 name: 'CustomSettings',
                 component: () => import('@/views/account/settings/Custom'),
                 meta: { title: 'account.settings.menuMap.custom', hidden: true, keepAlive: true, permission: ['user'] }
               },
               {
-                path: '/account/settings/binding',
+                path: '/profile/settings/binding',
                 name: 'BindingSettings',
                 component: () => import('@/views/account/settings/Binding'),
                 meta: { title: 'account.settings.menuMap.binding', hidden: true, keepAlive: true, permission: ['user'] }
               },
               {
-                path: '/account/settings/notification',
+                path: '/profile/settings/notification',
                 name: 'NotificationSettings',
                 component: () => import('@/views/account/settings/Notification'),
                 meta: {

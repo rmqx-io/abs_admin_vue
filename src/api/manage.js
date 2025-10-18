@@ -597,6 +597,60 @@ export function sys_role_layer_top(arg) {
   })
 }
 
+// 增强的角色管理API
+export function getRolePermissions(roleId) {
+  return request({
+    url: `${prefix}/sys_role/${roleId}/permissions`,
+    method: 'get'
+  })
+}
+
+export function updateRolePermissions(roleId, permissions) {
+  return request({
+    url: `${prefix}/sys_role/${roleId}/permissions`,
+    method: 'put',
+    data: { permissions }
+  })
+}
+
+export function getPredefinedRoles() {
+  return request({
+    url: `${prefix}/sys_role/predefined`,
+    method: 'get'
+  })
+}
+
+export function validateRoleLevel(currentUserLevel, targetRoleLevel) {
+  return request({
+    url: `${prefix}/sys_role/validate_level`,
+    method: 'post',
+    data: { currentUserLevel, targetRoleLevel }
+  })
+}
+
+export function getRolesByUserLevel(userLevel) {
+  return request({
+    url: `${prefix}/sys_role/by_level/${userLevel}`,
+    method: 'get'
+  })
+}
+
+// 权限验证API
+export function checkUserPermission(permission) {
+  return request({
+    url: `${prefix}/permission/check`,
+    method: 'post',
+    data: { permission }
+  })
+}
+
+export function getUserRolePermissions() {
+  return request({
+    url: `${prefix}/user/role/permissions`,
+    method: 'get'
+  })
+}
+
 export function dictPage (arg) {
   return request({
     url: api.sys_dict_page,
