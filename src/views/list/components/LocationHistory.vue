@@ -3,7 +3,7 @@
     <div class="filter-container">
       <a-row :gutter="16">
         <a-col :span="8">
-          <a-form-item label="开始时间">
+          <a-form-item :label="$t('device.location.startTime')">
             <a-date-picker
               v-model="startDate"
               format="YYYY-MM-DD"
@@ -17,7 +17,7 @@
           </a-form-item>
         </a-col>
         <a-col :span="8">
-          <a-form-item label="结束时间">
+          <a-form-item :label="$t('device.location.endTime')">
             <a-date-picker
               v-model="endDate"
               format="YYYY-MM-DD"
@@ -31,7 +31,7 @@
           </a-form-item>
         </a-col>
         <a-col :span="4">
-          <a-button type="primary" @click="fetchLocationData">查询</a-button>
+          <a-button type="primary" @click="fetchLocationData">{{ $t('device.location.query') }}</a-button>
         </a-col>
       </a-row>
     </div>
@@ -79,18 +79,22 @@ export default {
         pageSize: 10,
         total: 0,
       },
-      columns: [
-        { title: '时间', dataIndex: 'location_time', scopedSlots: { customRender: 'time' } },
-        { title: '火星坐标', scopedSlots: { customRender: 'coordinates' } },
-        { title: 'GPS坐标', scopedSlots: { customRender: 'gpsCoordinates' } },
-        { title: '速度 (Km/h)', dataIndex: 'speed', scopedSlots: { customRender: 'speed' } },
-        { title: '里程 (Km)', dataIndex: 'mileage', scopedSlots: { customRender: 'mileage' } },
-        { title: '卫星数', dataIndex: 'rssi' }
-      ],
       startDate: defaultStart.format('YYYY-MM-DD HH:mm:ss'),
       startTime: defaultStart.format('YYYY-MM-DD HH:mm:ss'),
       endDate: defaultEnd.format('YYYY-MM-DD HH:mm:ss'),
       endTime: defaultEnd.format('YYYY-MM-DD HH:mm:ss'),
+    }
+  },
+  computed: {
+    columns() {
+      return [
+        { title: this.$t('device.location.table.time'), dataIndex: 'location_time', scopedSlots: { customRender: 'time' } },
+        { title: this.$t('device.location.table.marsCoordinates'), scopedSlots: { customRender: 'coordinates' } },
+        { title: this.$t('device.location.table.gpsCoordinates'), scopedSlots: { customRender: 'gpsCoordinates' } },
+        { title: this.$t('device.location.table.speed'), dataIndex: 'speed', scopedSlots: { customRender: 'speed' } },
+        { title: this.$t('device.location.table.mileage'), dataIndex: 'mileage', scopedSlots: { customRender: 'mileage' } },
+        { title: this.$t('device.location.table.satellites'), dataIndex: 'rssi' }
+      ]
     }
   },
   mounted() {
@@ -130,7 +134,7 @@ export default {
         this.pagination.total = response.totalCount || 0
       } catch (error) {
         console.error('Error fetching location history:', error)
-        this.$message.error('获取位置记录失败')
+        this.$message.error(this.$t('device.location.fetchError'))
       } finally {
         this.loading = false
       }

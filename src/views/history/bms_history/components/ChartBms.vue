@@ -19,13 +19,13 @@
       init(arr, title, color, name, unitTag, unit) {
         var series = []
         title.forEach((items, index) => {
-          //每一串电池定义一个类型 最多20
+          // 每一串电池定义一个类型 最多20
           series.push({
             name: items,
             type: 'line',
             smooth: true,
             symbol: 'none',
-            data: [], //最终是一个类型 如电池1，多个[时间，数值] 共20个
+            data: [], // 最终是一个类型 如电池1，多个[时间，数值] 共20个
             markPoint: {
               data: [
                 {
@@ -41,10 +41,10 @@
             },
           })
         })
-        //遍历 x时间点 items 每个时间点的电池数组
+        // 遍历 x时间点 items 每个时间点的电池数组
         arr.forEach((items, index) => {
           items.forEach((items2, index2) => {
-            //补充到相对于的编号index2
+            // 补充到相对于的编号index2
             series[index2].data.push([new Date(items2.date), items2.value])
           })
         })
@@ -53,8 +53,8 @@
       drawLineChart(series, color, name, unitTag, unit) {
         var that = this
         this.chartHis = echarts.init(this.$refs.chart_bms)
-        //配置
-        let option = {
+        // 配置
+        const option = {
           sampling: 'lttb',
           color: color,
           tooltip: {
@@ -63,16 +63,16 @@
               var htmlStr = ''
               for (var i = 0; i < params.length; i++) {
                 var param = params[i]
-                var xValue = getDateStr(param.value[0]) //x轴的名称
-                var yValue = param.value[1] //Y
-                var seriesName = param.seriesName //图例名称
-                var color = param.color //图例颜色
+                var xValue = getDateStr(param.value[0]) // x轴的名称
+                var yValue = param.value[1] // Y
+                var seriesName = param.seriesName // 图例名称
+                var color = param.color // 图例颜色
 
                 if (i === 0) {
-                  htmlStr += xValue + '<br/>' //x轴的名称
+                  htmlStr += xValue + '<br/>' // x轴的名称
                 }
                 htmlStr += '<div>'
-                //为了保证和原来的效果一样，这里自己实现了一个点的效果
+                // 为了保证和原来的效果一样，这里自己实现了一个点的效果
                 htmlStr +=
                   '<span style="margin-right:5px;display:inline-block;width:10px;height:10px;border-radius:5px;background-color:' +
                   color +
@@ -85,7 +85,7 @@
                 // } else {
                 //   console.log('#对比#', yValue, maxVol, mixVol)
                 // }
-                //圆点后面显示的文本
+                // 圆点后面显示的文本
                 htmlStr += seriesName + '：' + yValue + unit
                 // 文本颜色设置-(需要设置,请解注释下面一行)
                 htmlStr += '</span>'

@@ -211,7 +211,7 @@ export default {
         this.bms_loading = true
         // let arg = Object.assign(parameter, this.queryData)
         console.log('parameter', parameter)
-        let arg = this.queryData
+        const arg = this.queryData
         console.log('loadData request arg:', arg)
         return getBmsType(this.deviceId).then(res => {
           console.log('getBmsType', res)

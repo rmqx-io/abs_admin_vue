@@ -775,31 +775,31 @@ export default {
     },
     alarm_display (alarm) {
       if (alarm === true) {
-        return '异常'
+        return this.$t('device.alarm.abnormal')
       }
       if (alarm === false) {
-        return '正常'
+        return this.$t('device.alarm.normal')
       }
-      return '未读取'
+      return this.$t('device.alarm.unread')
     },
     set_alarms () {
       this.alarms = [
-        { key: '低容量报警', value: this.battery_alarm_low_power },
-        { key: 'MOS管超温报警', value: this.battery_alarm_mos_high_temperature },
-        { key: '充电过压报警', value: this.battery_alarm_charging_high_voltage },
-        { key: '放电欠压报警', value: this.battery_alarm_discharging_low_voltage },
-        { key: '电池超温报警', value: this.battery_alarm_high_temperature },
-        { key: '充电过流报警', value: this.battery_alarm_charging_high_current },
-        { key: '放电过流报警', value: this.battery_alarm_discharging_high_current },
-        { key: '电芯压差报警', value: this.battery_alarm_voltage_difference },
-        { key: '电池箱内超温报警', value: this.battery_alarm_box_high_temperature },
-        { key: '电池低温报警', value: this.battery_alarm_low_temperature },
-        { key: '单体过压报警', value: this.battery_alarm_single_cell_high_voltage },
-        { key: '单体欠压报警', value: this.battery_alarm_single_cell_low_voltage },
-        { key: '309_A保护', value: this.battery_alarm_309_a },
-        { key: '309_B保护', value: this.battery_alarm_309_b },
-        { key: '湿度报警', value: this.battery_alarm_humidity },
-        { key: '防拆报警', value: this.battery_alarm_disassemble }
+        { key: this.$t('dashboard.alarm.lowCapacity'), value: this.battery_alarm_low_power },
+        { key: this.$t('dashboard.alarm.mosOverheat'), value: this.battery_alarm_mos_high_temperature },
+        { key: this.$t('dashboard.alarm.chargeOvervoltage'), value: this.battery_alarm_charging_high_voltage },
+        { key: this.$t('dashboard.alarm.dischargeUndervoltage'), value: this.battery_alarm_discharging_low_voltage },
+        { key: this.$t('dashboard.alarm.batteryOverheat'), value: this.battery_alarm_high_temperature },
+        { key: this.$t('dashboard.alarm.chargeOvercurrent'), value: this.battery_alarm_charging_high_current },
+        { key: this.$t('dashboard.alarm.dischargeOvercurrent'), value: this.battery_alarm_discharging_high_current },
+        { key: this.$t('dashboard.alarm.cellVoltageDiff'), value: this.battery_alarm_voltage_difference },
+        { key: this.$t('dashboard.alarm.boxOverheat'), value: this.battery_alarm_box_high_temperature },
+        { key: this.$t('dashboard.alarm.lowTemperature'), value: this.battery_alarm_low_temperature },
+        { key: this.$t('dashboard.alarm.cellOvervoltage'), value: this.battery_alarm_single_cell_high_voltage },
+        { key: this.$t('dashboard.alarm.cellUndervoltage'), value: this.battery_alarm_single_cell_low_voltage },
+        { key: this.$t('dashboard.alarm.protection309A'), value: this.battery_alarm_309_a },
+        { key: this.$t('dashboard.alarm.protection309B'), value: this.battery_alarm_309_b },
+        { key: this.$t('dashboard.alarm.humidity'), value: this.battery_alarm_humidity },
+        { key: this.$t('dashboard.alarm.antiTamper'), value: this.battery_alarm_disassemble }
       ]
     },
     getBatteryInfoLatestJx(bmsInfo) {
@@ -832,13 +832,13 @@ export default {
         arg.param = this.form_ls_control_param(mos, on_off)
         console.log('bms_ls', arg)
       }
-      this.$message.info("设置 MOS")
+      this.$message.info(this.$t('device.mos.setting'))
       sendFmBmsCommand(this.deviceId, arg)
       .then(res => {
-        this.$message.info("设置 MOS 成功")
+        this.$message.info(this.$t('device.mos.success'))
         console.log("send command", mos, on_off, res);
       }).catch(() => {
-        this.$message.error("设置 MOS 失败")
+        this.$message.error(this.$t('device.mos.failed'))
       })
     },
     form_ls_control_param(mos, on_off) {
@@ -867,7 +867,7 @@ export default {
       return param_vec.join(',')
     },
     refresh () {
-      this.$message.info("刷新")
+      this.$message.info(this.$t('device.refreshing'))
       getBmsTypeInt(this.deviceId)
         .then(res => {
           console.log('bms type int', res)
@@ -881,7 +881,7 @@ export default {
         const bms_type = res.data.bms_type
         getBatteryInfoLatest(this.deviceId, res.data.bms_type, {})
           .then(res => {
-            this.$message.info("刷新成功")
+            this.$message.info(this.$t('device.refreshSuccess'))
             console.log('battery info latest', res)
             if (res.data && res.data.vehicle_detail_vo) {
               this.battery_capacity_config = res.data.battery_capacity
@@ -981,7 +981,7 @@ export default {
       // bms type 227(0xe3) is fm
       if (bms_type === 227) {
         // 0X84
-        // 电流数据 2 HEX 
+        // 电流数据 2 HEX
         // 10000（10000-11000）*0.01=-10.00a（放电）（10000-9500）¥0.01=5.00a（充电）精度10MA单位：
         // 参考上图协议说明，10000减数据，负数是放电，正数是充电，精度10ma，除100单位就是安
         // 服务器返回的值已经除以100，单位为 A
@@ -1000,11 +1000,11 @@ export default {
       // next tick to update the status
       this.$nextTick(() => {
         if (battery_currency === 0.00) {
-          this.battery_charging_status = '搁置中'
+          this.battery_charging_status = this.$t('device.status.idle')
         } else if (battery_currency > 0) {
-          this.battery_charging_status = '充电中'
+          this.battery_charging_status = this.$t('device.status.charging')
         } else {
-          this.battery_charging_status = '放电中'
+          this.battery_charging_status = this.$t('device.status.discharging')
         }
         console.log('battery status charging', this.battery_charging_status)
       })

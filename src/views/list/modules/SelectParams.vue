@@ -1,6 +1,12 @@
 <template>
-  <a-modal :footer="null" title="生产测试" width="90%" :visible="visible" :confirmLoading="loading"
-    :class="{ 'custom-modal-height': true }" @cancel="() => { $emit('cancel') }">
+  <a-modal
+:footer="null"
+title="生产测试"
+width="90%"
+:visible="visible"
+:confirmLoading="loading"
+    :class="{ 'custom-modal-height': true }"
+@cancel="() => { $emit('cancel') }">
     <!-- dataSource：{{dataSource}} -->
     <a-spin :spinning="loading">
       <a-table rowKey="ce" :dataSource="dataSource" :columns="columns">
@@ -15,30 +21,42 @@
       <!-- textarea：{{textarea}}<br> devicelist：{{devicelist}} -->
       <el-form-item>设备编号：</el-form-item>
       <el-form-item>
-        <el-input type="textarea" :rows="4" placeholder="输入设备编号
-  一行一个编号" v-model="textarea">
+        <el-input
+type="textarea"
+:rows="4"
+placeholder="输入设备编号
+  一行一个编号"
+v-model="textarea">
         </el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" style="background-color: #40A9FF; border: #40A9FF;"
+        <el-button
+type="primary"
+style="background-color: #40A9FF; border: #40A9FF;"
           @click="AddDeviceList">添加</el-button>
-        <el-button type="primary" style="background-color: #40A9FF; border: #40A9FF;"
+        <el-button
+type="primary"
+style="background-color: #40A9FF; border: #40A9FF;"
           @click="ClearDeviceList">清空</el-button>
         <el-button type="primary" style="background-color: #40A9FF; border: #40A9FF;" @click="initBMSUI1">查询</el-button>
       </el-form-item>
       <!-- bmsParamInfo:{{bmsParamInfo}} -->
     </el-form>
 
-    <a-table :rowKey="(record, index) => { return index }" :loading="isLoading" :scroll="{ x: 'max-content' ,y:340}"
-      :dataSource="InstructionsDataSource" :columns="InstructionsColumns">
+    <a-table
+:rowKey="(record, index) => { return index }"
+:loading="isLoading"
+:scroll="{ x: 'max-content' ,y:340}"
+      :dataSource="InstructionsDataSource"
+:columns="InstructionsColumns">
       <span slot="bms_status" slot-scope="text">
         <a-tag :color="text == '在线' ? 'green':'red'">
-          {{text}}
+          {{ text }}
         </a-tag>
       </span>
       <span slot="satellites" slot-scope="text">
         <a-tag :color="text > 0 ? 'green':'red'">
-          {{text}}
+          {{ text }}
         </a-tag>
       </span>
     </a-table>
@@ -212,7 +230,7 @@
     },
     watch: {
       // textarea(newVal, oldVal) {
-      //   // 这里可以处理 textarea 数据的变化  
+      //   // 这里可以处理 textarea 数据的变化
       //   console.log('textarea changed from', oldVal, 'to', newVal);
       // }
     },
@@ -229,32 +247,31 @@
       },
       async initBMSUI(item) {
         this.isLoading = true
-        let temId = item.deviceId
+        const temId = item.deviceId
         let bms_type = null
         let receive_time = null
         let acc_status = null
         let soc = 0
         try {
-          let temRes1 = await getBmsType(temId)
+          const temRes1 = await getBmsType(temId)
           if (temRes1.code === "SUCCESS") {
             bms_type = temRes1.data.bms_type
           } else {
             console.error('获取BMS类型失败，状态码：', temRes1.status);
-            // 可以设置bms_type为一个默认值或者null  
-            bms_type = null; // 或者其他默认值 
+            // 可以设置bms_type为一个默认值或者null
+            bms_type = null; // 或者其他默认值
           }
         } catch (e) {
-          // 处理任何在await调用中抛出的错误  
+          // 处理任何在await调用中抛出的错误
           console.log('获取BMS类型时发生错误：', e);
-          bms_type = null; // 或者其他默认值  
+          bms_type = null; // 或者其他默认值
 
           acc_status = 0
           console.log("heihei", acc_status);
         }
         if (bms_type != null) {
-
           try {
-            let temRes2 = await getBatteryInfoLatest(temId, bms_type);
+            const temRes2 = await getBatteryInfoLatest(temId, bms_type);
             if (!(temRes2.data && temRes2.data.vehicle_detail_vo)) {
               console.log("数据没有！");
             }
@@ -270,31 +287,28 @@
             acc_status = temRes2.data.vehicle_detail_vo.status;
             console.log("acc_status 1", acc_status);
           } catch (error) {
-            // 捕获getBatteryInfoLatest抛出的任何错误  
+            // 捕获getBatteryInfoLatest抛出的任何错误
             console.error('获取电池信息时发生错误：', error);
           }
         }
 
+        const temRes3 = await refreshOnlineStatus(temId, bms_type)
+        const bms_status = temRes3.data ? "在线" : "离线"
 
-        let temRes3 = await refreshOnlineStatus(temId, bms_type)
-        let bms_status = temRes3.data ? "在线" : "离线"
-
-
-
-        let temRes4 = await getDeviceList(
+        const temRes4 = await getDeviceList(
           Object.assign((this.queryData, {
             device_id: temId,
             device_status: "total",
             location_only: false
           })))
-        let bmsParamInfo = temRes4.data.records
+        const bmsParamInfo = temRes4.data.records
         bmsParamInfo.forEach(item => {
           console.log("acc_status 2", item);
           if (bms_type == null) {
             soc = item.bms_soc != null ? item.bms_soc / 50 : '0'
             // console.log("soc 2", soc);
           }
-          let soh = item.bms_soh != null ? item.bms_soh : '_'
+          const soh = item.bms_soh != null ? item.bms_soh : '_'
           let last_communication_time = moment(item.last_communication_time).format(
             'YYYY-MM-DD HH:mm:ss');
           let location_time = moment(item.location_time).format(
@@ -318,23 +332,16 @@
         this.isLoading = false
         return
 
-
-
-
         return new Promise((res_my) => {
-
           const arg = Object.assign(this.queryData)
           arg.device_id = this.dataSource[ix].deviceId
           arg.device_status = "total"
           arg.location_only = false
 
-
           const argtime = {
             start_date: moment(new Date() - 2 * 60 * 60 * 1000),
             start_time: moment(new Date() - 2 * 60 * 60 * 1000)
           }
-
-
 
           /**
            * 查询修改时间
@@ -343,7 +350,6 @@
           getBmsType(arg.device_id).then(res => {
             console.log('bms type', res.data.bms_type)
             const bms_type = res.data.bms_type
-
 
             console.log("kkkk")
             console.log(ix)
@@ -356,7 +362,6 @@
                     'YYYY-MM-DD HH:mm:ss')
                   this.acc_status = res.data.vehicle_detail_vo.status
 
-
                   /**
                    * 网络状态的接口
                    */
@@ -368,13 +373,11 @@
                       this.bms_status = '离线'
                     }
 
-
                     /**
                      * 查询设备基本的参数
                      */
                     getDeviceList(arg).then(res => {
                       this.bmsParamInfo = res.data.records
-
 
                       this.bmsParamInfo.forEach(item => {
                         Object.assign(item, {
@@ -393,18 +396,10 @@
 
                       res_my("ok")
                     })
-
-
                   }).catch(err => {
                     console.log('refresh online status', err)
                     this.$message.error(err.data.message)
                   })
-
-
-
-
-
-
                 }
               }).catch(err => {
                 console.log('battery info latest', err)
@@ -412,52 +407,50 @@
           }).catch(err => {
             console.log('bms type', err)
           })
-
         })
-
       },
-      //这里留着写删除~~~
+      // 这里留着写删除~~~
       delDeviceId({
         id
       }) {
-        let temFindCurrent = this.dataSource.findIndex(item => {
+        const temFindCurrent = this.dataSource.findIndex(item => {
           return item.id == id
         })
         this.dataSource.splice(temFindCurrent, 1)
       },
 
-      //添加
+      // 添加
       AddDeviceList() {
         this.devicelist = this.textarea.split('\n');
 
-        let uniqueDeviceIds = this.devicelist
+        const uniqueDeviceIds = this.devicelist
           .map(deviceId => {
-            // 查找分号的位置  
-            const semicolonIndex = deviceId.indexOf(';'); // 注意这里使用的是全角分号 '；' 而不是半角分号 ';'  
+            // 查找分号的位置
+            const semicolonIndex = deviceId.indexOf(';'); // 注意这里使用的是全角分号 '；' 而不是半角分号 ';'
 
-            // 如果没有找到分号或者分号前的部分不是数字，则保持原样  
+            // 如果没有找到分号或者分号前的部分不是数字，则保持原样
             if (semicolonIndex === -1 || !/^\d+$/.test(deviceId.substring(0, semicolonIndex))) {
               return deviceId;
             }
 
-            // 截取分号前的部分  
+            // 截取分号前的部分
             const partBeforeSemicolon = deviceId.substring(0, semicolonIndex);
 
-            // 如果截取的部分长度大于或等于12，则取最后12位数字，否则取全部数字  
-            return partBeforeSemicolon.length >= 12 && /^\d+$/.test(partBeforeSemicolon) ?
-              partBeforeSemicolon.substring(partBeforeSemicolon.length - 12) :
-              partBeforeSemicolon;
+            // 如果截取的部分长度大于或等于12，则取最后12位数字，否则取全部数字
+            return partBeforeSemicolon.length >= 12 && /^\d+$/.test(partBeforeSemicolon)
+              ? partBeforeSemicolon.substring(partBeforeSemicolon.length - 12)
+              : partBeforeSemicolon;
           })
           .filter(deviceId => /^\d{12}$/.test(deviceId) && !this.dataSource.some(item => item.deviceId === deviceId));
 
-        let newDevices = uniqueDeviceIds.map(deviceId => ({
+        const newDevices = uniqueDeviceIds.map(deviceId => ({
           deviceId
         }));
 
-        // 合并新旧数据源    
+        // 合并新旧数据源
         this.dataSource = this.dataSource.concat(newDevices);
       },
-      //添加设备按钮
+      // 添加设备按钮
       AddDevice() {
         this.SendInstrucetionStatus = !this.SendInstrucetionStatus
         if (this.SendInstrucetionStatus == true) {
@@ -471,7 +464,6 @@
         this.dataSource = []
         this.InstructionsDataSource = []
       },
-
 
       onShowSizeChange(current, pageSize) {
         console.log(current, pageSize);

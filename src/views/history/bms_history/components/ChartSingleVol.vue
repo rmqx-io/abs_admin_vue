@@ -19,16 +19,16 @@
       init(arr) {
         var series = []
         arr[0].forEach((items, index) => {
-          //每一串电池定义一个类型 最多20
+          // 每一串电池定义一个类型 最多20
           series.push({
             name: '电池' + index,
             type: 'line',
             smooth: true,
             symbol: 'none',
-            data: [], //最终是一个类型 如电池1，多个[时间，数值] 共20个
+            data: [], // 最终是一个类型 如电池1，多个[时间，数值] 共20个
           })
         })
-        //遍历 x时间点 items 每个时间点的电池数组
+        // 遍历 x时间点 items 每个时间点的电池数组
         arr.forEach((items, index) => {
           var maxVol = -1
           var mixVol = -1
@@ -42,7 +42,7 @@
             } else if (items2.value < mixVol) {
               mixVol = items2.value
             }
-            //补充到相对于的编号index2
+            // 补充到相对于的编号index2
             series[index2].data.push([new Date(items2.date), items2.value])
           })
 
@@ -87,8 +87,8 @@
         //   }
         // }
 
-        //配置
-        let option = {
+        // 配置
+        const option = {
           sampling: 'lttb',
           color: [
             '#1abc9c',
@@ -121,21 +121,21 @@
               for (var i = 0; i < params.length; i++) {
                 var param = params[i]
                 // console.log('########测试', param)
-                var xValue = getDateStr(param.value[0]) //x轴的名称
-                var yValue = param.value[1] //Y
+                var xValue = getDateStr(param.value[0]) // x轴的名称
+                var yValue = param.value[1] // Y
                 var maxVol = param.value[2]
                 var mixVol = param.value[3]
-                var seriesName = param.seriesName //图例名称
+                var seriesName = param.seriesName // 图例名称
                 // var value = param.value //y轴值
-                var color = param.color //图例颜色
+                var color = param.color // 图例颜色
 
                 if (i === 0) {
-                  htmlStr += xValue + '<br/>' //x轴的名称
+                  htmlStr += xValue + '<br/>' // x轴的名称
                 }
                 if (i % 4 == 0) {
                   htmlStr += '<div>'
                 }
-                //为了保证和原来的效果一样，这里自己实现了一个点的效果
+                // 为了保证和原来的效果一样，这里自己实现了一个点的效果
                 htmlStr +=
                   '<span style="margin-right:5px; ' +
                   (i % 4 == 0 ? '' : 'margin-left:15px;') +
@@ -148,7 +148,7 @@
                 } else if (mixVol == yValue) {
                   htmlStr += '<span style="color:#f34d37">'
                 }
-                //圆点后面显示的文本
+                // 圆点后面显示的文本
                 htmlStr += seriesName + '：' + yValue + 'V'
                 // 文本颜色设置-(需要设置,请解注释下面一行)
                 htmlStr += '</span>'

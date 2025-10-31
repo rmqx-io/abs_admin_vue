@@ -226,27 +226,6 @@ import {
 } from '@/components'
 import { baseMixin } from '@/store/app-mixin'
 
-const barData = []
-const barData2 = []
-for (let i = 0; i < 12; i += 1) {
-  barData.push({
-    x: `${i + 1}月`,
-    y: Math.floor(Math.random() * 1000) + 200
-  })
-  barData2.push({
-    x: `${i + 1}月`,
-    y: Math.floor(Math.random() * 1000) + 200
-  })
-}
-
-const rankList = []
-for (let i = 0; i < 7; i++) {
-  rankList.push({
-    name: '白鹭岛 ' + (i + 1) + ' 号店',
-    total: 1234.56 - i * 100
-  })
-}
-
 const searchUserData = []
 for (let i = 0; i < 7; i++) {
   searchUserData.push({
@@ -254,54 +233,14 @@ for (let i = 0; i < 7; i++) {
     y: Math.ceil(Math.random() * 10)
   })
 }
-const searchUserScale = [
-  {
-    dataKey: 'x',
-    alias: '时间'
-  },
-  {
-    dataKey: 'y',
-    alias: '用户数',
-    min: 0,
-    max: 10
-  }]
-
-const searchData = []
-for (let i = 0; i < 50; i += 1) {
-  searchData.push({
-    index: i + 1,
-    keyword: `搜索关键词-${i}`,
-    count: Math.floor(Math.random() * 1000),
-    range: Math.floor(Math.random() * 100),
-    status: Math.floor((Math.random() * 10) % 2)
-  })
-}
 
 const DataSet = require('@antv/data-set')
-
-const sourceData = [
-  { item: '家用电器', count: 32.2 },
-  { item: '食用酒水', count: 21 },
-  { item: '个护健康', count: 17 },
-  { item: '服饰箱包', count: 13 },
-  { item: '母婴产品', count: 9 },
-  { item: '其他', count: 7.8 }
-]
 
 const pieScale = [{
   dataKey: 'percent',
   min: 0,
   formatter: '.0%'
 }]
-
-const dv = new DataSet.View().source(sourceData)
-dv.transform({
-  type: 'percent',
-  field: 'count',
-  dimension: 'item',
-  as: 'percent'
-})
-const pieData = dv.rows
 
 export default {
   name: 'Analysis',
@@ -320,20 +259,18 @@ export default {
   data () {
     return {
       loading: true,
-      rankList,
+      barData: [],
+      barData2: [],
+      rankList: [],
 
-      // 搜索用户数
+      // search user metrics
       searchUserData,
-      searchUserScale,
-      searchData,
+      searchUserScale: [],
+      searchData: [],
 
-      barData,
-      barData2,
-
-      //
       pieScale,
-      pieData,
-      sourceData,
+      pieData: [],
+      sourceData: [],
       pieStyle: {
         stroke: '#fff',
         lineWidth: 1
@@ -366,13 +303,98 @@ export default {
       ]
     }
   },
+  watch: {
+    '$i18n.locale' () {
+      this.initializeData()
+    }
+  },
   created () {
+    this.initializeData()
     setTimeout(() => {
       this.loading = !this.loading
     }, 1000)
+  },
+  methods: {
+    initializeData () {
+      this.barData = this.generateBarData()
+      this.barData2 = this.generateBarData()
+      this.rankList = this.generateRankList()
+      this.searchUserScale = this.generateSearchUserScale()
+      this.searchData = this.generateSearchData()
+      this.sourceData = this.generateSourceData()
+      this.updatePieData()
+    },
+    generateBarData () {
+      const data = []
+      for (let i = 0; i < 12; i += 1) {
+        data.push({
+          x: this.$t('dashboard.analysis.month-label', { month: i + 1 }),
+          y: Math.floor(Math.random() * 1000) + 200
+        })
+      }
+      return data
+    },
+    generateRankList () {
+      const list = []
+      for (let i = 0; i < 7; i += 1) {
+        list.push({
+          name: this.$t('dashboard.analysis.rank-store-name', { index: i + 1 }),
+          total: 1234.56 - i * 100
+        })
+      }
+      return list
+    },
+    generateSearchUserScale () {
+      return [
+        {
+          dataKey: 'x',
+          alias: this.$t('dashboard.analysis.axis.time')
+        },
+        {
+          dataKey: 'y',
+          alias: this.$t('dashboard.analysis.axis.users'),
+          min: 0,
+          max: 10
+        }
+      ]
+    },
+    generateSearchData () {
+      const data = []
+      for (let i = 0; i < 50; i += 1) {
+        data.push({
+          index: i + 1,
+          keyword: this.$t('dashboard.analysis.search-keyword-prefix', { index: i }),
+          count: Math.floor(Math.random() * 1000),
+          range: Math.floor(Math.random() * 100),
+          status: Math.floor((Math.random() * 10) % 2)
+        })
+      }
+      return data
+    },
+    generateSourceData () {
+      return [
+        { item: this.$t('dashboard.analysis.pie.household'), count: 32.2 },
+        { item: this.$t('dashboard.analysis.pie.drinks'), count: 21 },
+        { item: this.$t('dashboard.analysis.pie.personal-care'), count: 17 },
+        { item: this.$t('dashboard.analysis.pie.clothing'), count: 13 },
+        { item: this.$t('dashboard.analysis.pie.maternal'), count: 9 },
+        { item: this.$t('dashboard.analysis.pie.other'), count: 7.8 }
+      ]
+    },
+    updatePieData () {
+      const dv = new DataSet.View().source(this.sourceData)
+      dv.transform({
+        type: 'percent',
+        field: 'count',
+        dimension: 'item',
+        as: 'percent'
+      })
+      this.pieData = dv.rows
+    }
   }
 }
 </script>
+*** End Patch
 
 <style lang="less" scoped>
   .extra-wrapper {

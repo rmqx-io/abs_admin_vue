@@ -105,7 +105,7 @@ export default {
       },
       showBatchCommand: true,
       showDevices: false,
-      currentBatchSendCommandId: 0 
+      currentBatchSendCommandId: 0
     }
   },
   mounted () {
@@ -130,7 +130,7 @@ export default {
       this.showDevices = true
     },
     loadData (parameter) {
-      let arg = Object.assign(parameter, this.queryData)
+      const arg = Object.assign(parameter, this.queryData)
       arg.page_no = arg.pageNo
       arg.page_size = arg.pageSize
       delete arg.pageNo

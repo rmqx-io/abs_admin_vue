@@ -105,7 +105,7 @@ export default {
         page_size: 5
       },
       loadData: parameter => {
-        let arg = Object.assign(parameter, this.queryData)
+        const arg = Object.assign(parameter, this.queryData)
         arg.page_no = arg.pageNo
         arg.page_size = arg.pageSize
         delete arg.pageNo

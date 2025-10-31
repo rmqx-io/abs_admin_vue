@@ -39,7 +39,8 @@
     <div class='operate'>
       <a-button type='dashed' style='width: 100%' icon='plus' @click='addData'>添加</a-button>
     </div>
-    <a-table :columns='columns'
+    <a-table
+:columns='columns'
              :rowKey='record => record.id'
              :dataSource='data'
              :pagination='pagination'
@@ -48,7 +49,6 @@
              childrenColumnName='childs'
              @change='handleTableChange'
     >
-
 
       <!--<template slot="rate" slot-scope="rate">-->
       <!--{{rate+'%'}}-->
@@ -142,7 +142,8 @@
         <a-form-item label='是否菜单'>
           <a-row>
             <a-col>
-              <a-switch checked-children='菜单'
+              <a-switch
+checked-children='菜单'
                         un-checked-children='权限'
                         v-model='dialogData.is_menu'
                         @change='function(val){
@@ -164,13 +165,15 @@
 
       </a-form>
 
-
     </a-modal>
   </div>
 
 </template>
 
 <script>
+import { res_add, res_delete, res_page, res_update, sys_res_layer_top } from '@/api/manage'
+import { showMsg } from '@/utils/data'
+
 const columns = [
   {
     title: 'id',
@@ -203,10 +206,6 @@ const columns = [
     scopedSlots: { customRender: 'action' }
   }
 ]
-
-
-import { res_add, res_delete, res_page, res_update, sys_res_layer_top } from '@/api/manage'
-import { showMsg } from '@/utils/data'
 
 export default {
   mounted() {
@@ -262,9 +261,9 @@ export default {
       if (arg.time_end != null) {
         arg.time_end = arg.time_end.format('YYYY-MM-DDThh:mm:ss')
       }
-      //取分页数据
+      // 取分页数据
       res_page(arg).then((res) => {
-        //alert(JSON.stringify(res))
+        // alert(JSON.stringify(res))
         const pagination = { ...this.pagination }
         this.loading = false
         this.data = res.data.records
@@ -280,7 +279,7 @@ export default {
       this.visible = true
       this.dialogMode = 'add'
     },
-    //处理添加产品
+    // 处理添加产品
     handleAddData: function() {
       if (this.dialogData.is_menu === false) {
         this.dialogData.path = null
@@ -295,7 +294,7 @@ export default {
       } else if (this.dialogMode === 'edit') {
         res_update(this.dialogData)
           .then((res) => {
-            //showMsg(this, res)
+            // showMsg(this, res)
             this.visible = false
             this.fetch()
           })
@@ -313,7 +312,7 @@ export default {
         this.dialogData.resource_ids = [scope.parent_id]
       }
     },
-    //handleEdit
+    // handleEdit
     handleEdit: function(scope) {
       this.getAllRes(scope.id)
       this.visible = true
@@ -332,7 +331,7 @@ export default {
       }
     },
     handleDelete: function(scope) {
-      let self = this
+      const self = this
       this.$confirm({
         title: '你确定要删除?',
         content: '你确定要删除！',
@@ -360,7 +359,7 @@ export default {
       }
     },
     onResCheck: function(data) {
-      let len = data.checked.length
+      const len = data.checked.length
       if (len >= 1) {
         this.dialogData.resource_ids = { 'checked': [data.checked[len - 1]], 'halfChecked': [] }
         this.dialogData.parent_id = data.checked[len - 1]
@@ -374,17 +373,17 @@ export default {
       sys_res_layer_top({})
         .then((res) => {
           this.loading_all_res = false;
-          let arr = []
+          const arr = []
           for (let index = 0; index < res.data.length; index++) {
-            let item = res.data[index]
+            const item = res.data[index]
             if (skipId !== undefined && skipId !== null && item.id === skipId) {
-              //nothing
+              // nothing
             } else {
               arr.push(item)
             }
           }
           this.all_res = arr;
-        }).catch((e)=>{
+        }).catch((e) => {
         this.loading_all_res = false;
       })
     }

@@ -5,7 +5,7 @@
         <a-card>
           <div>
             <div>
-              <h4>设备统计</h4>
+              <h4>{{ $t('dashboard.deviceStats') }}</h4>
             </div>
             <div>
               <Pie
@@ -19,7 +19,7 @@
         </a-card>
         <a-card>
           <div>
-            <h4>告警统计</h4>
+            <h4>{{ $t('dashboard.alarmStats') }}</h4>
           </div>
           <div>
             <Pie
@@ -34,7 +34,7 @@
       <a-col :sm="24" :md="24" :xl="17" :style="{ marginBottom: '24px' }">
         <a-card>
           <div style='height: 786px; width: 100%; margin-bottom: 20px'>
-            <h4>设备地图</h4>
+            <h4>{{ $t('dashboard.deviceMap') }}</h4>
             <device-map />
           </div>
         </a-card>
@@ -97,7 +97,7 @@ export default {
       loadingDevice: false,
       loadingAlarm: false,
       deviceChartData: {
-        labels: ['在线', '离线', '待机'],
+        labels: [],
         datasets: [
           {
             // light blue 88,173,250 hex: #58ADF8
@@ -121,24 +121,7 @@ export default {
       },
       alarmChartData: {
         // will be overwritten by data from server
-        labels: [
-          '低容量报警',
-          'MOS管超温报警',
-          '充电过压报警',
-          '放电欠压报警',
-          '电池超温报警',
-          '充电过流报警',
-          '放电过流报警',
-          '电芯压差报警',
-          '电池箱内超温报警',
-          '电池低温报警',
-          '单体过压报警',
-          '单体欠压报警',
-          '309_A保护',
-          '309_B保护',
-          '湿度报警',
-          '防拆报警'
-        ],
+        labels: [],
         datasets: [
           {
             // light blue 88,173,250 hex: #58ADF8
@@ -189,6 +172,30 @@ export default {
   },
   mounted () {
     console.log('mounted')
+    // Initialize chart labels with translations
+    this.deviceChartData.labels = [
+      this.$t('dashboard.status.online'),
+      this.$t('dashboard.status.offline'),
+      this.$t('dashboard.status.standby')
+    ]
+    this.alarmChartData.labels = [
+      this.$t('dashboard.alarm.lowCapacity'),
+      this.$t('dashboard.alarm.mosOverheat'),
+      this.$t('dashboard.alarm.chargeOvervoltage'),
+      this.$t('dashboard.alarm.dischargeUndervoltage'),
+      this.$t('dashboard.alarm.batteryOverheat'),
+      this.$t('dashboard.alarm.chargeOvercurrent'),
+      this.$t('dashboard.alarm.dischargeOvercurrent'),
+      this.$t('dashboard.alarm.cellVoltageDiff'),
+      this.$t('dashboard.alarm.boxOverheat'),
+      this.$t('dashboard.alarm.lowTemperature'),
+      this.$t('dashboard.alarm.cellOvervoltage'),
+      this.$t('dashboard.alarm.cellUndervoltage'),
+      this.$t('dashboard.alarm.protection309A'),
+      this.$t('dashboard.alarm.protection309B'),
+      this.$t('dashboard.alarm.humidity'),
+      this.$t('dashboard.alarm.antiTamper')
+    ]
     this.get_alarm_name()
     this.getStatusCount()
     this.getBmsAlarmCount()
@@ -219,8 +226,10 @@ export default {
       getDeviceAlarmTypes(227)
         .then(res => {
           console.log('alarm type', res)
-          if (res.data && res.data.cn) {
-            this.alarmChartData.labels = res.data.cn
+          if (res.data) {
+            // Use Chinese labels if current locale is zh-CN, otherwise use English
+            const currentLocale = this.$i18n.locale
+            this.alarmChartData.labels = currentLocale === 'zh-CN' ? res.data.cn : res.data.en
           }
         })
     },

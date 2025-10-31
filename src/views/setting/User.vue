@@ -48,7 +48,8 @@
     <div class='operate'>
       <a-button type='dashed' style='width: 100%' icon='plus' @click='addData'>添加</a-button>
     </div>
-    <a-table :columns='columns'
+    <a-table
+:columns='columns'
              :rowKey='record => record.id'
              :dataSource='data'
              :pagination='pagination'
@@ -67,13 +68,12 @@
           <a-tag color='blue'>角色名称: {{ record.role.name }}</a-tag>
           <a-tree
             :selected-keys='[]'
-            :replace-fields="{  children: 'childs',  title: 'name',   key: 'id' }"
+            :replace-fields="{ children: 'childs', title: 'name', key: 'id' }"
             :autoExpandParent='true'
             :tree-data='[record.role]'
           />
         </div>
       </div>
-
 
       <!--<template slot="rate" slot-scope="rate">-->
       <!--{{rate+'%'}}-->
@@ -177,7 +177,7 @@
         <a-form-item label='角色集'>
           <a-tree
             v-model='dialogData.role_ids'
-            :replace-fields="{ children: 'childs', title: 'name', key: 'id'  }"
+            :replace-fields="{ children: 'childs', title: 'name', key: 'id' }"
             checkable
             :auto-expand-parent='true'
             :tree-data='all_role'
@@ -193,6 +193,16 @@
 </template>
 
 <script>
+import {
+  sys_role_layer_top,
+  sys_user_add,
+  sys_user_remove,
+  sys_user_page,
+  sys_user_update,
+  getAdminOrgTree
+} from '@/api/manage'
+import { showMsg } from '@/utils/data'
+
 const columns = [
   {
     title: 'id',
@@ -234,16 +244,6 @@ const columns = [
     scopedSlots: { customRender: 'action' }
   }
 ]
-
-import {
-  sys_role_layer_top,
-  sys_user_add,
-  sys_user_remove,
-  sys_user_page,
-  sys_user_update,
-  getAdminOrgTree
-} from '@/api/manage'
-import { showMsg } from '@/utils/data'
 
 export default {
   mounted() {
@@ -318,9 +318,9 @@ export default {
       if (arg.name === '') {
         arg.name = null
       }
-      //取分页数据
+      // 取分页数据
       sys_user_page(arg).then((res) => {
-        //alert(JSON.stringify(res))
+        // alert(JSON.stringify(res))
         const pagination = { ...this.pagination }
         this.loading = false
         this.data = res.data.records
@@ -379,7 +379,7 @@ export default {
       this.dialogData.organization_id = scope.organization_id
     },
     handleDelete: function(scope) {
-      let self = this
+      const self = this
       this.$confirm({
         title: '你确定要删除?',
         content: '你确定要删除！',
@@ -398,7 +398,7 @@ export default {
       })
     },
     handleEnableDisable: function(scope) {
-      let self = this
+      const self = this
       this.$confirm({
         title: scope.state === 0 ? '你确定要启用?' : '你确定要禁用?',
         content: scope.state === 0 ? '你确定要启用?' : '你确定要禁用?',
@@ -431,7 +431,7 @@ export default {
         })
     },
     onRolesCheck: function(data) {
-      let len = data.checked.length
+      const len = data.checked.length
       if (len >= 1) {
         this.dialogData.role_ids = { 'checked': [data.checked[len - 1]], 'halfChecked': [] }
         this.dialogData.role_id = data.checked[len - 1]

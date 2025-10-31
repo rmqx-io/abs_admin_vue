@@ -5,32 +5,32 @@
         <div v-if='!showMoreParam' style='margin-bottom: 10px'>
           <a-row :gutter='48'>
             <a-col :md='8' :sm='24'>
-              <a class="ant-dropdown-link" @click='showMoreParam = true'>更多参数<a-icon type="down"/></a>
+              <a class="ant-dropdown-link" @click='showMoreParam = true'>{{ $t('alarm.moreParams') }}<a-icon type="down"/></a>
             </a-col>
           </a-row>
         </div>
         <div v-if='showMoreParam'>
           <a-row :gutter='48'>
             <a-col :md='8' :sm='8'>
-              <a class="ant-dropdown-link" @click='showMoreParam = false'>收起参数<a-icon type="up"/></a>
+              <a class="ant-dropdown-link" @click='showMoreParam = false'>{{ $t('alarm.hideParams') }}<a-icon type="up"/></a>
             </a-col>
           </a-row>
           <a-row>
             <a-col :md="4" :sm="24" v-if='false'>
-              <a-form-item label="来源类型">
+              <a-form-item :label="$t('alarm.sourceType')">
                 <a-select v-model='bms_type'>
-                  <a-select-option value="0">全部</a-select-option>
+                  <a-select-option value="0">{{ $t('alarm.all') }}</a-select-option>
                   <a-select-option value="1">808</a-select-option>
-                  <a-select-option value="227">弗铭</a-select-option>
+                  <a-select-option value="227">{{ $t('alarm.fuming') }}</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
             <a-col :md='4' :sm='24'>
-              <a-form-item label="告警">
+              <a-form-item :label="$t('alarm.alarm')">
                 <div><span>{{ selectedItems.join(", ") }}</span></div>
                 <a-dropdown @visible-change="onVisibleChange">
                   <a-button>
-                    {{ selectedItems.length ? "选择了 " + selectedItems.length + " 种" : "所有告警" }}
+                    {{ selectedItems.length ? $t('alarm.selected') + ' ' + selectedItems.length + ' ' + $t('alarm.types') : $t('alarm.allAlarms') }}
                     <a-icon type="down" />
                   </a-button>
                   <a-menu slot="overlay">
@@ -41,30 +41,30 @@
                     </a-checkbox-group>
                     <a-menu-divider />
                     <a-button type="primary" size="small" @click="saveSelectedItems">
-                      确定
+                      {{ $t('alarm.confirm') }}
                     </a-button>
                     <a-button type="cancel" size="small" @click="cancelSelectedItems">
-                      清除
+                      {{ $t('alarm.clear') }}
                     </a-button>
                   </a-menu>
                 </a-dropdown>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="12">
-              <a-form-item label='开始时间'>
-                <a-date-picker v-model="queryData.start_date" show-time format="YYYY-MM-DD HH:mm:ss" placeholder="起始时间"/>
+              <a-form-item :label="$t('alarm.startTime')">
+                <a-date-picker v-model="queryData.start_date" show-time format="YYYY-MM-DD HH:mm:ss" :placeholder="$t('alarm.startTimePlaceholder')"/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="12">
-              <a-form-item label='结束时间'>
-                <a-date-picker v-model="queryData.end_date" show-time format="YYYY-MM-DD HH:mm:ss" placeholder="结束时间"/>
+              <a-form-item :label="$t('alarm.endTime')">
+                <a-date-picker v-model="queryData.end_date" show-time format="YYYY-MM-DD HH:mm:ss" :placeholder="$t('alarm.endTimePlaceholder')"/>
               </a-form-item>
             </a-col>
           </a-row>
         </div>
         <a-row :gutter='48'>
           <a-col :md="8" :sm="24">
-            <a-button type="primary" @click="$refs.alarmtable.refresh(true)">查询</a-button>
+            <a-button type="primary" @click="$refs.alarmtable.refresh(true)">{{ $t('alarm.query') }}</a-button>
           </a-col>
         </a-row>
       </a-form>
@@ -99,7 +99,7 @@
           </template>
         </span>
         <span slot='operation' slot-scope="text, record">
-          <a @click="handleBatteryInfo(record)">电池详情</a>
+          <a @click="handleBatteryInfo(record)">{{ $t('alarm.table.batteryDetail') }}</a>
         </span>
       </s-table>
 
@@ -161,37 +161,6 @@ export default {
       alarm_types: ['Item 1', 'Item 2', 'Item 3', 'Item 4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'],
       selectedItems: [],
       prevSelectedItems: [],
-      columns: [
-        {
-          title: '编号',
-          dataIndex: 'id'
-        },
-        {
-          title: '设备编号',
-          dataIndex: 'device_id'
-        },
-        {
-          title: '类型',
-          dataIndex: 'device_type',
-          scopedSlots: { customRender: 'device_type' }
-        },
-        {
-          title: '告警',
-          dataIndex: 'alarm',
-          scopedSlots: { customRender: 'alarm' }
-        },
-        {
-          title: '时间',
-          dataIndex: 'timestamp',
-          scopedSlots: { customRender: 'timestamp' }
-        },
-        {
-          title: '操作',
-          dataIndex: 'operation',
-          scopedSlots: { customRender: 'operation' },
-          fixed: 'right',
-        }
-      ],
       loading: false,
       queryData: {
         device_id: null,
@@ -203,6 +172,41 @@ export default {
         end_date: null,
         organization_id: null
       }
+    }
+  },
+  computed: {
+    columns() {
+      return [
+        {
+          title: this.$t('alarm.table.id'),
+          dataIndex: 'id'
+        },
+        {
+          title: this.$t('alarm.table.deviceId'),
+          dataIndex: 'device_id'
+        },
+        {
+          title: this.$t('alarm.table.type'),
+          dataIndex: 'device_type',
+          scopedSlots: { customRender: 'device_type' }
+        },
+        {
+          title: this.$t('alarm.table.alarm'),
+          dataIndex: 'alarm',
+          scopedSlots: { customRender: 'alarm' }
+        },
+        {
+          title: this.$t('alarm.table.time'),
+          dataIndex: 'timestamp',
+          scopedSlots: { customRender: 'timestamp' }
+        },
+        {
+          title: this.$t('alarm.table.operation'),
+          dataIndex: 'operation',
+          scopedSlots: { customRender: 'operation' },
+          fixed: 'right',
+        }
+      ]
     }
   },
   methods: {
@@ -307,7 +311,7 @@ export default {
       if (alarmName.length > 0) {
         alarmName = alarmName.substring(0, alarmName.length - 1)
       } else {
-        alarmName = '无'
+        alarmName = this.$t('alarm.none')
       }
       return alarmName
     },
@@ -317,8 +321,10 @@ export default {
       getDeviceAlarmTypes(236)
         .then(res => {
           console.log('alarm type', res)
-          if (res.data && res.data.cn) {
-            this.alarm_types = res.data.cn
+          if (res.data) {
+            // Use Chinese labels if current locale is zh-CN, otherwise use English
+            const currentLocale = this.$i18n.locale
+            this.alarm_types = currentLocale === 'zh-CN' ? res.data.cn : res.data.en
           }
         })
     },

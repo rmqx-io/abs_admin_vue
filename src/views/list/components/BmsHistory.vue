@@ -87,13 +87,13 @@ export default {
     methods: {
         getBmsHistoryDataAndUpdateChart() {
             const start_date = this.date
-            let start_time = moment(this.date)
+            const start_time = moment(this.date)
             // set start_time to 00:00:00
             start_time.hour(0)
             start_time.minute(0)
             start_time.second(0)
             const end_date = this.date
-            let end_time = moment(this.date)
+            const end_time = moment(this.date)
             // set end_time to 23:59:59
             end_time.hour(23)
             end_time.minute(59)

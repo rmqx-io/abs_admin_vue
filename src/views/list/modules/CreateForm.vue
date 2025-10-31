@@ -129,8 +129,8 @@ export default {
         })
     },
     getDeviceModelListOptions () {
-      let parameter = {}
-      let arg = Object.assign(parameter, this.queryData)
+      const parameter = {}
+      const arg = Object.assign(parameter, this.queryData)
       arg.page_no = arg.pageNo
       arg.page_size = arg.pageSize
       delete arg.pageNo

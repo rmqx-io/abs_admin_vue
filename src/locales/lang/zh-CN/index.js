@@ -10,20 +10,30 @@ import form from './form'
 import result from './result'
 import account from './account'
 import device from './device'
+import list from './list'
+import org from './org'
+import alarm from './alarm'
 
 const components = {
   antLocale: antd,
-  momentName: 'zh-CN',
+  momentName: 'zh-cn',
   momentLocale: momentCN,
-  'Total': '全部',
+  'Total': '总计',
   'Status': '状态',
   'Online': '在线',
   'Offline': '离线',
   'Standby': '待机',
   'No': '编号',
-  'Organization': '运营单位',
+  'Organization': '组织',
   'BT Code': 'BT码',
-  'Alarm': '告警'
+  'ICCID': 'ICCID',
+  'SOH': 'SOH',
+  'SOC': 'SOC',
+  'Alarm': '告警',
+  'common.search': '查询',
+  'common.more': '更多',
+  'common.edit': '修改',
+  'common.batchActions': '批量操作'
 }
 
 export default {
@@ -41,5 +51,8 @@ export default {
   ...form,
   ...result,
   ...account,
-  ...device
+  ...device,
+  ...list,
+  ...org,
+  ...alarm
 }

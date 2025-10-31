@@ -16,7 +16,7 @@
         <a-form-item :label="configItem.name_cn">
           <div>当前值: {{ configItem.value }} 范围: {{ configItem.min }} ~ {{ configItem.max }}</div>
           <div>{{ configItem.comment }}</div>
-          <div v-if='formErrorMessage' class='error'>{{ this.formErrorMessage}}</div>
+          <div v-if='formErrorMessage' class='error'>{{ this.formErrorMessage }}</div>
           <a-input type="text" v-model="configItem.value" />
         </a-form-item>
       </a-form>

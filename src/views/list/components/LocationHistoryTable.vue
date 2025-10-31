@@ -3,7 +3,7 @@
     <div class="filter-container">
       <a-row :gutter="16">
         <a-col :span="8">
-          <a-form-item label="开始时间">
+          <a-form-item :label="$t('device.location.startTime')">
             <a-date-picker
               v-model="startDate"
               format="YYYY-MM-DD"
@@ -17,7 +17,7 @@
           </a-form-item>
         </a-col>
         <a-col :span="8">
-          <a-form-item label="结束时间">
+          <a-form-item :label="$t('device.location.endTime')">
             <a-date-picker
               v-model="endDate"
               format="YYYY-MM-DD"
@@ -31,7 +31,7 @@
           </a-form-item>
         </a-col>
         <a-col :span="4">
-          <a-button type="primary" @click="refresh(true)">查询</a-button>
+          <a-button type="primary" @click="refresh(true)">{{ $t('device.location.query') }}</a-button>
         </a-col>
       </a-row>
     </div>
@@ -47,9 +47,9 @@
     >
       <span slot="device_info" slot-scope="text, record">
         <template>
-          编号: <span>{{ record.code }}</span>
+          {{ $t('device.historyTable.code') }}: <span>{{ record.code }}</span>
           <br />
-          别名: <span>{{ record.alias }}</span>
+          {{ $t('device.historyTable.alias') }}: <span>{{ record.alias }}</span>
           <br />
           ICCID: <span>{{ record.iccid }}</span>
         </template>
@@ -57,17 +57,17 @@
 
       <span slot="organization_info" slot-scope="text, record">
         <template>
-          组织: <span>{{ record.organization_name }}</span>
+          {{ $t('device.historyTable.organization') }}: <span>{{ record.organization_name }}</span>
           <br />
-          仓库: <span>{{ record.storehouse_name }}</span>
+          {{ $t('device.historyTable.warehouse') }}: <span>{{ record.storehouse_name }}</span>
         </template>
       </span>
 
       <span slot="battery_info" slot-scope="text, record">
         <template>
-          里程: <span>{{ record.mileage || '-' }} km</span>
+          {{ $t('device.historyTable.mileage') }}: <span>{{ record.mileage || '-' }} km</span>
           <br />
-          总里程: <span>{{ record.total_mileage || '-' }} km</span>
+          {{ $t('device.historyTable.totalMileage') }}: <span>{{ record.total_mileage || '-' }} km</span>
         </template>
       </span>
     </s-table>
@@ -78,24 +78,6 @@
 import { STable } from '@/components'
 import { getDeviceList, getLocation } from '@/api/manage'
 import moment from 'moment'
-
-const columns = [
-  {
-    title: '设备信息',
-    dataIndex: 'code',
-    scopedSlots: { customRender: 'device_info' }
-  },
-  {
-    title: '组织信息',
-    dataIndex: 'organization_name',
-    scopedSlots: { customRender: 'organization_info' }
-  },
-  {
-    title: '电池信息',
-    dataIndex: 'battery',
-    scopedSlots: { customRender: 'battery_info' }
-  }
-]
 
 export default {
   name: 'LocationHistoryTable',
@@ -116,7 +98,6 @@ export default {
     const defaultStart = moment().subtract(24, 'hours')
     const defaultEnd = moment()
     return {
-      columns,
       startDate: defaultStart,
       startTime: defaultStart,
       endDate: defaultEnd,
@@ -173,6 +154,27 @@ export default {
             }
           })
       }
+    }
+  },
+  computed: {
+    columns() {
+      return [
+        {
+          title: this.$t('device.historyTable.deviceInfo'),
+          dataIndex: 'code',
+          scopedSlots: { customRender: 'device_info' }
+        },
+        {
+          title: this.$t('device.historyTable.organizationInfo'),
+          dataIndex: 'organization_name',
+          scopedSlots: { customRender: 'organization_info' }
+        },
+        {
+          title: this.$t('device.historyTable.batteryInfo'),
+          dataIndex: 'battery',
+          scopedSlots: { customRender: 'battery_info' }
+        }
+      ]
     }
   },
   methods: {

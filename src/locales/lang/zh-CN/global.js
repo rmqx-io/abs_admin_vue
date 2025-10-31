@@ -2,5 +2,20 @@ export default {
   submit: '提交',
   save: '保存',
   'submit.ok': '提交成功',
-  'save.ok': '保存成功'
+  'save.ok': '保存成功',
+  'common.search': '查询',
+  'common.reset': '重置',
+  'common.add': '添加',
+  'common.expand': '展开',
+  'common.collapse': '收起',
+  'common.edit': '编辑',
+  'common.more': '更多',
+  'common.detail': '详情',
+  'common.delete': '删除',
+  'common.close': '关闭',
+  'common.open': '开启',
+  'common.selectPlaceholder': '请选择',
+  'common.batchActions': '批量操作',
+  'common.lock': '锁定',
+  'common.disable': '禁用'
 }

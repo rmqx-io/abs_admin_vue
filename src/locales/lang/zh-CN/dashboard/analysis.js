@@ -13,6 +13,7 @@ export default {
   'dashboard.analysis.visits-trend': '访问量趋势',
   'dashboard.analysis.visits-ranking': '门店访问量排名',
   'dashboard.analysis.day-visits': '日访问量',
+  'dashboard.analysis.month-label': '{month}月',
   'dashboard.analysis.week': '周同比',
   'dashboard.analysis.day': '日同比',
   'dashboard.analysis.payments': '支付笔数',
@@ -38,5 +39,15 @@ export default {
   'dashboard.analysis.table.rank': '排名',
   'dashboard.analysis.table.search-keyword': '搜索关键词',
   'dashboard.analysis.table.users': '用户数',
-  'dashboard.analysis.table.weekly-range': '周涨幅'
+  'dashboard.analysis.table.weekly-range': '周涨幅',
+  'dashboard.analysis.axis.time': '时间',
+  'dashboard.analysis.axis.users': '用户数',
+  'dashboard.analysis.search-keyword-prefix': '搜索关键词-{index}',
+  'dashboard.analysis.rank-store-name': '白鹭岛 {index} 号店',
+  'dashboard.analysis.pie.household': '家用电器',
+  'dashboard.analysis.pie.drinks': '食用酒水',
+  'dashboard.analysis.pie.personal-care': '个护健康',
+  'dashboard.analysis.pie.clothing': '服饰箱包',
+  'dashboard.analysis.pie.maternal': '母婴产品',
+  'dashboard.analysis.pie.other': '其他'
 }

@@ -158,9 +158,9 @@
     },
     data() {
       var curDate = new Date()
-      let yy = curDate.getFullYear()
-      let mm = curDate.getMonth()
-      let dd = curDate.getDate()
+      const yy = curDate.getFullYear()
+      const mm = curDate.getMonth()
+      const dd = curDate.getDate()
       return {
         mAddPage: '0',
         mTotalPage: '0',
@@ -245,11 +245,11 @@
         this.hasInit = true
         this.handleQuery()
       },
-      //点击开始
+      // 点击开始
       onBtnTrackStart() {
         this.handleQuery()
       },
-      //第一页
+      // 第一页
       handleQuery() {
         // console.log('#this.queryForm.key', this.queryForm.key)
         if (this.queryForm.key == '') {
@@ -303,7 +303,7 @@
           )
         }
       },
-      //多次请求
+      // 多次请求
       async getBmsHis(sn, type, ptid, initer) {
         if (initer) {
           this.searchLoading = true
@@ -316,7 +316,7 @@
             this.loading = false
           }, 10000)
         }
-        //遍历循环请求
+        // 遍历循环请求
         this.dateInit = Date.parse(new Date())
         await this.getBmsHisRequest(sn, 1, 1000, type, ptid)
         if (initer) {
@@ -346,10 +346,10 @@
         var batteryList = []
         for (let index = 0; index < list.length; index++) {
           var item = list[index]
-          //每一串
+          // 每一串
           var batteryTemp = JSON.parse(item.BatteryVoltages)
           var batteryItemList = []
-          //每个时间的电池数组
+          // 每个时间的电池数组
           batteryTemp.forEach((items, index) => {
             var vol = parseFloat(items.Voltage / 1000).toFixed(3)
             batteryItemList.push({
@@ -358,14 +358,14 @@
               date: item.ReceiveTime,
             })
           })
-          //每一个时间存一组电池数据 x时间 y每个电池电压
+          // 每一个时间存一组电池数据 x时间 y每个电池电压
           batteryList.push(batteryItemList)
-          //补充数据
+          // 补充数据
           if (index + 1 < list.length) {
             var time1 = Date.parse(new Date(item.ReceiveTime))
             var item2 = list[index + 1]
             var time2 = Date.parse(new Date(item2.ReceiveTime))
-            //补充空白数据 间隔 15分钟
+            // 补充空白数据 间隔 15分钟
             if (time2 - time1 >= 15 * 60 * 1000) {
               var batteryItemList2 = []
               var batteryItemList3 = []
@@ -376,14 +376,14 @@
                   value: 0,
                   date: getDateStr(new Date(time1 + 60 * 1000)),
                 })
-                //补充点
+                // 补充点
                 batteryItemList3.push({
                   pos: j,
                   value: 0,
                   date: getDateStr(new Date(time2 - 60 * 1000)),
                 })
               }
-              //补充单体电池空白数据
+              // 补充单体电池空白数据
               batteryList.push(batteryItemList2)
               batteryList.push(batteryItemList3)
             }
@@ -427,14 +427,14 @@
               })
             })
           }
-          //补充数据
+          // 补充数据
           if (index + 1 < list.length) {
             var time1 = Date.parse(new Date(item.ReceiveTime))
             var item2 = list[index + 1]
             var time2 = Date.parse(new Date(item2.ReceiveTime))
-            //补充空白数据 间隔 15分钟
+            // 补充空白数据 间隔 15分钟
             if (time2 - time1 >= 15 * 60 * 1000) {
-              //补充电流空白数据
+              // 补充电流空白数据
               curList.push([
                 {
                   value: 0,
@@ -447,7 +447,7 @@
                   date: getDateStr(new Date(time2 - 60 * 1000)),
                 },
               ])
-              //补充电量空白数据
+              // 补充电量空白数据
               socList.push([
                 {
                   value: 0,
@@ -506,14 +506,14 @@
               date: item.ReceiveTime,
             },
           ])
-          //补充数据
+          // 补充数据
           if (index + 1 < list.length) {
             var time1 = Date.parse(new Date(item.ReceiveTime))
             var item2 = list[index + 1]
             var time2 = Date.parse(new Date(item2.ReceiveTime))
-            //补充空白数据 间隔 15分钟
+            // 补充空白数据 间隔 15分钟
             if (time2 - time1 >= 15 * 60 * 1000) {
-              //补充电压空白数据
+              // 补充电压空白数据
               volList.push([
                 {
                   value: 0,
@@ -526,7 +526,7 @@
                   date: getDateStr(new Date(time2 - 60 * 1000)),
                 },
               ])
-              //补充电量空白数据
+              // 补充电量空白数据
               socList.push([
                 {
                   value: 0,
@@ -563,24 +563,24 @@
       },
       setFmUI() {
         this.list = this.dataListFM
-        //单体电池
+        // 单体电池
         var batteryList = []
         var volList = []
         var socList = []
         var curList = []
         var tempList = []
-        //遍历当前数据列表-全部
+        // 遍历当前数据列表-全部
         for (let index = 0; index < this.list.length; index++) {
           var beforeItem = null
           if (index != 0) {
             beforeItem = this.list[index - 1]
           }
           var item = this.list[index]
-          //电压、电流、温度、soc
+          // 电压、电流、温度、soc
           var shouldAdd = true
           if (beforeItem != null) {
             if (item.ReceiveTime == beforeItem.ReceiveTime) {
-              //不添加
+              // 不添加
               console.log('不添加', index)
               continue
             }
@@ -594,7 +594,7 @@
               item.CellTemperature == beforeItem.CellTemperature &&
               item.PowerTubeTemperature == beforeItem.PowerTubeTemperature
             ) {
-              //不添加
+              // 不添加
               shouldAdd = false
             }
           }
@@ -631,10 +631,10 @@
                 date: item.ReceiveTime,
               },
             ])
-            //每一串
+            // 每一串
             var batteryTemp = JSON.parse(item.BatteryVoltages)
             var batteryItemList = []
-            //每个时间的电池数组
+            // 每个时间的电池数组
             batteryTemp.forEach((items, index) => {
               var vol = parseFloat(items.Voltage / 1000).toFixed(3)
               batteryItemList.push({
@@ -643,16 +643,16 @@
                 date: item.ReceiveTime,
               })
             })
-            //每一个时间存一组电池数据 x时间 y每个电池电压
+            // 每一个时间存一组电池数据 x时间 y每个电池电压
             batteryList.push(batteryItemList)
           }
 
-          //以下是判断如果两点间隔大于 15分钟，就补充两个空白时间点，折线图才不会很突兀。
+          // 以下是判断如果两点间隔大于 15分钟，就补充两个空白时间点，折线图才不会很突兀。
           if (index + 1 < this.list.length) {
             var time1 = Date.parse(new Date(item.ReceiveTime))
             var item2 = this.list[index + 1]
             var time2 = Date.parse(new Date(item2.ReceiveTime))
-            //补充空白数据 间隔 15分钟
+            // 补充空白数据 间隔 15分钟
             if (time2 - time1 >= 15 * 60 * 1000) {
               // console.log('离线########################', time1)
               var batteryItemList2 = []
@@ -664,17 +664,17 @@
                   value: 0,
                   date: getDateStr(new Date(time1 + 1000)),
                 })
-                //补充点
+                // 补充点
                 batteryItemList3.push({
                   pos: j,
                   value: 0,
                   date: getDateStr(new Date(time2 - 1000)),
                 })
               }
-              //补充单体电池空白数据
+              // 补充单体电池空白数据
               batteryList.push(batteryItemList2)
               batteryList.push(batteryItemList3)
-              //补充电压空白数据
+              // 补充电压空白数据
               volList.push([
                 {
                   value: 0,
@@ -687,7 +687,7 @@
                   date: getDateStr(new Date(time2 - 60 * 1000)),
                 },
               ])
-              //补充电流空白数据
+              // 补充电流空白数据
               curList.push([
                 {
                   value: 0,
@@ -700,7 +700,7 @@
                   date: getDateStr(new Date(time2 - 60 * 1000)),
                 },
               ])
-              //补充电量空白数据
+              // 补充电量空白数据
               socList.push([
                 {
                   value: 0,
@@ -713,7 +713,7 @@
                   date: getDateStr(new Date(time2 - 60 * 1000)),
                 },
               ])
-              //补充温度空白数据
+              // 补充温度空白数据
               tempList.push([
                 {
                   value: 0,
@@ -744,7 +744,7 @@
               ])
             }
           }
-          //结束1次循环
+          // 结束1次循环
         }
 
         // console.log(
@@ -796,16 +796,16 @@
       },
       setMyUI() {
         this.list = this.dataListMY
-        //单体电池
+        // 单体电池
         var batteryList = []
         var volList = []
         var socList = []
         var curList = []
         var tempList = []
-        //遍历当前数据列表-全部
+        // 遍历当前数据列表-全部
         for (let index = 0; index < this.list.length; index++) {
           var item = this.list[index]
-          //电压、电流、温度、soc
+          // 电压、电流、温度、soc
           volList.push([
             {
               value: (item.TotalBatteryVoltage * 0.1).toFixed(1),
@@ -835,7 +835,7 @@
             },
           ])
 
-          //每一串
+          // 每一串
           var batteryTemp = JSON.parse(item.BatteryVoltages)
           var batteryNum = item.TotalCOM
           if (batteryNum >= 21) {
@@ -863,7 +863,7 @@
             })
           }
           var batteryItemList = []
-          //每个时间的电池数组
+          // 每个时间的电池数组
           batteryTemp.forEach((items, index) => {
             var vol = parseFloat(items.Voltage / 1000).toFixed(3)
             batteryItemList.push({
@@ -872,9 +872,9 @@
               date: item.ReceiveTime,
             })
           })
-          //每一个时间存一组电池数据 x时间 y每个电池电压
+          // 每一个时间存一组电池数据 x时间 y每个电池电压
           batteryList.push(batteryItemList)
-          //以下是判断如果两点间隔大于 15分钟，就补充两个空白时间点，折线图才不会很突兀。
+          // 以下是判断如果两点间隔大于 15分钟，就补充两个空白时间点，折线图才不会很突兀。
           if (index + 1 < this.list.length) {
             var time1 = Date.parse(new Date(item.ReceiveTime))
             var item2 = this.list[index + 1]
@@ -886,7 +886,7 @@
             //   index,
             //   getDateStr(new Date(item.ReceiveTime))
             // )
-            //补充空白数据 间隔 15分钟
+            // 补充空白数据 间隔 15分钟
             if (time2 - time1 >= 15 * 60 * 1000) {
               // console.log('离线########################', time1)
               var batteryItemList2 = []
@@ -898,17 +898,17 @@
                   value: 0,
                   date: getDateStr(new Date(time1 + 1000)),
                 })
-                //补充点
+                // 补充点
                 batteryItemList3.push({
                   pos: j,
                   value: 0,
                   date: getDateStr(new Date(time2 - 1000)),
                 })
               }
-              //补充单体电池空白数据
+              // 补充单体电池空白数据
               batteryList.push(batteryItemList2)
               batteryList.push(batteryItemList3)
-              //补充电压空白数据
+              // 补充电压空白数据
               volList.push([
                 {
                   value: 0,
@@ -921,7 +921,7 @@
                   date: getDateStr(new Date(time2 - 60 * 1000)),
                 },
               ])
-              //补充电流空白数据
+              // 补充电流空白数据
               curList.push([
                 {
                   value: 0,
@@ -934,7 +934,7 @@
                   date: getDateStr(new Date(time2 - 60 * 1000)),
                 },
               ])
-              //补充电量空白数据
+              // 补充电量空白数据
               socList.push([
                 {
                   value: 0,
@@ -947,7 +947,7 @@
                   date: getDateStr(new Date(time2 - 60 * 1000)),
                 },
               ])
-              //补充温度空白数据
+              // 补充温度空白数据
               tempList.push([
                 {
                   value: 0,
@@ -970,7 +970,7 @@
               ])
             }
           }
-          //结束1次循环
+          // 结束1次循环
         }
         // console.log(
         //   '#测试#',
@@ -1017,16 +1017,16 @@
       },
       setMtUI() {
         this.list = this.dataListMT
-        //单体电池
+        // 单体电池
         var batteryList = []
         var volList = []
         var socList = []
         var curList = []
         var tempList = []
-        //遍历当前数据列表-全部
+        // 遍历当前数据列表-全部
         for (let index = 0; index < this.list.length; index++) {
           var item = this.list[index]
-          //电压、电流、温度、soc
+          // 电压、电流、温度、soc
           volList.push([
             {
               value: parseFloat(item.TotalBatteryVoltage / 100).toFixed(2),
@@ -1064,10 +1064,10 @@
             },
           ])
 
-          //每一串
+          // 每一串
           var batteryTemp = JSON.parse(item.BatteryVoltages)
           var batteryItemList = []
-          //每个时间的电池数组
+          // 每个时间的电池数组
           batteryTemp.forEach((items, index) => {
             var vol = parseFloat(items.Voltage / 1000).toFixed(3)
             batteryItemList.push({
@@ -1076,15 +1076,15 @@
               date: item.ReceiveTime,
             })
           })
-          //每一个时间存一组电池数据 x时间 y每个电池电压
+          // 每一个时间存一组电池数据 x时间 y每个电池电压
           batteryList.push(batteryItemList)
-          //以下是判断如果两点间隔大于 15分钟，就补充两个空白时间点，折线图才不会很突兀。
+          // 以下是判断如果两点间隔大于 15分钟，就补充两个空白时间点，折线图才不会很突兀。
           if (index + 1 < this.list.length) {
             var time1 = Date.parse(new Date(item.ReceiveTime))
             var item2 = this.list[index + 1]
             var time2 = Date.parse(new Date(item2.ReceiveTime))
 
-            //补充空白数据 间隔 15分钟
+            // 补充空白数据 间隔 15分钟
             if (time2 - time1 >= 15 * 60 * 1000) {
               // console.log('离线########################', time1)
               var batteryItemList2 = []
@@ -1096,17 +1096,17 @@
                   value: 0,
                   date: getDateStr(new Date(time1 + 1000)),
                 })
-                //补充点
+                // 补充点
                 batteryItemList3.push({
                   pos: j,
                   value: 0,
                   date: getDateStr(new Date(time2 - 1000)),
                 })
               }
-              //补充单体电池空白数据
+              // 补充单体电池空白数据
               batteryList.push(batteryItemList2)
               batteryList.push(batteryItemList3)
-              //补充电压空白数据
+              // 补充电压空白数据
               volList.push([
                 {
                   value: 0,
@@ -1119,7 +1119,7 @@
                   date: getDateStr(new Date(time2 - 60 * 1000)),
                 },
               ])
-              //补充电流空白数据
+              // 补充电流空白数据
               curList.push([
                 {
                   value: 0,
@@ -1140,7 +1140,7 @@
                   date: getDateStr(new Date(time2 - 60 * 1000)),
                 },
               ])
-              //补充电量空白数据
+              // 补充电量空白数据
               socList.push([
                 {
                   value: 0,
@@ -1153,7 +1153,7 @@
                   date: getDateStr(new Date(time2 - 60 * 1000)),
                 },
               ])
-              //补充温度空白数据
+              // 补充温度空白数据
               tempList.push([
                 {
                   value: 0,
@@ -1184,7 +1184,7 @@
               ])
             }
           }
-          //结束1次循环
+          // 结束1次循环
         }
         // console.log(
         //   '#测试#',
@@ -1229,7 +1229,7 @@
           )
         }, 100)
       },
-      //异步获取数据-网络请求
+      // 异步获取数据-网络请求
       async fetchData() {
         // if (true) {
         //   this.getBmsHis(this.queryForm.key)
@@ -1283,7 +1283,6 @@
           }
           if (ptid == '') {
             this.$baseMessage('未匹配该电池型号', 'error')
-            return
           }
         } else {
           this.$baseMessage('未匹配到设备号', 'error')

@@ -5,14 +5,14 @@
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item label="编号">
+              <a-form-item :label="$t('org.form.id')">
                 <a-input v-model="queryParam.id" placeholder=""/>
               </a-form-item>
             </a-col>
             <a-col :md="!advanced && 8 || 24" :sm="24">
               <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
-                <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
-                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
+                <a-button type="primary" @click="$refs.table.refresh(true)">{{ $t('common.search') }}</a-button>
+                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">{{ $t('common.reset') }}</a-button>
               </span>
             </a-col>
           </a-row>
@@ -20,7 +20,7 @@
       </div>
 
       <div class="table-operator">
-        <a-button type="primary" icon="plus" @click="handleAdd">添加</a-button>
+        <a-button type="primary" icon="plus" @click="handleAdd">{{ $t('org.actions.add') }}</a-button>
       </div>
 
       <s-table
@@ -89,33 +89,6 @@ import ZkTable from 'vue-table-with-tree-grid'
 
 Vue.use(ZkTable)
 
-const columns = [
-  {
-    title: '编号',
-    dataIndex: 'id'
-  },
-  {
-    title: '名称',
-    dataIndex: 'name'
-  },
-  {
-    title: '上级',
-    dataIndex: 'parent'
-  },
-  {
-    title: '描述',
-    dataIndex: 'description'
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'create_date'
-  },
-  {
-    title: '更新时间',
-    dataIndex: 'update_time'
-  }
-]
-
 export default {
   name: 'OrgList',
   components: {
@@ -125,7 +98,6 @@ export default {
     StepByStepModal
   },
   data () {
-    this.columns = columns
     return {
       // create model
       visible: false,
@@ -142,8 +114,9 @@ export default {
         page_no: 1,
         page_size: 5
       },
+      columns: [],
       loadData: parameter => {
-        let arg = Object.assign(parameter, this.queryData)
+        const arg = Object.assign(parameter, this.queryData)
         arg.page_no = arg.pageNo
         arg.page_size = arg.pageSize
         delete arg.pageNo
@@ -178,20 +151,17 @@ export default {
         selectionType: false
       },
       orgList: [],
-       orgColumns: [
-         {
-           label: '名称',
-           prop: 'title'
-         },
-         {
-           label: '编号',
-          prop: 'value'
-        }
-      ]
+      orgColumns: []
     }
   },
   created () {
+    this.updateColumns()
     this.loadOrgTree()
+  },
+  watch: {
+    '$i18n.locale' () {
+      this.updateColumns()
+    }
   },
   computed: {
     rowSelection () {
@@ -202,6 +172,45 @@ export default {
     }
   },
   methods: {
+    updateColumns () {
+      this.columns = [
+        {
+          title: this.$t('org.table.columns.id'),
+          dataIndex: 'id'
+        },
+        {
+          title: this.$t('org.table.columns.name'),
+          dataIndex: 'name'
+        },
+        {
+          title: this.$t('org.table.columns.parent'),
+          dataIndex: 'parent'
+        },
+        {
+          title: this.$t('org.table.columns.description'),
+          dataIndex: 'description'
+        },
+        {
+          title: this.$t('org.table.columns.createTime'),
+          dataIndex: 'create_date'
+        },
+        {
+          title: this.$t('org.table.columns.updateTime'),
+          dataIndex: 'update_time'
+        }
+      ]
+
+      this.orgColumns = [
+        {
+          label: this.$t('org.tree.columns.title'),
+          prop: 'title'
+        },
+        {
+          label: this.$t('org.tree.columns.value'),
+          prop: 'value'
+        }
+      ]
+    },
     handleAdd () {
       console.log('handle add')
       this.mdl = null
@@ -232,7 +241,7 @@ export default {
               // this.$refs.table.refresh()
               this.loadOrgTree()
 
-              this.$message.info('修改成功')
+              this.$message.info(this.$t('org.message.updateSuccess'))
             })
           } else {
             delete values.id
@@ -258,7 +267,7 @@ export default {
               // this.$refs.table.refresh()
               this.loadOrgTree()
 
-              this.$message.info('新增成功')
+              this.$message.info(this.$t('org.message.createSuccess'))
             })
           }
         } else {

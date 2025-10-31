@@ -3,24 +3,24 @@
   <a-card :bordered="false" :bodyStyle="{ padding: '16px 16px', height: '100%' }" :style="{ height: '100%' }">
     <div v-if='showExporting'>
       <a-alert
-        :message="exportError ? '导出失败' : '导出设备'"
-        :description="exportError ? `导出过程中发生错误: ${exportError}` : '导出选中的设备'"
+        :message="exportError ? $t('list.device.export.failed') : $t('list.device.export.title')"
+        :description="exportError ? $t('list.device.export.error', { error: exportError }) : $t('list.device.export.description')"
         :type="exportError ? 'error' : 'info'"
         show-icon
       >
       </a-alert>
 
-      <!-- 添加独立的错误提示和恢复按钮 -->
+      <!-- Independent error prompt and resume button -->
       <div v-if="exportError" class="export-error-actions">
         <a-button type="primary" @click="resumeExporting">
-          恢复导出
+          {{ $t('list.device.export.resume') }}
         </a-button>
       </div>
 
       <div v-if="lastExportedDeviceId" class="export-status">
-        <span>最后导出设备ID: {{ lastExportedDeviceId }}</span>
+        <span>{{ $t('list.device.export.lastId', { id: lastExportedDeviceId }) }}</span>
         <span v-if="exportedCount && totalExportCount">
-          (已导出 {{ exportedCount }}/{{ totalExportCount }} 条记录)
+          {{ $t('list.device.export.progress', { current: exportedCount, total: totalExportCount }) }}
         </span>
       </div>
 
@@ -39,16 +39,16 @@
         @change="onTabChange"
       >
         <a-tab-pane key="table">
-          <template #tab><a-icon type="table" /><span>列表</span></template>
+          <template #tab><a-icon type="table" /><span>{{ $t('list.device.tabs.table') }}</span></template>
         </a-tab-pane>
         <a-tab-pane key="map">
-          <template #tab><a-icon type="environment" /><span>地图</span></template>
+          <template #tab><a-icon type="environment" /><span>{{ $t('list.device.tabs.map') }}</span></template>
         </a-tab-pane>
         <a-tab-pane key="alarm">
-          <template #tab><a-icon type="warning" /><span>告警</span></template>
+          <template #tab><a-icon type="warning" /><span>{{ $t('list.device.tabs.alarm') }}</span></template>
         </a-tab-pane>
         <a-tab-pane key="location-history">
-          <template #tab><a-icon type="history" /><span>历史里程</span></template>
+          <template #tab><a-icon type="history" /><span>{{ $t('list.device.tabs.locationHistory') }}</span></template>
         </a-tab-pane>
       </a-tabs>
 
@@ -86,13 +86,13 @@
           </a-col>
           <a-col :md='4' :sm='12'>
             <div v-if='!showMoreParam' style='margin-bottom: 10px'>
-              <a class="ant-dropdown-link" @click='showMoreParam = true'>更多参数<a-icon type="down"/></a>
+              <a class="ant-dropdown-link" @click='showMoreParam = true'>{{ $t('list.device.filters.moreParams') }}<a-icon type="down"/></a>
             </div>
             <div v-if='showMoreParam'>
               <a
                 class="ant-dropdown-link"
                 @click='() => { showMoreParam = false; queryData.bt_code = ""; queryData.iccid = ""; queryData.soh = ""; queryData.soc = ""; queryData.alarm = "" }'
-              >收起参数<a-icon type="up"/></a>
+              >{{ $t('list.device.filters.collapseParams') }}<a-icon type="up"/></a>
             </div>
           </a-col>
         </a-row>
@@ -108,7 +108,7 @@
         <a-row>
           <a-col v-if="!showAlarm" :md="!advanced && 4 || 12" :sm="12">
             <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
-              <a-button type="primary" @click="refreshTable(true)">查询</a-button>
+              <a-button type="primary" @click="refreshTable(true)">{{ $t('common.search') }}</a-button>
               <!--                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>-->
               <!--              <a @click="toggleAdvanced" style="margin-left: 8px">-->
               <!--                {{ advanced ? '收起' : '展开' }}-->
@@ -119,7 +119,7 @@
           <!-- checkbox for contains_search -->
           <a-col :md="4" :sm="12">
             <a-form-item>
-              <a-checkbox v-model="queryData.contains_search">模糊搜索</a-checkbox>
+              <a-checkbox v-model="queryData.contains_search">{{ $t('list.device.filters.fuzzySearch') }}</a-checkbox>
             </a-form-item>
           </a-col>
           <!--          <a-col :md="8" :sm="24">-->
@@ -132,21 +132,21 @@
 
     <div v-if='showTableTab'>
       <div v-if="table_visible" class="table-operator">
-        <a-button type='primary' icon='plus' @click='handleAdd'>添加/修改</a-button>
-        <a-button type='primary' @click='handleBatchCommandManager'>下发指令管理</a-button>
-        <a-button type='primary' @click='handleSelectParams'>生产测试</a-button>
-        <a-button type='primary' @click='handleExport'>导出</a-button>
-        <a-button type='primary' @click='handleImport'>导入</a-button>
-        <a-button type='primary' @click='handleSendBtCode'>下发 BT 码</a-button>
-        <a-button type='primary' @click='handleRefreshOnlineStatusPage'>刷新设备在线状态(当前页)</a-button>
+        <a-button type='primary' icon='plus' @click='handleAdd'>{{ $t('list.device.actions.addEdit') }}</a-button>
+        <a-button type='primary' @click='handleBatchCommandManager'>{{ $t('list.device.actions.commandManager') }}</a-button>
+        <a-button type='primary' @click='handleSelectParams'>{{ $t('list.device.actions.productionTest') }}</a-button>
+        <a-button type='primary' @click='handleExport'>{{ $t('list.device.actions.export') }}</a-button>
+        <a-button type='primary' @click='handleImport'>{{ $t('list.device.actions.import') }}</a-button>
+        <a-button type='primary' @click='handleSendBtCode'>{{ $t('list.device.actions.sendBtCode') }}</a-button>
+        <a-button type='primary' @click='handleRefreshOnlineStatusPage'>{{ $t('list.device.actions.refreshOnlineStatus') }}</a-button>
         <a-dropdown v-action:edit v-if='selectedRowKeys.length > 0'>
           <a-menu slot='overlay'>
             <a-menu-item key='send-command' @click='handleSendCommandBatch'>
               <a-icon type='batch' />
-              下发指令
+              {{ $t('list.device.actions.batchCommand') }}
             </a-menu-item>
           </a-menu>
-          <a-button style='margin-left: 8px'>批量操作
+          <a-button style='margin-left: 8px'>{{ $t('common.batchActions') }}
             <a-icon type='down' />
           </a-button>
         </a-dropdown>
@@ -168,7 +168,7 @@
           {{ index + 1 }}
         </span>
         <span slot="status" slot-scope="text">
-          <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
+          <a-badge :status="statusMap[text].status" :text="statusMap[text].text" />
         </span>
         <span slot="description" slot-scope="text">
           <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
@@ -176,9 +176,9 @@
 
         <span slot="device_info" slot-scope="text, record">
           <template>
-            编号: <span>{{ record.code }}</span>
+            {{ $t('list.device.info.code') }}: <span>{{ record.code }}</span>
             <br />
-            别名: <span>{{ record.alias }}</span>
+            {{ $t('list.device.info.alias') }}: <span>{{ record.alias }}</span>
             <br />
             ICCID: <span>{{ record.iccid }}</span>
           </template>
@@ -186,9 +186,9 @@
 
         <span slot="organization_info" slot-scope="text, record">
           <template>
-            组织: <span>{{ record.organization_name }}</span>
+            {{ $t('list.device.info.organization') }}: <span>{{ record.organization_name }}</span>
             <br />
-            仓库: <span>{{ record.storehouse_name }}</span>
+            {{ $t('list.device.info.storehouse') }}: <span>{{ record.storehouse_name }}</span>
           </template>
         </span>
 
@@ -199,29 +199,29 @@
             <br />
             SOH: <span>{{ record.bms_soh }}</span>
             <br />
-            循环次数: <span>{{ record.bms_battery_cycle}}</span>
+            {{ $t('list.device.info.batteryCycle') }}: <span>{{ record.bms_battery_cycle }}</span>
             <br />
-            软件版本: <span>{{ record.bms_software_version }}</span>
+            {{ $t('list.device.info.softwareVersion') }}: <span>{{ record.bms_software_version }}</span>
             <br />
-            硬件版本: <span>{{ record.bms_hardware_version }}</span>
+            {{ $t('list.device.info.hardwareVersion') }}: <span>{{ record.bms_hardware_version }}</span>
           </template>
         </span>
 
         <span slot="model_info" slot-scope="text, record">
           <template>
-            电池型号: <span>{{ record.bms_product_no}}</span>
+            {{ $t('list.device.info.batteryModel') }}: <span>{{ record.bms_product_no }}</span>
             <br />
-            设备型号: <span>{{ record.model_name }}</span>
+            {{ $t('list.device.info.deviceModel') }}: <span>{{ record.model_name }}</span>
             <br />
-            BT码: <span>{{ record.bms_bt }}</span>
+            {{ $t('list.device.info.btCode') }}: <span>{{ record.bms_bt }}</span>
           </template>
         </span>
 
         <span slot="version_info" slot-scope="text, record">
           <template>
-            硬件: <span>{{ record.s_ver }}</span>
+            {{ $t('list.device.info.hardwareShort') }}: <span>{{ record.s_ver }}</span>
             <br />
-            软件: <span>{{ record.h_ver }}</span>
+            {{ $t('list.device.info.softwareShort') }}: <span>{{ record.h_ver }}</span>
           </template>
         </span>
 
@@ -229,9 +229,9 @@
           <template>
             {{ record.location_time ? localTime(record.location_time) : '' }}
             <br />
-            信号强度: <span>{{ record.signal }}</span>
+            {{ $t('list.device.info.signalStrength') }}: <span>{{ record.signal }}</span>
             <br />
-            卫星: <span>{{ record.satellites }}</span>
+            {{ $t('list.device.info.satellites') }}: <span>{{ record.satellites }}</span>
           </template>
         </span>
 
@@ -239,7 +239,7 @@
           <template>
             <!-- 上次基站定位: <span>{{ record.last_cell_location_time ? localTime(record.last_cell_location_time) : '' }}</span> -->
             <!-- <br /> -->
-            上次网络通讯: <span>{{ record.last_communication_time ? localTime(record.last_communication_time) : '' }}</span>
+            {{ $t('list.device.info.lastCommunication') }}: <span>{{ record.last_communication_time ? localTime(record.last_communication_time) : '' }}</span>
             <!-- <br /> -->
             <!-- 第一次 GPS 定位: <span>{{ record.first_gps_location_time ? localTime(record.first_gps_location_time) : '' }}</span> -->
             <!-- <br /> -->
@@ -249,29 +249,29 @@
 
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleBatteryInfo(record)">电池详情</a>
+            <a @click="handleBatteryInfo(record)">{{ $t('list.device.menu.batteryDetails') }}</a>
             <a-divider type="vertical" />
             <a-dropdown>
-              <a class="ant-dropdown-link">更多<a-icon type="down"/>
+              <a class="ant-dropdown-link">{{ $t('common.more') }}<a-icon type="down"/>
               </a>
               <a-menu slot="overlay">
                 <a-menu-item v-if='is_sysadmin'>
-                  <a v-if="is_sysadmin" @click="handleEdit(record)">修改</a>
+                  <a v-if="is_sysadmin" @click="handleEdit(record)">{{ $t('common.edit') }}</a>
                 </a-menu-item>
                 <a-menu-item>
-                  <a @click="handleMap(record)">历史行程</a>
+                  <a @click="handleMap(record)">{{ $t('list.device.menu.historyRoute') }}</a>
                 </a-menu-item>
                 <a-menu-item>
-                  <a @click="handleLocationHistory(record)">历史里程</a>
+                  <a @click="handleLocationHistory(record)">{{ $t('list.device.menu.historyMileage') }}</a>
                 </a-menu-item>
                 <a-menu-item>
-                  <a @click="handleSendCommand(record)">下发指令</a>
+                  <a @click="handleSendCommand(record)">{{ $t('list.device.menu.sendCommand') }}</a>
                 </a-menu-item>
                 <a-menu-item>
-                  <a @click="handleProtocolLog(record)">协议日志</a>
+                  <a @click="handleProtocolLog(record)">{{ $t('list.device.menu.protocolLog') }}</a>
                 </a-menu-item>
                 <a-menu-item>
-                  <a @click='handleRefreshOnlineStatus(record)'>刷新在线状态</a>
+                  <a @click='handleRefreshOnlineStatus(record)'>{{ $t('list.device.menu.refreshStatus') }}</a>
                 </a-menu-item>
               </a-menu>
             </a-dropdown>
@@ -344,45 +344,45 @@
         v-if="map_visible && !table_visible"
         style="width: 100%"
       >
-        <div><a @click="handleMapClose()"><< 返回</a></div>
+        <div><a @click="handleMapClose()">{{ $t('list.device.map.back') }}</a></div>
         <div><br /></div>
-        <div>设备：{{ device_id }}</div>
+        <div>{{ $t('list.device.map.device', { deviceId: device_id }) }}</div>
         <div><br /></div>
         <a-spin :spinning="map_loading">
           <a-form>
             <a-row :gutter="48">
               <a-col :md="4" :sm="24">
-                <a-form-item aria-label="起始日期">
-                  <a-date-picker v-model="queryData.start_date" style="width: 100%" placeholder="起始日期"/>
+                <a-form-item :aria-label="$t('list.device.map.startDate')">
+                  <a-date-picker v-model="queryData.start_date" style="width: 100%" :placeholder="$t('list.device.map.startDate')"/>
                 </a-form-item>
               </a-col>
               <a-col :md="4" :sm="24">
-                <a-form-item aria-label="起始时间">
-                  <a-time-picker v-model="queryData.start_time" style="width: 100%" placeholder="起始时间"/>
+                <a-form-item :aria-label="$t('list.device.map.startTime')">
+                  <a-time-picker v-model="queryData.start_time" style="width: 100%" :placeholder="$t('list.device.map.startTime')"/>
                 </a-form-item>
               </a-col>
             </a-row>
             <a-row :gutter="48">
               <a-col :md="4" :sm="24">
-                <a-form-item aria-label="结束日期">
+                <a-form-item :aria-label="$t('list.device.map.endDate')">
                   <a-date-picker
                     v-model="queryData.end_date"
                     style="width: 100%"
-                    placeholder="结束日期"
+                    :placeholder="$t('list.device.map.endDate')"
                   />
                 </a-form-item>
               </a-col>
               <a-col :md="4" :sm="24">
-                <a-form-item aria-label="结束时间">
+                <a-form-item :aria-label="$t('list.device.map.endTime')">
                   <a-time-picker
                     v-model="queryData.end_time"
                     style="width: 100%"
-                    placeholder="结束时间"
+                    :placeholder="$t('list.device.map.endTime')"
                   />
                 </a-form-item>
               </a-col>
               <a-col :md="4" :sm="24">
-                <a-button type="primary" @click="refreshMap(device_id)">查询</a-button>
+                <a-button type="primary" @click="refreshMap(device_id)">{{ $t('list.device.map.search') }}</a-button>
               </a-col>
             </a-row>
           </a-form>
@@ -395,7 +395,7 @@
           style='height: 70vh'
           @complete="onMapComplete"
         >
-          <amap-polyline 
+          <amap-polyline
             v-if="polyline.path && polyline.path.length > 0"
             :path="polyline.path"
             stroke-color="#3366FF"
@@ -422,7 +422,7 @@
 
     <div v-if='packet_log_visible'>
       <a-modal
-        title="协议日志"
+        :title="$t('list.device.modal.protocolLog')"
         width='90vw'
         centered
         :visible="packet_log_visible"
@@ -480,9 +480,9 @@
             <a-tooltip>
               <template #title>
                 <div>
-                  <p>设备编号：{{ record.device.code }}</p>
-                  <p>电池编号：{{ record.device.bms_bt }}</p>
-                  <p>定位时间：{{ record.device.location_time }}</p>
+                  <p>{{ $t('list.device.map.tooltip.deviceCode') }}：{{ record.device.code }}</p>
+                  <p>{{ $t('list.device.map.tooltip.batteryCode') }}：{{ record.device.bms_bt }}</p>
+                  <p>{{ $t('list.device.map.tooltip.locationTime') }}：{{ record.device.location_time }}</p>
                 </div>
               </template>
               <div class="custom-marker" />
@@ -502,7 +502,7 @@
     </div>
 
     <a-modal
-      title="历史里程记录"
+      :title="$t('list.device.modal.historyMileage')"
       width="90%"
       :visible="locationHistoryVisible"
       @cancel="locationHistoryVisible = false"
@@ -565,119 +565,6 @@ function interpolate(u, begin, end) {
 
 // let amapManager = new VueAMap.AMapManager()
 
-const columns = [
-  // {
-  //   title: '#',
-  //   scopedSlots: { customRender: 'serial' }
-  // },
-  {
-    title: '编号',
-    dataIndex: 'code',
-    scopedSlots: { customRender: 'device_info' }
-  },
-  {
-    title: '组织信息',
-    dataIndex: 'organization_name',
-    scopedSlots: { customRender: 'organization_info' }
-  },
-  {
-    title: 'BMS',
-    dataIndex: 'bms',
-    scopedSlots: { customRender: 'bms_info' }
-  },
-  {
-    title: '设备型号',
-    dataIndex: 'model_name',
-    scopedSlots: { customRender: 'model_info' }
-  },
-  {
-    title: '版本信息',
-    dataIndex: 'version',
-    scopedSlots: { customRender: 'version_info' }
-  },
-  {
-    title: 'GPS 定位时间',
-    dataIndex: 'location_time',
-    scopedSlots: { customRender: 'location_time' },
-    width: '136px'
-  },
-  {
-    title: '注册时间',
-    dataIndex: 'register_time',
-    scopedSlots: { customRender: 'register_time' },
-    width: '136px'
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'create_date',
-    scopedSlots: { customRender: 'create_date' },
-    width: '136px'
-  },
-  {
-    title: '其他时间',
-    dataIndex: 'other_time',
-    scopedSlots: { customRender: 'other_time' }
-  },
-  // {
-  //   title: '第一次 GPS 定位时间',
-  //   dataIndex: 'first_gps_location_time',
-  //   width: '136px'
-  // },
-  // {
-  //   title: '第一次基站定位时间',
-  //   dataIndex: 'first_cell_location_time',
-  //   width: '136px'
-  // },
-  // {
-  //   title: '描述',
-  //   dataIndex: 'description',
-  //   scopedSlots: { customRender: 'description' }
-  // },
-  // {
-  //   title: '服务调用次数',
-  //   dataIndex: 'callNo',
-  //   sorter: true,
-  //   needTotal: true,
-  //   customRender: (text) => text + ' 次'
-  // },
-  // {
-  //   title: '状态',
-  //   dataIndex: 'status',
-  //   scopedSlots: { customRender: 'status' }
-  // },
-  // {
-  //   title: '更新时间',
-  //   dataIndex: 'updatedAt',
-  //   sorter: true
-  // },
-
-  {
-    title: '操作',
-    dataIndex: 'action23',
-    scopedSlots: { customRender: 'action' },
-    fixed: 'right'
-  }
-]
-
-const statusMap = {
-  0: {
-    status: 'default',
-    text: '关闭'
-  },
-  1: {
-    status: 'processing',
-    text: '运行中'
-  },
-  2: {
-    status: 'success',
-    text: '已上线'
-  },
-  3: {
-    status: 'error',
-    text: '异常'
-  }
-}
-
 export default {
   name: 'TableList',
   components: {
@@ -697,7 +584,6 @@ export default {
     LocationHistoryTable
   },
   data() {
-    this.columns = columns
     return {
       activeTab: 'table',
       styles: {
@@ -846,14 +732,7 @@ export default {
       totalExportCount: null,
     }
   },
-  filters: {
-    statusFilter(type) {
-      return statusMap[type].text
-    },
-    statusTypeFilter(type) {
-      return statusMap[type].status
-    }
-  },
+
   created() {
     // getRoleList({ t: new Date() })
     const role = storage.get(ROLE)
@@ -872,6 +751,121 @@ export default {
       return {
         selectedRowKeys: this.selectedRowKeys,
         onChange: this.onSelectChange
+      }
+    },
+    columns() {
+      return [
+        // {
+        //   title: '#',
+        //   scopedSlots: { customRender: 'serial' }
+        // },
+        {
+          title: this.$t('list.device.columns.code'),
+          dataIndex: 'code',
+          scopedSlots: { customRender: 'device_info' }
+        },
+        {
+          title: this.$t('list.device.columns.organizationInfo'),
+          dataIndex: 'organization_name',
+          scopedSlots: { customRender: 'organization_info' }
+        },
+        {
+          title: 'BMS',
+          dataIndex: 'bms',
+          scopedSlots: { customRender: 'bms_info' }
+        },
+        {
+          title: this.$t('list.device.columns.deviceModel'),
+          dataIndex: 'model_name',
+          scopedSlots: { customRender: 'model_info' }
+        },
+        {
+          title: this.$t('list.device.columns.versionInfo'),
+          dataIndex: 'version',
+          scopedSlots: { customRender: 'version_info' }
+        },
+        {
+          title: this.$t('list.device.columns.gpsLocationTime'),
+          dataIndex: 'location_time',
+          scopedSlots: { customRender: 'location_time' },
+          width: '136px'
+        },
+        {
+          title: this.$t('list.device.columns.registerTime'),
+          dataIndex: 'register_time',
+          scopedSlots: { customRender: 'register_time' },
+          width: '136px'
+        },
+        {
+          title: this.$t('list.device.columns.createTime'),
+          dataIndex: 'create_date',
+          scopedSlots: { customRender: 'create_date' },
+          width: '136px'
+        },
+        {
+          title: this.$t('list.device.columns.otherTime'),
+          dataIndex: 'other_time',
+          scopedSlots: { customRender: 'other_time' }
+        },
+        // {
+        //   title: '第一次 GPS 定位时间',
+        //   dataIndex: 'first_gps_location_time',
+        //   width: '136px'
+        // },
+        // {
+        //   title: '第一次基站定位时间',
+        //   dataIndex: 'first_cell_location_time',
+        //   width: '136px'
+        // },
+        // {
+        //   title: '描述',
+        //   dataIndex: 'description',
+        //   scopedSlots: { customRender: 'description' }
+        // },
+        // {
+        //   title: '服务调用次数',
+        //   dataIndex: 'callNo',
+        //   sorter: true,
+        //   needTotal: true,
+        //   customRender: (text) => text + ' 次'
+        // },
+        // {
+        //   title: '状态',
+        //   dataIndex: 'status',
+        //   scopedSlots: { customRender: 'status' }
+        // },
+        // {
+        //   title: '更新时间',
+        //   dataIndex: 'updatedAt',
+        //   sorter: true
+        // },
+
+        {
+          title: this.$t('list.device.columns.action'),
+          dataIndex: 'action23',
+          scopedSlots: { customRender: 'action' },
+          fixed: 'right'
+        }
+      ]
+    },
+    statusMap() {
+      return {
+        0: {
+          status: 'default',
+          text: this.$t('list.device.status.closed')
+        },
+        1: {
+          status: 'processing',
+          text: this.$t('list.device.status.running')
+        },
+        2: {
+          status: 'success',
+          text: this.$t('list.device.status.online')
+        },
+        3: {
+          status: 'error',
+          text: this.$t('list.device.status.abnormal')
+        }
       }
     }
     // queryData () {
@@ -1200,56 +1194,56 @@ export default {
         path: [],
         markers: []
       };
-      
+
       this.map_loading = true;
       const arg = Object.assign({}, this.queryData);
       console.log('loadData request arg:', arg);
-      
+
       getLocation(deviceId, arg)
         .then(res => {
           this.map_loading = false;
-          
+
           // Check if we have valid data
           if (!res.data || res.data.length === 0) {
             this.$message.info('No location data available for this device');
             return;
           }
-          
+
           try {
             // Filter for valid coordinates
-            const validLocations = res.data.filter(item => 
-              item.mars_longitude && item.mars_latitude && 
+            const validLocations = res.data.filter(item =>
+              item.mars_longitude && item.mars_latitude &&
               !isNaN(item.mars_longitude) && !isNaN(item.mars_latitude) &&
               item.mars_longitude !== 0 && item.mars_latitude !== 0
             );
-            
+
             if (validLocations.length === 0) {
               this.$message.info('No valid location data available for this device');
               return;
             }
-            
+
             // Set center point for the map
             this.center = [validLocations[0].mars_longitude, validLocations[0].mars_latitude];
-            
+
             // Process coordinates
             const newPath = [];
             const newMarkers = [];
-            
+
             validLocations.forEach(item => {
               const lon = parseFloat(item.mars_longitude);
               const lat = parseFloat(item.mars_latitude);
               newPath.push([lon, lat]);
               newMarkers.push([lon, lat]);
             });
-            
-            // Set the polyline data 
+
+            // Set the polyline data
             this.polyline = {
               path: newPath,
               markers: newMarkers
             };
-            
+
             console.log('Path data prepared:', this.polyline.path);
-            
+
             // Force map refresh to re-render components
             this.refresh_map = false;
             this.$nextTick(() => {
@@ -1529,7 +1523,7 @@ export default {
       const fetchWithTimeout = async (url, options, timeout = 30000) => {
         const controller = new AbortController();
         const id = setTimeout(() => controller.abort(), timeout);
-        
+
         try {
           const response = await fetch(url, {
             ...options,
@@ -1716,7 +1710,7 @@ export default {
 
       this.$message.success(`成功导出 ${exportedCount} 条记录`)
       this.exportProgress = 100
-      
+
       // 导出完成后，隐藏导出状态
       setTimeout(() => {
         this.showExporting = false
@@ -1988,4 +1982,3 @@ export default {
   margin-left: 10px;
 }
 </style>
-

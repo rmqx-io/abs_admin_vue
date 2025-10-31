@@ -3,7 +3,7 @@
         <div>
             <h2>告警数据库配置</h2>
             <p>管理告警数据是否写入数据库的开关</p>
-            
+
             <a-form :model="configForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
                 <a-form-item label="告警数据库写入">
                     <a-switch
@@ -15,13 +15,13 @@
                         {{ configForm.enabled ? '已启用' : '已禁用' }}
                     </span>
                 </a-form-item>
-                
+
                 <a-form-item label="当前状态">
                     <a-tag :color="configForm.enabled ? 'green' : 'red'">
                         {{ configForm.enabled ? '告警数据将写入数据库' : '告警数据不会写入数据库' }}
                     </a-tag>
                 </a-form-item>
-                
+
                 <a-form-item label="说明">
                     <div>
                         <p>• 启用时：所有BMS告警数据将正常写入数据库</p>
@@ -30,7 +30,7 @@
                     </div>
                 </a-form-item>
             </a-form>
-            
+
             <div class="action-buttons">
                 <a-button type="primary" @click="refreshConfig" :loading="loading">
                     刷新状态
@@ -89,7 +89,7 @@ export default {
                 this.loading = false
             }
         },
-        
+
         async onSwitchChange (checked) {
             this.loading = true
             try {
@@ -133,4 +133,4 @@ p {
     margin-bottom: 8px;
     color: #666;
 }
-</style> 
+</style>

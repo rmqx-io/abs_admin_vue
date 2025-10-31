@@ -90,7 +90,7 @@
         />
         <p v-if="offlineMessageTtl !== null">有效期 {{ getTimeGap(offlineMessageTtl) }}。</p>
     </a-form-item>
-    <div v-if='formErrorMessage' class='error'>{{ this.formErrorMessage}}</div>
+    <div v-if='formErrorMessage' class='error'>{{ this.formErrorMessage }}</div>
   </a-modal>
 </template>
 
@@ -960,7 +960,7 @@ B1-A0-7E
             ) {
                     subCommand = "0xff";
             }
-            let arg = {
+            const arg = {
                 id: (new Date()).getTime(), // current timestamp in milliseconds
                 name: this.currentRow.name,
                 command: this.currentRow.command,
@@ -989,8 +989,7 @@ B1-A0-7E
                     console.log("batch command id", res.data.id);
                     // close current dialog and show batch command manager dialog
                     this.$emit("ok", res.data.id);
-                }
-                else {
+                } else {
                     // send command failed
                     this.$message.error(res);
                 }
@@ -1104,14 +1103,11 @@ B1-A0-7E
             const days = Math.floor(hours / 24);
             if (days > 0) {
                 return `${days} 天 ${hours % 24} 小时`;
-            }
-            else if (hours > 0) {
+            } else if (hours > 0) {
                 return `${hours} 小时 ${minutes % 60} 分钟`;
-            }
-            else if (minutes > 0) {
+            } else if (minutes > 0) {
                 return `${minutes} 分钟 ${seconds % 60} 秒`;
-            }
-            else {
+            } else {
                 return `${seconds} 秒`;
             }
         },

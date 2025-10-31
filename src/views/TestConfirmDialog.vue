@@ -1,7 +1,7 @@
 <template>
   <div class="test-confirm-dialog">
     <h1>Confirm Dialog Test Page</h1>
-    
+
     <div class="test-controls">
       <el-button type="primary" @click="showBasicConfirm">Basic Confirmation</el-button>
       <el-button type="warning" @click="showWarningConfirm">Warning Confirmation</el-button>
@@ -38,7 +38,7 @@ export default {
         this.lastResult = 'User cancelled the basic dialog'
       })
     },
-    
+
     showWarningConfirm() {
       this.$confirm('This action may have consequences. Continue?', 'Warning', {
         confirmButtonText: 'Continue',
@@ -50,7 +50,7 @@ export default {
         this.lastResult = 'User cancelled the warning dialog'
       })
     },
-    
+
     showDangerConfirm() {
       this.$confirm('This action cannot be undone! Are you sure?', 'Danger', {
         confirmButtonText: 'Delete',
@@ -62,7 +62,7 @@ export default {
         this.lastResult = 'User cancelled the danger dialog'
       })
     },
-    
+
     showCustomConfirm() {
       this.$confirm('Would you like to save your changes before continuing?', 'Custom Confirmation', {
         confirmButtonText: 'Save',
@@ -81,11 +81,11 @@ export default {
         }
       })
     },
-    
+
     showResumeExportConfirm() {
       const exportedCount = 150;
       const totalCount = 500;
-      
+
       this.$confirm(
         `发现未完成的导出任务 (已导出 ${exportedCount}/${totalCount} 条记录)，是否继续上次的导出?`,
         '继续导出',
@@ -100,7 +100,7 @@ export default {
         this.lastResult = 'User chose to restart the export'
       })
     },
-    
+
     async showAsyncConfirm() {
       try {
         // The proper way to wait for confirmation dialog results is to use await
@@ -113,14 +113,14 @@ export default {
             type: 'warning'
           }
         ).then(() => true).catch(() => false);
-        
+
         // This code will only execute after the user has responded to the dialog
         if (confirmed) {
           this.lastResult = 'User confirmed the async dialog - code continued execution after confirmation';
         } else {
           this.lastResult = 'User cancelled the async dialog - code continued execution after cancellation';
         }
-        
+
         // You can perform additional async operations here
         await new Promise(resolve => setTimeout(resolve, 1000));
         this.lastResult += '\nAdditional async operations completed';

@@ -174,7 +174,6 @@ export default {
       })
     },
 
-
     handleAdd: function (scope) {
       this.queryData = { id: null, name: null, code: null, parent_id: null, state: 1 };
       if (scope && scope.id) this.dialogData.parent_id = scope.id

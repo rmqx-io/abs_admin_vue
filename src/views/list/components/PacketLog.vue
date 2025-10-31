@@ -62,7 +62,7 @@
           <span slot='time_tracking' slot-scope="text, record">
             <template>
               <span>
-                {{ record.time_tracking ? localTime(record.time_tracking) : ''}}
+                {{ record.time_tracking ? localTime(record.time_tracking) : '' }}
               </span>
             </template>
           </span>

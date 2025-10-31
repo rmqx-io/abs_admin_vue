@@ -50,7 +50,7 @@ export const asyncRouterMap = [
             name: 'TableListWrapper',
             hideChildrenInMenu: true, // 强制显示 MenuItem 而不是 SubMenu
             component: () => import('@/views/list/DeviceList'),
-            meta: { title: '设备列表', keepAlive: true, permission: ['table'] },
+            meta: { title: 'menu.list.device-list', keepAlive: true, permission: ['table'] },
             children: [
             ]
           },
@@ -70,7 +70,7 @@ export const asyncRouterMap = [
             // component: () => import('@/views/profile/basic'),
             name: 'Info',
             component: () => import('@/views/list/components/BatteryInfo'),
-            meta: { title: '电池详情', keepAlive: true, permission: ['table'] }
+            meta: { title: 'menu.list.battery-detail', keepAlive: true, permission: ['table'] }
           }
         ]
       },
@@ -109,13 +109,13 @@ export const asyncRouterMap = [
             path: '/setting/user',
             name: 'setting_user',
             component: () => import('@/views/setting/User'),
-            meta: { title: '账号管理', keepAlive: true, permission: ['table'] }
+            meta: { title: 'menu.setting.user', keepAlive: true, permission: ['table'] }
           },
           {
             path: '/setting/app_user',
             name: 'app_user',
             component: () => import('@/views/setting/AppUser'),
-            meta: { title: 'App 账号管理', keepAlive: true, permission: ['table'] }
+            meta: { title: 'menu.setting.app-user', keepAlive: true, permission: ['table'] }
           }
         ]
       },
@@ -275,25 +275,25 @@ export const asyncRouterMap = [
         component: RouteView,
         redirect: '/setting/user',
         name: 'setting',
-        meta: { title: '设置', icon: 'setting', keepAlive: true, permission: ['setting'] },
+        meta: { title: 'menu.setting', icon: 'setting', keepAlive: true, permission: ['setting'] },
         children: [
           {
             path: '/setting/user',
             name: 'setting_user',
             component: () => import('@/views/setting/User'),
-            meta: { title: '账号管理', keepAlive: true, permission: ['setting'] }
+            meta: { title: 'menu.setting.user', keepAlive: true, permission: ['setting'] }
           },
           {
             path: '/setting/role',
             name: 'setting_role',
             component: () => import('@/views/setting/Role'),
-            meta: { title: '角色管理', keepAlive: true, permission: ['setting'] }
+            meta: { title: 'menu.setting.role', keepAlive: true, permission: ['setting'] }
           },
           {
             path: '/setting/res',
             name: 'setting_res',
             component: () => import('@/views/setting/Res'),
-            meta: { title: '权限管理', keepAlive: true, permission: ['setting'] }
+            meta: { title: 'menu.setting.res', keepAlive: true, permission: ['setting'] }
           }
           // ,{
           //   path: '/setting/dict',
@@ -308,7 +308,7 @@ export const asyncRouterMap = [
         component: RouteView,
         redirect: '/tools/',
         name: 'tools',
-        meta: { title: '工具', icon: 'tool', keepAlive: true, permission: ['setting'] },
+        meta: { title: 'menu.tools', icon: 'tool', keepAlive: true, permission: ['setting'] },
         children: [
           {
             path: '/tools/bms',
@@ -326,7 +326,7 @@ export const asyncRouterMap = [
             name: 'tools_alarm_config',
             component: () => import('@/views/tools/AlarmConfig'),
             meta: {
-              title: '告警配置',
+              title: 'menu.tools.alarm-config',
               hidden: false,
               keepAlive: true,
               permission: ['setting']
@@ -339,7 +339,7 @@ export const asyncRouterMap = [
         name: 'test',
         component: RouteView,
         redirect: '/test/confirm-dialog',
-        meta: { title: '测试', icon: 'experiment', permission: ['setting'] },
+        meta: { title: 'menu.test', icon: 'experiment', permission: ['setting'] },
         children: [
           {
             path: '/test/confirm-dialog',

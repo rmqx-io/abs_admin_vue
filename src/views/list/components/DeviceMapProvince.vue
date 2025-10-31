@@ -1,8 +1,13 @@
 <template>
   <div id="map-container">
     <amap :zoom="5" :center="center">
-      <amap-polygon v-for="(boundary, provinceName) in provinceBoundaries" :path="boundary" :strokeWeight="1"
-        :fillOpacity="0.5" :fillColor="getProvinceColor(provinceName)" @mouseover="showProvinceData(provinceName)"
+      <amap-polygon
+v-for="(boundary, provinceName) in provinceBoundaries"
+:path="boundary"
+:strokeWeight="1"
+        :fillOpacity="0.5"
+:fillColor="getProvinceColor(provinceName)"
+@mouseover="showProvinceData(provinceName)"
         @mouseout="hideProvinceData()" />
     </amap>
   </div>
@@ -78,7 +83,6 @@ export default {
         ],
         // ... other provinces ...
       };
-
 
       // Replace this with your method to fetch province boundaries data
       // For example, you can use axios or fetch to get the data from your backend API

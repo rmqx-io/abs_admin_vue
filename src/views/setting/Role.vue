@@ -39,7 +39,8 @@
     <div class='operate'>
       <a-button type='dashed' style='width: 100%' icon='plus' @click='addData'>添加</a-button>
     </div>
-    <a-table :columns='columns'
+    <a-table
+:columns='columns'
              :rowKey='record => record.id'
              :dataSource='data'
              :pagination='pagination'
@@ -48,7 +49,6 @@
              childrenColumnName='childs'
              @change='handleTableChange'
     >
-
 
       <!--<template slot="rate" slot-scope="rate">-->
       <!--{{rate+'%'}}-->
@@ -126,13 +126,15 @@
         </a-form-item>
       </a-form>
 
-
     </a-modal>
   </div>
 
 </template>
 
 <script>
+import { role_add, role_delete, role_page, role_update, sys_res_layer_top } from '@/api/manage'
+import { showMsg } from '@/utils/data'
+
 const columns = [
   {
     title: 'id',
@@ -155,9 +157,6 @@ const columns = [
     scopedSlots: { customRender: 'action' }
   }
 ]
-
-import { role_add, role_delete, role_page, role_update,sys_res_layer_top } from '@/api/manage'
-import { showMsg } from '@/utils/data'
 export default {
   mounted() {
     this.fetch()
@@ -182,8 +181,8 @@ export default {
       },
       visible: false,
       dialogMode: 'add',
-      all_res:[],
-      loading_all_res:false,
+      all_res: [],
+      loading_all_res: false,
     }
   },
   methods: {
@@ -211,9 +210,9 @@ export default {
       if (arg.time_end != null) {
         arg.time_end = arg.time_end.format('YYYY-MM-DDThh:mm:ss')
       }
-      //取分页数据
+      // 取分页数据
       role_page(arg).then((res) => {
-        //alert(JSON.stringify(res))
+        // alert(JSON.stringify(res))
         const pagination = { ...this.pagination }
         this.loading = false
         this.data = res.data.records
@@ -228,7 +227,7 @@ export default {
       this.visible = true
       this.dialogMode = 'add'
     },
-    //处理添加产品
+    // 处理添加产品
     handleAddData: function() {
       if (this.dialogMode === 'add') {
         role_add(this.dialogData)
@@ -240,7 +239,7 @@ export default {
       } else if (this.dialogMode === 'edit') {
         role_update(this.dialogData)
           .then((res) => {
-            //showMsg(this, res)
+            // showMsg(this, res)
             this.visible = false
             this.fetch()
           })
@@ -251,14 +250,14 @@ export default {
       this.dialogMode = 'add'
       this.dialogData = Object.assign({}, scope)
     },
-    //handleEdit
+    // handleEdit
     handleEdit: function(scope) {
       this.visible = true
       this.dialogMode = 'edit'
-      this.dialogData = Object.assign({  }, scope)
+      this.dialogData = Object.assign({ }, scope)
     },
     handleDelete: function(scope) {
-      let self = this
+      const self = this
       this.$confirm({
         title: '你确定要删除?',
         content: '你确定要删除！',
@@ -289,7 +288,7 @@ export default {
         .then((res) => {
             this.all_res = res.data;
           this.loading_all_res = false;
-        }).catch((e)=>{
+        }).catch((e) => {
           this.loading_all_res = false;
       })
     }

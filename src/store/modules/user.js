@@ -1,6 +1,6 @@
 import storage from 'store'
 import { login, getInfo, logout } from '@/api/login'
-import {ACCESS_TOKEN, PERMISSIONS, USER, ROLE} from '@/store/mutation-types'
+import { ACCESS_TOKEN, PERMISSIONS, USER, ROLE } from '@/store/mutation-types'
 import { welcome } from '@/utils/util'
 
 const user = {
@@ -56,8 +56,8 @@ const user = {
       return new Promise((resolve, reject) => {
         getInfo().then(response => {
           const result = response;
-          console.info('getInfo resp:',response);
-          var name=null;
+          console.info('getInfo resp:', response);
+          var name = null;
           if (response.data.role) {
             var role = response.data.role;
             role.permissions = response.data.permissions;
@@ -70,12 +70,12 @@ const user = {
             name = response.data.user.name;
             commit('SET_ROLES', role);
             commit('SET_INFO', result);
-            console.info('SET_ROLES:',JSON.stringify(role));
+            console.info('SET_ROLES:', JSON.stringify(role));
           } else {
             reject(new Error('getInfo: roles must be a non-null array !'))
           }
           commit('SET_NAME', { name: name, welcome: welcome() })
-          //TODO avatar
+          // TODO avatar
           commit('SET_AVATAR', "")
 
           console.info('GetInfo RESOLVE');

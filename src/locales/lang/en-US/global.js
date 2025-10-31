@@ -1,0 +1,21 @@
+export default {
+  submit: 'Submit',
+  save: 'Save',
+  'submit.ok': 'Submitted successfully',
+  'save.ok': 'Saved successfully',
+  'common.search': 'Search',
+  'common.reset': 'Reset',
+  'common.add': 'Add',
+  'common.expand': 'Expand',
+  'common.collapse': 'Collapse',
+  'common.edit': 'Edit',
+  'common.more': 'More',
+  'common.detail': 'Details',
+  'common.delete': 'Delete',
+  'common.close': 'Close',
+  'common.open': 'Open',
+  'common.selectPlaceholder': 'Please select',
+  'common.batchActions': 'Batch Actions',
+  'common.lock': 'Lock',
+  'common.disable': 'Disable'
+}

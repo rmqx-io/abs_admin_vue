@@ -38,7 +38,8 @@
     <div class='operate'>
       <a-button type='dashed' style='width: 100%' icon='plus' @click='addData'>添加</a-button>
     </div>
-    <a-table :columns='columns'
+    <a-table
+:columns='columns'
              :rowKey='record => record.id'
              :dataSource='data'
              :pagination='pagination'
@@ -105,13 +106,16 @@
         </a-form-item>
       </a-form>
 
-
     </a-modal>
   </div>
 
 </template>
 
 <script>
+// import {kvPage, kvAdd, kvUpdate, kvDelete} from '@/api/manage'
+// import {showMsg} from '@/utils/data'
+import moment from 'moment'
+
 const columns = [
   {
     title: 'key',
@@ -139,10 +143,6 @@ const columns = [
   }
 ]
 
-// import {kvPage, kvAdd, kvUpdate, kvDelete} from '@/api/manage'
-// import {showMsg} from '@/utils/data'
-import moment from 'moment'
-
 export default {
   mounted() {
     this.fetch()
@@ -166,7 +166,6 @@ export default {
         remark: null,
         value: null
       },
-
 
       visible: false,
       dialogMode: 'add'
@@ -214,32 +213,32 @@ export default {
       this.visible = true;
       this.dialogMode = 'add';
     },
-    //处理添加产品
+    // 处理添加产品
     handleAddData: function() {
       if (this.dialogMode === 'add') {
         kvAdd(this.dialogData)
           .then((res) => {
-            //showMsg(this, res)
+            // showMsg(this, res)
             this.visible = false;
             this.fetch();
           })
       } else if (this.dialogMode === 'edit') {
         kvUpdate(this.dialogData)
           .then((res) => {
-            //showMsg(this, res)
+            // showMsg(this, res)
             this.visible = false;
             this.fetch();
           })
       }
     },
-    //handleEdit
+    // handleEdit
     handleEdit: function(scope) {
       this.visible = true
       this.dialogMode = 'edit'
       this.dialogData = Object.assign({}, scope)
     },
     handleDelete: function(scope) {
-      let self = this
+      const self = this
       this.$confirm({
         title: '你确定要删除?',
         content: '你确定要删除！',

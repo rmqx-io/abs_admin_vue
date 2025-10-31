@@ -1,6 +1,11 @@
 <template>
     <div v-if="this.currentBatchSendCommandId > 0">
-        <a-modal title="设备" width="90vw" centered :visible="visible" @ok="() => { $emit('ok') }"
+        <a-modal
+title="设备"
+width="90vw"
+centered
+:visible="visible"
+@ok="() => { $emit('ok') }"
             @cancel="() => { $emit('cancel') }">
             <a-row>
                 <span>命令编号 {{ this.currentBatchSendCommandId }}</span>
@@ -64,7 +69,7 @@ export default {
             if (this.$refs.tableDevices) this.$refs.tableDevices.refresh()
         },
         loadDataDevices(parameter) {
-            let arg = Object.assign(parameter, this.queryData)
+            const arg = Object.assign(parameter, this.queryData)
             arg.page_no = arg.pageNo
             arg.page_size = arg.pageSize
             delete arg.pageNo

@@ -15,6 +15,8 @@ export default {
     'menu.list': '列表页',
     'menu.device': '设备管理',
     'menu.list.table-list': '查询表格',
+    'menu.list.device-list': '设备列表',
+    'menu.list.battery-detail': '电池详情',
     'menu.list.basic-list': '标准列表',
     'menu.list.card-list': '卡片列表',
     'menu.list.search-list': '搜索列表',
@@ -42,5 +44,13 @@ export default {
   'menu.model': '类型管理',
   'menu.device-model': '设备类型',
   'menu.battery-model': '电池类型',
-  'menu.ota': 'OTA管理'
+  'menu.ota': 'OTA管理',
+  'menu.setting': '设置',
+  'menu.setting.user': '账号管理',
+  'menu.setting.role': '角色管理',
+  'menu.setting.res': '权限管理',
+  'menu.setting.app-user': 'App账号管理',
+  'menu.tools': '工具',
+  'menu.tools.alarm-config': '告警配置',
+  'menu.test': '测试'
 }
