@@ -198,7 +198,7 @@ export default {
     ]
     this.get_alarm_name()
     this.getStatusCount()
-    this.getBmsAlarmCount()
+    this.getBmsAlarmCount_()
   },
   methods: {
     getStatusCount () {
@@ -212,14 +212,17 @@ export default {
         // this.deviceChartPieData = this.labelAndDataToPieData(this.deviceChartData.labels, this.deviceChartData.datasets[0].data)
       })
     },
-    getBmsAlarmCount () {
+    getBmsAlarmCount_ () {
       this.loadingAlarm = true
-      getBmsAlarmCount({}).then(res => {
+      getBmsAlarmCount().then(res => {
         console.log('alarm count', res)
         this.alarmChartData.datasets[0].data = res.data
         this.loadingAlarm = false
         // this.alarmChartPieData = this.labelAndDataToPieData(this.alarmChartData.labels, this.alarmChartData.datasets[0].data)
         this.alarmBarData = this.labelAndDataToBarData(this.alarmChartData.labels, this.alarmChartData.datasets[0].data)
+      }).catch(err => {
+        console.error('Failed to get BMS alarm count:', err)
+        this.loadingAlarm = false
       })
     },
     get_alarm_name () {

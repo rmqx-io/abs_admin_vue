@@ -16,12 +16,13 @@
       />
       <span>{{ getDevicesLocationPageNo }}</span> / <span>{{ getDevicesLocationPages }}</span>, <span>{{ markersFound }}</span>
     </div>
+    <!-- AMap for Chinese users -->
     <amap
+      v-if="!useLeaflet && refresh_map"
       cache-key="marker-cluster-map"
       :zoom="4"
       async
       :center="center"
-      v-if="refresh_map"
     >
       <!-- 点聚合 -->
       <amap-marker-cluster
@@ -34,6 +35,16 @@
           :cluster-options="getClusterOptions" -->
       </amap-marker-cluster>
     </amap>
+    <!-- Leaflet for English users -->
+    <l-map
+      v-if="useLeaflet && refresh_map"
+      ref="leafletMap"
+      :zoom="13"
+      :center="center"
+      height="100%"
+      @ready="onLeafletMapReady"
+      @complete="onMapComplete"
+    />
   </div>
 </template>
 
@@ -42,9 +53,26 @@ import {
   getDeviceList,
   wgs84togcj02
 } from '@/api/manage'
+import L from 'leaflet'
+import 'leaflet.markercluster'
+import 'leaflet/dist/leaflet.css'
+import 'leaflet.markercluster/dist/MarkerCluster.css'
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
+import LMap from '@/components/leaflet/LMap.vue'
+
+// Fix for missing marker icons in webpack builds
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+})
 
 export default {
   name: 'DeviceMap',
+  components: {
+    LMap
+  },
   data () {
     return {
       isGettingDeviceLocation: false,
@@ -78,15 +106,25 @@ export default {
         zoomOnClick: true
       },
       observer: null,
-      isVisible: false
+      isVisible: false,
+      leafletMap: null,
+      leafletClusterGroup: null
+    }
+  },
+  computed: {
+    isEnglish() {
+      const isEnglish = this.$i18n.locale.startsWith('en')
+      console.log('DeviceMap i18n.locale', this.$i18n.locale)
+      console.log('DeviceMap isEnglish', isEnglish)
+      return isEnglish
+    },
+    useLeaflet() {
+      return this.isEnglish
     }
   },
   mounted () {
     this.createObserver();
     this.refreshMap()
-  },
-  beforeDestroy() {
-    this.destroyObserver();
   },
   methods: {
     refreshMap () {
@@ -119,11 +157,20 @@ export default {
           res.data.records.forEach((item, index) => {
             if (item.last_location_lng !== null && item.last_location_lat !== null) {
               this.markersFound += 1
-              const gcj02 = wgs84togcj02(item.last_location_lng, item.last_location_lat)
-              // console.log('gcj02', gcj02)
+              // For Leaflet (English), use WGS84 directly; for AMap (Chinese), convert to GCJ-02
+              const coordinates = this.useLeaflet
+                ? [item.last_location_lng, item.last_location_lat]
+                : wgs84togcj02(item.last_location_lng, item.last_location_lat)
+              console.log('DeviceMap coordinates:', {
+                device_id: item.code,
+                useLeaflet: this.useLeaflet,
+                raw: [item.last_location_lng, item.last_location_lat],
+                final: coordinates
+              })
               this.deviceMarkers.push({
-                lnglat: gcj02,
-                title: item.code
+                lnglat: coordinates,
+                title: item.code,
+                device: item
               })
             }
           })
@@ -131,11 +178,17 @@ export default {
             this.isGettingDeviceLocation = false
             this.getDevicesLocationPages = 1
             this.getDevicesLocationPageNo = 0
-            console.log('markersFound', this.markersFound)
+            console.log('DeviceMap markersFound', this.markersFound)
             // refresh map to make sure it is displayed, by hide and show
             this.refresh_map = false
             this.$nextTick(() => {
                 this.refresh_map = true
+                // Update Leaflet markers if using Leaflet
+                if (this.useLeaflet) {
+                  setTimeout(() => {
+                    this.updateLeafletMarkers()
+                  }, 500)
+                }
               }
             )
           } else {
@@ -168,7 +221,191 @@ export default {
         this.observer.disconnect();
       }
       console.log('DeviceMap destroy');
+    },
+    onMapComplete() {
+      console.log('DeviceMap: Map loaded and ready');
+    },
+    onLeafletMapReady(map) {
+      console.log('DeviceMap Leaflet map ready:', map)
+      this.leafletMap = map
+      this.ensureLeafletCluster()
+      this.updateLeafletMarkers()
+    },
+    ensureLeafletCluster() {
+      if (!this.useLeaflet || !this.leafletMap) {
+        return
+      }
+      if (!this.leafletClusterGroup) {
+        console.log('DeviceMap: creating cluster group')
+        const clusterRadius = this.options && this.options.gridSize ? this.options.gridSize : 80
+        this.leafletClusterGroup = L.markerClusterGroup({
+          maxClusterRadius: clusterRadius,
+          showCoverageOnHover: false,
+          zoomToBoundsOnClick: true,
+          spiderfyOnMaxZoom: true,
+          removeOutsideVisibleBounds: true,
+          animate: true,
+          chunkedLoading: false
+        })
+        this.leafletClusterGroup.addTo(this.leafletMap)
+        console.log('DeviceMap: cluster group added to map, has layer:', this.leafletMap.hasLayer(this.leafletClusterGroup))
+      }
+    },
+    updateLeafletMarkers() {
+      console.log('DeviceMap: updateLeafletMarkers called, useLeaflet:', this.useLeaflet, 'deviceMarkers.length:', this.deviceMarkers.length)
+      
+      if (!this.useLeaflet || !this.leafletMap) {
+        return
+      }
+
+      this.ensureLeafletCluster()
+
+      if (!this.leafletClusterGroup) {
+        console.log('DeviceMap: cluster group missing')
+        return
+      }
+
+      console.log('DeviceMap: clearing existing layers')
+      this.leafletClusterGroup.clearLayers()
+
+      const markers = []
+      console.log('DeviceMap: processing', this.deviceMarkers.length, 'device markers')
+      
+      this.deviceMarkers.forEach((item, index) => {
+        if (!item.lnglat || item.lnglat.length !== 2) {
+          console.log(`DeviceMap: skipping invalid entry ${index}`, item)
+          return
+        }
+        
+        let lng = item.lnglat[0]
+        let lat = item.lnglat[1]
+        
+        // Convert to numbers if they are strings
+        if (typeof lng === 'string') lng = parseFloat(lng)
+        if (typeof lat === 'string') lat = parseFloat(lat)
+        
+        console.log(`DeviceMap: item ${index} coordinates: lng=${lng}, lat=${lat}`)
+        
+        if (!Number.isFinite(lng) || !Number.isFinite(lat)) {
+          console.log(`DeviceMap: invalid coordinates for entry ${index}`, item.lnglat)
+          return
+        }
+        
+        // Create marker with Leaflet's [lat, lng] order
+        const marker = L.marker([lat, lng])
+        
+        // Add marker to map directly to test if it's visible
+        marker.addTo(this.leafletMap)
+        console.log(`DeviceMap: marker ${index} added directly to map at [${lat}, ${lng}]`)
+        
+        if (item.device || item.title) {
+          const popupContent = `
+            <div>
+              <p><b>Device Code:</b> ${(item.device && item.device.code) || item.title || 'N/A'}</p>
+              ${item.device && item.device.bms_bt ? `<p><b>Battery Code:</b> ${item.device.bms_bt}</p>` : ''}
+              ${item.device && item.device.location_time ? `<p><b>Location Time:</b> ${item.device.location_time}</p>` : ''}
+            </div>
+          `
+          marker.bindPopup(popupContent)
+        }
+        markers.push(marker)
+      })
+
+      console.log('DeviceMap: created', markers.length, 'markers')
+      
+      // Test: Check if the map container has the correct size
+      const mapSize = this.leafletMap.getSize()
+      console.log('DeviceMap: map container size:', mapSize)
+      
+      if (mapSize.x === 0 || mapSize.y === 0) {
+        console.warn('DeviceMap: map container has zero size, invalidating size')
+        this.leafletMap.invalidateSize()
+      }
+      
+      if (markers.length > 0) {
+        // Don't add to cluster for now, keep them on the map directly for testing
+        // this.leafletClusterGroup.addLayers(markers)
+        
+        // Pan to the first marker
+        const firstMarker = markers[0]
+        const latlng = firstMarker.getLatLng()
+        console.log('DeviceMap: panning to first marker at:', latlng)
+        this.leafletMap.setView(latlng, 13)
+        
+        // Check if marker is actually visible in DOM
+        setTimeout(() => {
+          const markerElements = document.querySelectorAll('.leaflet-marker-icon')
+          console.log('DeviceMap: found', markerElements.length, 'marker elements in DOM')
+          markerElements.forEach((el, i) => {
+            console.log(`DeviceMap: marker element ${i} style:`, el.style.cssText)
+          })
+        }, 500)
+      } else {
+        console.log('DeviceMap: no valid markers to add')
+      }
+    },
+    clearLeafletCluster() {
+      if (this.leafletClusterGroup && this.leafletMap) {
+        this.leafletClusterGroup.clearLayers()
+        if (this.leafletMap.hasLayer(this.leafletClusterGroup)) {
+          this.leafletMap.removeLayer(this.leafletClusterGroup)
+        }
+      }
+      this.leafletClusterGroup = null
+    },
+    fitLeafletBounds(retries = 0) {
+      if (!this.useLeaflet) {
+        return
+      }
+
+      const mapComponent = this.$refs.leafletMap
+      if (!mapComponent) {
+        console.log('DeviceMap: map component not found')
+        if (retries < 5) {
+          setTimeout(() => this.fitLeafletBounds(retries + 1), 200)
+        }
+        return
+      }
+
+      const map = this.leafletMap || (mapComponent.getMap ? mapComponent.getMap() : null)
+      if (!map) {
+        console.log('DeviceMap: map not ready yet, retry:', retries)
+        if (retries < 5) {
+          setTimeout(() => this.fitLeafletBounds(retries + 1), 200)
+        }
+        return
+      }
+      this.leafletMap = map
+
+      if (!this.leafletClusterGroup) {
+        console.log('DeviceMap: cluster group not ready')
+        return
+      }
+
+      const layers = this.leafletClusterGroup.getLayers()
+      if (!layers || layers.length === 0) {
+        console.log('DeviceMap: no layers in cluster group')
+        return
+      }
+
+      const bounds = this.leafletClusterGroup.getBounds()
+      if (!bounds || !bounds.isValid()) {
+        console.log('DeviceMap: invalid bounds, trying single marker center')
+        const first = layers[0] && layers[0].getLatLng ? layers[0].getLatLng() : null
+        if (first) {
+          console.log('DeviceMap: centering on first marker:', first)
+          map.setView(first, 15)
+        }
+        return
+      }
+
+      console.log('DeviceMap: fitting bounds to markers', bounds)
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 })
     }
+  },
+  beforeDestroy() {
+    this.destroyObserver()
+    this.clearLeafletCluster()
   }
 }
 </script>
@@ -196,6 +433,6 @@ export default {
   position: absolute;
   z-index: 1;
   width: 100%;
-  backgroud-color: #fff;
+  background-color: #fff;
 }
 </style>
