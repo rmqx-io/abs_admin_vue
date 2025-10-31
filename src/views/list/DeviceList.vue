@@ -458,6 +458,7 @@
       </div>
       <!-- TODO: use device map component -->
       <amap
+        ref="clusterMap"
         :zoom="zoom"
         :center="center2"
         style='height: 70vh'
@@ -1248,6 +1249,10 @@ export default {
             this.refresh_map = false;
             this.$nextTick(() => {
               this.refresh_map = true;
+              // Fit map bounds to show all markers
+              this.$nextTick(() => {
+                this.fitMapBounds(newMarkers);
+              });
             });
           } catch (error) {
             console.error('Error processing location data:', error);
@@ -1312,6 +1317,11 @@ export default {
             this.getDevicesLocationPages = 1
             this.getDevicesLocationPageNo = 0
             console.log('markersFound', this.markersFound)
+            // Fit map bounds to show all markers after loading all devices
+            if (this.deviceMarkers.length > 0) {
+              const markerPositions = this.deviceMarkers.map(m => m.lnglat)
+              this.fitMapBounds(markerPositions)
+            }
           } else {
             this.getDeviceLocation(arg, page_no + 1)
           }
@@ -1368,6 +1378,87 @@ export default {
     onMapComplete() {
       console.log('Map loaded and ready');
       this.map_loading = false;
+    },
+    fitMapBounds(markers) {
+      console.log('fitMapBounds called with markers:', markers);
+
+      if (!markers || markers.length === 0) {
+        console.log('No markers to fit bounds');
+        return;
+      }
+
+      const attemptFit = () => {
+        const mapComponent = this.$refs.map || this.$refs.clusterMap;
+
+        if (!mapComponent) {
+          console.log('Map component reference not found');
+          return;
+        }
+
+        // vue-amap exposes the AMap.Map instance via $map and the ready promise on $amap
+        const context = mapComponent.$amap;
+        const mapFromComponent = () => mapComponent.$map || (context && context.context && context.context.target) || null;
+
+        const resolvedMap = mapFromComponent();
+        if (resolvedMap) {
+          this.applyFitToMap(resolvedMap, markers);
+          return;
+        }
+
+        if (context && context.ready && context.ready.promise && typeof context.ready.promise.then === 'function') {
+          console.log('Waiting for AMap ready promise to resolve');
+          context.ready.promise.then(map => {
+            this.applyFitToMap(map, markers);
+          }).catch(err => {
+            console.log('Failed to resolve AMap ready promise', err);
+          });
+          return;
+        }
+
+        console.log('AMap context not ready yet, skipping fit for now');
+      };
+
+      // Give the map time to mount before attempting to fit bounds
+      this.$nextTick(() => {
+        this.$nextTick(attemptFit);
+      });
+    },
+    applyFitToMap(amapInstance, markers) {
+      if (!amapInstance || typeof amapInstance.getZoom !== 'function') {
+        console.log('Invalid or uninitialized AMap instance:', amapInstance);
+        return;
+      }
+
+      if (markers.length === 1) {
+        if (typeof amapInstance.setZoomAndCenter === 'function') {
+          console.log('Fitting map to single marker via setZoomAndCenter');
+          amapInstance.setZoomAndCenter(9, markers[0]);
+        } else {
+          if (typeof amapInstance.setCenter === 'function') {
+            console.log('Fitting map to single marker via setCenter');
+            amapInstance.setCenter(markers[0]);
+          }
+          if (typeof amapInstance.setZoom === 'function') {
+            console.log('Fitting map to single marker via setZoom');
+            amapInstance.setZoom(9);
+          }
+        }
+      } else if (typeof amapInstance.setFitView === 'function') {
+        console.log('Fitting map to multiple markers via setFitView');
+        amapInstance.setFitView(null, false, [50, 50, 50, 50]);
+      } else {
+        console.log('setFitView not available, falling back to center/zoom calculation');
+        const lngs = markers.map(point => point[0]);
+        const lats = markers.map(point => point[1]);
+        const avgLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
+        const avgLat = (Math.min(...lats) + Math.max(...lats)) / 2;
+        if (typeof amapInstance.setCenter === 'function') {
+          amapInstance.setCenter([avgLng, avgLat]);
+        }
+        if (typeof amapInstance.setZoom === 'function') {
+          amapInstance.setZoom(10);
+        }
+      }
     },
     onMapChange() {
       console.log('map change', this.showMap);
