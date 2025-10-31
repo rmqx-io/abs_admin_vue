@@ -33,6 +33,11 @@ import 'element-ui/lib/theme-chalk/display.css'
 import '@/styles/variables.scss'
 import '@/styles/element-variables.scss'
 
+// Import Leaflet CSS for English map support
+import 'leaflet/dist/leaflet.css'
+import 'leaflet.markercluster/dist/MarkerCluster.css'
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
+
 import AmapVue from '@amap/amap-vue'
 
 Vue.config.productionTip = false
