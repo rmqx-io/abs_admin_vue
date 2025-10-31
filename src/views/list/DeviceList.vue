@@ -428,10 +428,12 @@
           @ready="onLeafletMapReady"
           @complete="onMapComplete"
         >
+          <!-- Main polyline - render when map is ready and data available -->
           <l-polyline
-            v-if="polyline.path && polyline.path.length > 0"
+            v-if="leafletMapReady && polyline.path && polyline.path.length > 0"
+            :key="'polyline-' + polyline.path.length + '-ready'"
             :path="polyline.path"
-            stroke-color="#3366FF"
+            :stroke-color="'#3366FF'"
             :stroke-opacity="1"
             :stroke-weight="6"
           />
@@ -712,6 +714,7 @@ export default {
         path: [],
         markers: []
       },
+      leafletMapReady: false,
       // 高级搜索 展开/关闭
       advanced: false,
       // 查询参数
@@ -808,6 +811,17 @@ export default {
     },
     useLeaflet() {
       return this.isEnglish
+    },
+    shouldShowPolyline() {
+      const result = this.useLeaflet && this.polyline.path && this.polyline.path.length > 0;
+      console.log('shouldShowPolyline computed:', {
+        result,
+        useLeaflet: this.useLeaflet,
+        hasPath: !!this.polyline.path,
+        pathLength: this.polyline.path?.length,
+        refreshMap: this.refresh_map
+      });
+      return result;
     },
     rowSelection() {
       return {
@@ -1298,21 +1312,43 @@ export default {
               newMarkers.push([lon, lat]);
             });
 
-            // Set the polyline data
+            // Set the polyline data - LPolyline component handles coordinate conversion internally
             this.polyline = {
               path: newPath,
               markers: newMarkers
             };
 
-            console.log('Path data prepared:', this.polyline.path);
+            console.log('Path data prepared for', this.useLeaflet ? 'Leaflet' : 'AMap', ':', this.polyline.path);
 
             // Force map refresh to re-render components
             this.refresh_map = false;
+            this.leafletMapReady = false;
             this.$nextTick(() => {
               this.refresh_map = true;
+              console.log('Map refreshed, polyline data:', {
+                hasPath: !!(this.polyline.path && this.polyline.path.length > 0),
+                pathLength: this.polyline.path?.length,
+                useLeaflet: this.useLeaflet,
+                refresh_map: this.refresh_map,
+                polylinePathType: typeof this.polyline.path,
+                polylinePathIsArray: Array.isArray(this.polyline.path),
+                firstPathPoint: this.polyline.path?.[0]
+              });
+              
+              // Debug the exact condition used in template
+              const templateCondition = this.useLeaflet && this.polyline.path && this.polyline.path.length > 0;
+              console.log('Template condition result:', templateCondition);
+              console.log('Individual checks:', {
+                useLeaflet: this.useLeaflet,
+                hasPath: !!this.polyline.path,
+                pathLength: this.polyline.path?.length,
+                lengthCheck: this.polyline.path && this.polyline.path.length > 0
+              });
               // Fit map bounds to show all markers
               this.$nextTick(() => {
                 this.fitMapBounds(newMarkers);
+                // Force polyline to re-render by updating key
+                this.$forceUpdate();
               });
             });
           } catch (error) {
@@ -1468,6 +1504,7 @@ export default {
     onLeafletMapReady(map) {
       console.log('Leaflet map ready event received:', map)
       this.leafletMap = map
+      this.leafletMapReady = true
       this.ensureLeafletCluster()
       this.updateLeafletMarkers()
     },
@@ -2091,6 +2128,16 @@ export default {
     }
   },
   watch: {
+    'polyline.path': {
+      handler(newPath) {
+        console.log('Polyline path watcher triggered:', {
+          pathLength: newPath ? newPath.length : 0,
+          useLeaflet: this.useLeaflet,
+          refreshMap: this.refresh_map
+        });
+      },
+      deep: true
+    },
     deviceStatus(newVal) {
       if (!this.isSyncingFromRoute) this.updateRouteQuery()
     },

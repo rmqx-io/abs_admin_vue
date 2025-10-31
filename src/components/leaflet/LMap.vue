@@ -1,5 +1,8 @@
 <template>
-  <div ref="mapContainer" :style="{ width: '100%', height: mapHeight }"></div>
+  <div class="leaflet-map-wrapper" :style="{ width: '100%', height: mapHeight }">
+    <div ref="mapContainer" class="leaflet-map-container"></div>
+    <slot></slot>
+  </div>
 </template>
 
 <script>
@@ -132,4 +135,13 @@ export default {
 </script>
 
 <style scoped>
+.leaflet-map-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.leaflet-map-container {
+  width: 100%;
+  height: 100%;
+}
 </style>
