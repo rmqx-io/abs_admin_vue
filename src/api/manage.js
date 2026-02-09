@@ -53,6 +53,14 @@ const api = {
 
 export default api
 
+export function getAction (url, parameter) {
+  return request({
+    url: url,
+    method: 'get',
+    params: parameter
+  })
+}
+
 export function getUserList (parameter) {
   return request({
     url: api.user,

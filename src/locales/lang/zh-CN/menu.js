@@ -3,6 +3,7 @@ export default {
     'menu.home': '主页',
     'menu.dashboard': '仪表盘',
     'menu.dashboard.analysis': '分析页',
+    'menu.dashboard.status': '系统状态',
     'menu.dashboard.monitor': '监控页',
     'menu.dashboard.workplace': '工作台',
     'menu.form': '表单页',
