@@ -84,6 +84,14 @@ export const api = {
   tools_alarm_config: `${prefix}/tools/alarm_config`,
 }
 
+export function getAction (url, parameter) {
+  return request({
+    url: url,
+    method: 'get',
+    params: parameter
+  })
+}
+
 export function getUserList (parameter) {
   return request({
     url: api.user,
