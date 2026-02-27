@@ -17,6 +17,7 @@ const constantRouterComponents = {
   // 你需要动态引入的页面组件
   'Workplace': () => import('@/views/dashboard/Workplace'),
   'Analysis': () => import('@/views/dashboard/Analysis'),
+  'SystemStatus': () => import('@/views/dashboard/SystemStatus'),
 
   // form
   'BasicForm': () => import('@/views/form/basicForm'),
@@ -89,6 +90,19 @@ export const generatorDynamicRouter = (token) => {
       //      后端数据, 根级树数组,  根级 PID
       listToTree(result, childrenNav, 0)
       rootRouter.children = childrenNav
+
+      // ensure SystemStatus menu entry exists even if backend doesn't provide it
+      const hasSysStatus = rootRouter.children.some(c => c.name === 'SystemStatus' || c.key === 'system_status');
+      if (!hasSysStatus) {
+        rootRouter.children.push({
+          key: 'system_status',
+          name: 'SystemStatus',
+          path: 'system_status',
+          component: 'SystemStatus',
+          meta: { title: 'System Status', icon: 'dashboard' }
+        })
+      }
+
       menuNav.push(rootRouter)
       console.log('menuNav', menuNav)
       const routers = generator(menuNav)

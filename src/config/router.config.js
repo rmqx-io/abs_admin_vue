@@ -331,6 +331,18 @@ export const asyncRouterMap = [
               keepAlive: true,
               permission: ['setting']
             }
+          },
+          // system status page (added for convenience)
+          {
+            path: '/tools/system-status',
+            name: 'tools_system_status',
+            component: () => import('@/views/dashboard/SystemStatus'),
+            meta: {
+              title: 'System Status',
+              hidden: false,
+              keepAlive: true,
+              permission: ['setting']
+            }
           }
         ]
       },
