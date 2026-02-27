@@ -173,7 +173,9 @@
         <span slot="description" slot-scope="text">
           <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
         </span>
-
+        <span slot="online" slot-scope="text, record">
+          <a-badge :status="record.online ? 'processing' : 'default'" :text="record.online ? '在线' : '离线'" />
+        </span>
         <span slot="device_info" slot-scope="text, record">
           <template>
             {{ $t('list.device.info.code') }}: <span>{{ record.code }}</span>
@@ -839,6 +841,12 @@ export default {
           title: this.$t('list.device.columns.code'),
           dataIndex: 'code',
           scopedSlots: { customRender: 'device_info' }
+        },
+        {
+          title: this.$t('list.table.columns.status'),
+          dataIndex: 'online',
+          scopedSlots: { customRender: 'online' },
+          width: '100px'
         },
         {
           title: this.$t('list.device.columns.organizationInfo'),
