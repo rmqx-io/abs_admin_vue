@@ -22,6 +22,47 @@
         </a-col>
       </a-row>
     </a-card>
+    <a-card title="DB Proxy Metrics" :bordered="false" style="margin-bottom: 24px;">
+      <a-row :gutter="24">
+        <a-col :sm="24" :md="8" style="margin-bottom: 16px;">
+          <a-statistic title="Active Connections" :value="dbProxyMetrics.active_connections" :value-style="dbProxyMetrics.active_connections > 100 ? 'color: red;' : 'color: green;'">
+            <template #suffix>
+              <a-icon type="user" />
+            </template>
+          </a-statistic>
+        </a-col>
+        <a-col :sm="24" :md="8" style="margin-bottom: 16px;">
+          <a-statistic title="In-Flight Ops" :value="dbProxyMetrics.in_flight_ops" :value-style="dbProxyMetrics.in_flight_ops > 50 ? 'color: orange;' : 'color: blue;'">
+            <template #suffix>
+              <a-icon type="sync" />
+            </template>
+          </a-statistic>
+        </a-col>
+        <a-col :sm="24" :md="8" style="margin-bottom: 16px;">
+          <a-statistic title="Queue Depth" :value="dbProxyMetrics.queue_depth" :value-style="dbProxyMetrics.queue_depth > 1000 ? 'color: red;' : 'color: green;'">
+            <template #suffix>
+              <a-icon type="queue" />
+            </template>
+          </a-statistic>
+        </a-col>
+      </a-row>
+      <a-row :gutter="24">
+        <a-col :sm="24" :md="12" style="margin-bottom: 16px;">
+          <a-statistic title="Processed Requests" :value="dbProxyMetrics.processed_requests" precision="0">
+            <template #suffix>
+              <a-icon type="check-circle" />
+            </template>
+          </a-statistic>
+        </a-col>
+        <a-col :sm="24" :md="12" style="margin-bottom: 16px;">
+          <a-statistic title="Failed Requests" :value="dbProxyMetrics.failed_requests" :value-style="dbProxyMetrics.failed_requests > 0 ? 'color: red;' : 'color: green;'">
+            <template #suffix>
+              <a-icon type="close-circle" />
+            </template>
+          </a-statistic>
+        </a-col>
+      </a-row>
+    </a-card>
     <a-card title="DB Proxy Runtime Flags" :bordered="false" style="margin-bottom: 24px;">
       <a-row :gutter="16">
         <a-col :sm="24" :md="12" v-for="(value, key) in dbProxyRuntimeFlags" :key="`db-proxy-runtime-${key}`" style="margin-bottom: 12px;">
@@ -32,6 +73,40 @@
         </a-col>
       </a-row>
     </a-card>
+    
+    <a-card v-if="dbOperationMetrics" title="DB Operation Metrics (Proxy)" :bordered="false" style="margin-bottom: 24px;">
+      <a-row :gutter="24" style="margin-bottom: 24px;">
+        <a-col :sm="24" :md="12">
+          <a-statistic title="MySQL Operations" :value="dbOperationMetrics.total_mysql_ops" group-separator=",">
+            <template #suffix>
+              <span style="font-size: 14px; color: #ff4d4f" v-if="dbOperationMetrics.mysql_errors > 0">
+                ({{ dbOperationMetrics.mysql_errors }} errors)
+              </span>
+            </template>
+          </a-statistic>
+        </a-col>
+        <a-col :sm="24" :md="12">
+          <a-statistic title="Tarantool Operations" :value="dbOperationMetrics.total_tarantool_ops" group-separator=",">
+             <template #suffix>
+              <span style="font-size: 14px; color: #ff4d4f" v-if="dbOperationMetrics.tarantool_errors > 0">
+                ({{ dbOperationMetrics.tarantool_errors }} errors)
+              </span>
+            </template>
+          </a-statistic>
+        </a-col>
+      </a-row>
+      
+      <a-table 
+        v-if="dbOperationMetrics.top_slow_ops && dbOperationMetrics.top_slow_ops.length > 0"
+        :columns="opColumns" 
+        :data-source="dbOperationMetrics.top_slow_ops" 
+        :pagination="false" 
+        size="small"
+        row-schema="db-op-row"
+      >
+      </a-table>
+    </a-card>
+
     <a-card title="System Actions" :bordered="false">
       <a-button type="primary" @click="fetchStatus" :loading="loading">
         Refresh Status
@@ -58,7 +133,22 @@ export default {
         broker: { status: 'UNKNOWN', message: 'Loading...' }
       },
       dbConfigurations: {},
-      dbProxyRuntimeFlags: {}
+      dbProxyRuntimeFlags: {},
+      dbProxyMetrics: {
+        active_connections: 0,
+        in_flight_ops: 0,
+        processed_requests: 0,
+        failed_requests: 0,
+        queue_depth: 0
+      },
+      dbOperationMetrics: null,
+      opColumns: [
+        { title: 'DB', dataIndex: 'db', key: 'db', width: '15%' },
+        { title: 'Operation', dataIndex: 'op', key: 'op', width: '35%' },
+        { title: 'Kind', dataIndex: 'kind', key: 'kind', width: '15%' },
+        { title: 'Result', dataIndex: 'result', key: 'result', width: '15%' },
+        { title: 'Count', dataIndex: 'count', key: 'count', width: '20%' },
+      ]
     }
   },
   created () {
@@ -70,10 +160,22 @@ export default {
       getAction('/admin/tools/system_status').then(res => {
         if (res.code === 'SUCCESS') {
           const data = res.data || {}
-          const { db_configurations, db_proxy_runtime_flags, ...componentStatuses } = data
+          const { db_configurations, db_proxy_runtime_flags, db_operation_metrics, ...componentStatuses } = data
           this.componentStatusData = componentStatuses
           this.dbConfigurations = db_configurations || {}
           this.dbProxyRuntimeFlags = db_proxy_runtime_flags || {}
+          this.dbOperationMetrics = db_operation_metrics
+          
+          // Extract metrics from runtime flags
+          if (db_proxy_runtime_flags) {
+            this.dbProxyMetrics = {
+              active_connections: db_proxy_runtime_flags.active_connections || 0,
+              in_flight_ops: db_proxy_runtime_flags.in_flight_ops || 0,
+              processed_requests: db_proxy_runtime_flags.processed_requests || 0,
+              failed_requests: db_proxy_runtime_flags.failed_requests || 0,
+              queue_depth: db_proxy_runtime_flags.queue_depth || 0
+            }
+          }
         } else {
           this.$message.error('Failed to fetch system status')
         }
