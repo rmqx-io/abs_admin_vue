@@ -96,15 +96,36 @@
         </a-col>
       </a-row>
       
-      <a-table 
-        v-if="dbOperationMetrics.top_slow_ops && dbOperationMetrics.top_slow_ops.length > 0"
-        :columns="opColumns" 
-        :data-source="dbOperationMetrics.top_slow_ops" 
-        :pagination="false" 
-        size="small"
-        row-schema="db-op-row"
-      >
-      </a-table>
+      <a-tabs default-active-key="mysql" style="margin-top: 16px;">
+        <a-tab-pane key="mysql" tab="MySQL Slow Ops">
+          <a-table 
+            v-if="dbOperationMetrics.top_slow_ops_mysql && dbOperationMetrics.top_slow_ops_mysql.length > 0"
+            :columns="opColumns" 
+            :data-source="dbOperationMetrics.top_slow_ops_mysql" 
+            :pagination="false" 
+            size="small"
+            row-schema="db-op-row"
+          >
+          </a-table>
+          <div v-else style="padding: 16px; text-align: center; color: rgba(0,0,0,0.45);">
+            No slow operations recorded
+          </div>
+        </a-tab-pane>
+        <a-tab-pane key="tarantool" tab="Tarantool Slow Ops">
+          <a-table 
+            v-if="dbOperationMetrics.top_slow_ops_tarantool && dbOperationMetrics.top_slow_ops_tarantool.length > 0"
+            :columns="opColumns" 
+            :data-source="dbOperationMetrics.top_slow_ops_tarantool" 
+            :pagination="false" 
+            size="small"
+            row-schema="db-op-row"
+          >
+          </a-table>
+          <div v-else style="padding: 16px; text-align: center; color: rgba(0,0,0,0.45);">
+            No slow operations recorded
+          </div>
+        </a-tab-pane>
+      </a-tabs>
     </a-card>
 
     <a-card title="System Actions" :bordered="false">
@@ -143,11 +164,32 @@ export default {
       },
       dbOperationMetrics: null,
       opColumns: [
-        { title: 'DB', dataIndex: 'db', key: 'db', width: '15%' },
-        { title: 'Operation', dataIndex: 'op', key: 'op', width: '35%' },
-        { title: 'Kind', dataIndex: 'kind', key: 'kind', width: '15%' },
-        { title: 'Result', dataIndex: 'result', key: 'result', width: '15%' },
-        { title: 'Count', dataIndex: 'count', key: 'count', width: '20%' },
+        { title: 'DB', dataIndex: 'db', key: 'db', width: '10%' },
+        { title: 'Operation', dataIndex: 'op', key: 'op', width: '20%' },
+        { title: 'Kind', dataIndex: 'kind', key: 'kind', width: '10%' },
+        { title: 'Result', dataIndex: 'result', key: 'result', width: '10%' },
+        { title: 'Count', dataIndex: 'count', key: 'count', width: '10%' },
+        { 
+          title: 'Avg (ms)', 
+          dataIndex: 'avg_latency_ms', 
+          key: 'avg_latency_ms', 
+          width: '10%',
+          customRender: (text) => text !== undefined ? Number(text).toFixed(2) : '0.00'
+        },
+        { 
+          title: 'P95 (ms)', 
+          dataIndex: 'p95_latency_ms', 
+          key: 'p95_latency_ms', 
+          width: '10%',
+          customRender: (text) => text !== undefined ? Number(text).toFixed(2) : '0.00'
+        },
+        { 
+          title: 'P99 (ms)', 
+          dataIndex: 'p99_latency_ms', 
+          key: 'p99_latency_ms', 
+          width: '10%',
+          customRender: (text) => text !== undefined ? Number(text).toFixed(2) : '0.00'
+        },
       ]
     }
   },
