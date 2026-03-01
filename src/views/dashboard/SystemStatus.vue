@@ -64,6 +64,14 @@
       </a-row>
     </a-card>
     <a-card title="DB Proxy Runtime Flags" :bordered="false" style="margin-bottom: 24px;">
+      <a-row v-if="runtimeTarantoolOnly !== null" style="margin-bottom: 12px;">
+        <a-col :span="24">
+          <strong>Runtime Mode:</strong>
+          <a-tag :color="runtimeTarantoolOnly ? 'green' : 'blue'" style="margin-left: 8px;">
+            {{ runtimeTarantoolOnly ? 'Tarantool Only (Read/Write)' : 'Non Tarantool-Only' }}
+          </a-tag>
+        </a-col>
+      </a-row>
       <a-row :gutter="16">
         <a-col :sm="24" :md="12" v-for="(value, key) in dbProxyRuntimeFlags" :key="`db-proxy-runtime-${key}`" style="margin-bottom: 12px;">
           <div>
@@ -158,6 +166,17 @@ import { getAction } from '@/api/manage'
 
 export default {
   name: 'SystemStatus',
+  computed: {
+    runtimeTarantoolOnly () {
+      if (this.dbProxyRuntimeFlags.tarantool_only === true || this.dbProxyRuntimeFlags.tarantool_only === false) {
+        return this.dbProxyRuntimeFlags.tarantool_only
+      }
+      if (this.dbProxyRuntimeFlags.health_tarantool_only === true || this.dbProxyRuntimeFlags.health_tarantool_only === false) {
+        return this.dbProxyRuntimeFlags.health_tarantool_only
+      }
+      return null
+    }
+  },
   data () {
     return {
       loading: false,
