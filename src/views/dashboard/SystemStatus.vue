@@ -125,6 +125,23 @@
             No slow operations recorded
           </div>
         </a-tab-pane>
+        <a-tab-pane key="failures" tab="Latest Failures">
+          <a-table 
+            v-if="dbOperationMetrics.latest_failures && dbOperationMetrics.latest_failures.length > 0"
+            :columns="failureColumns" 
+            :data-source="dbOperationMetrics.latest_failures" 
+            :pagination="{ pageSize: 10 }" 
+            size="small"
+            row-key="time"
+          >
+            <template slot="error" slot-scope="text">
+              <span style="color: #ff4d4f; font-family: monospace; font-size: 12px; word-break: break-all;">{{ text }}</span>
+            </template>
+          </a-table>
+          <div v-else style="padding: 16px; text-align: center; color: rgba(0,0,0,0.45);">
+            No failures recorded
+          </div>
+        </a-tab-pane>
       </a-tabs>
     </a-card>
 
@@ -189,6 +206,18 @@ export default {
           key: 'p99_latency_ms', 
           width: '10%',
           customRender: (text) => text !== undefined ? Number(text).toFixed(2) : '0.00'
+        },
+      ],
+      failureColumns: [
+        { title: 'Time', dataIndex: 'time', key: 'time', width: '15%' },
+        { title: 'DB', dataIndex: 'db', key: 'db', width: '8%' },
+        { title: 'Op', dataIndex: 'op', key: 'op', width: '12%' },
+        { title: 'Path', dataIndex: 'path', key: 'path', width: '8%' },
+        { 
+          title: 'Error Message', 
+          dataIndex: 'error', 
+          key: 'error', 
+          scopedSlots: { customRender: 'error' }
         },
       ]
     }
