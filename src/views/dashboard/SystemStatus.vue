@@ -63,6 +63,34 @@
         </a-col>
       </a-row>
     </a-card>
+    <a-card v-if="pipelineMetrics" title="Pipeline & Batching Metrics" :bordered="false" style="margin-bottom: 24px;">
+      <a-row :gutter="24">
+        <a-col :sm="24" :md="6" style="margin-bottom: 16px;">
+          <a-statistic title="Pending Ops" :value="pipelineMetrics.pending_ops" :value-style="{ color: '#1890ff' }">
+            <template #suffix><a-icon type="clock-circle" /></template>
+          </a-statistic>
+        </a-col>
+        <a-col :sm="24" :md="6" style="margin-bottom: 16px;">
+          <a-statistic title="Coalesced Total" :value="pipelineMetrics.coalesced_total" :value-style="{ color: '#52c41a' }">
+            <template #suffix><a-icon type="merge-cells" /></template>
+          </a-statistic>
+        </a-col>
+        <a-col :sm="24" :md="6" style="margin-bottom: 16px;">
+          <a-statistic title="Flush Ops (Unique)" :value="pipelineMetrics.flush_ops_total" :value-style="{ color: '#722ed1' }">
+            <template #suffix><a-icon type="cloud-upload" /></template>
+          </a-statistic>
+        </a-col>
+        <a-col :sm="24" :md="6" style="margin-bottom: 16px;">
+          <a-statistic title="Avg Batch Size" :value="pipelineMetrics.avg_batch_size" :precision="2" :value-style="{ color: '#fa8c16' }">
+            <template #suffix><a-icon type="cluster" /></template>
+          </a-statistic>
+        </a-col>
+      </a-row>
+      <div style="margin-top: 8px; color: rgba(0,0,0,0.45); font-size: 12px;">
+        <a-icon type="info-circle" style="margin-right: 4px;" />
+        Pipelining reduces network RTT by grouping multiple operations. Coalescing merges redundant updates for the same device ID within a 100ms window.
+      </div>
+    </a-card>
     <a-card title="DB Proxy Runtime Flags" :bordered="false" style="margin-bottom: 24px;">
       <a-row v-if="runtimeTarantoolOnly !== null" style="margin-bottom: 12px;">
         <a-col :span="24">
@@ -199,6 +227,7 @@ export default {
         queue_depth: 0
       },
       dbOperationMetrics: null,
+      pipelineMetrics: null,
       opColumns: [
         { title: 'DB', dataIndex: 'db', key: 'db', width: '10%' },
         { title: 'Operation', dataIndex: 'op', key: 'op', width: '20%' },
@@ -250,11 +279,12 @@ export default {
       getAction('/admin/tools/system_status').then(res => {
         if (res.code === 'SUCCESS') {
           const data = res.data || {}
-          const { db_configurations, db_proxy_runtime_flags, db_operation_metrics, ...componentStatuses } = data
+          const { db_configurations, db_proxy_runtime_flags, db_operation_metrics, pipeline_metrics, ...componentStatuses } = data
           this.componentStatusData = componentStatuses
           this.dbConfigurations = db_configurations || {}
           this.dbProxyRuntimeFlags = db_proxy_runtime_flags || {}
           this.dbOperationMetrics = db_operation_metrics
+          this.pipelineMetrics = pipeline_metrics || null
           
           // Extract metrics from runtime flags
           if (db_proxy_runtime_flags) {
