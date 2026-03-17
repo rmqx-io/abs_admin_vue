@@ -227,7 +227,7 @@
 
         <span slot='location_time' slot-scope='text, record'>
           <template>
-            {{ record.location_time ? localTime(record.location_time) : '' }}
+            {{ record.location_time ? formatTime(record.location_time) : '' }}
             <br />
             {{ $t('list.device.info.signalStrength') }}: <span>{{ record.signal }}</span>
             <br />
@@ -1847,6 +1847,9 @@ export default {
       // return {
       //   offset: [-size / 2, -size / 2]
       // }
+    },
+    formatTime(time) {
+      return moment.utc(time).format('YYYY-MM-DD HH:mm:ss')
     },
     localTime(time) {
       return moment.utc(time).local().format('YYYY-MM-DD HH:mm:ss')
