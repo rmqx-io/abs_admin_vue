@@ -512,7 +512,7 @@
                 <div>
                   <p>{{ $t('list.device.map.tooltip.deviceCode') }}：{{ record.device.code }}</p>
                   <p>{{ $t('list.device.map.tooltip.batteryCode') }}：{{ record.device.bms_bt }}</p>
-                  <p>{{ $t('list.device.map.tooltip.locationTime') }}：{{ record.device.location_time }}</p>
+                  <p>{{ $t('list.device.map.tooltip.locationTime') }}：{{ record.device.location_time ? formatTime(record.device.location_time) : '' }}</p>
                 </div>
               </template>
               <div class="custom-marker" />
@@ -1334,7 +1334,7 @@ export default {
                 polylinePathIsArray: Array.isArray(this.polyline.path),
                 firstPathPoint: this.polyline.path?.[0]
               });
-              
+
               // Debug the exact condition used in template
               const templateCondition = this.useLeaflet && this.polyline.path && this.polyline.path.length > 0;
               console.log('Template condition result:', templateCondition);
@@ -1423,13 +1423,13 @@ export default {
             this.getDevicesLocationPageNo = 0
             console.log('markersFound', this.markersFound)
             console.log('DeviceList: Setting showMarkers=true, deviceMarkers.length=', this.deviceMarkers.length)
-            
+
             // Force a Vue update cycle before setting showMarkers
             this.$nextTick(() => {
               this.showMarkers = true
               // Force component re-render
               this.$forceUpdate()
-              
+
               // Fit map bounds after a delay to ensure map is ready
               setTimeout(() => {
                 if (this.useLeaflet) {
@@ -1531,7 +1531,7 @@ export default {
     },
     updateLeafletMarkers() {
       console.log('updateLeafletMarkers called, useLeaflet:', this.useLeaflet, 'deviceMarkers.length:', this.deviceMarkers.length)
-      
+
       if (!this.useLeaflet) {
         console.log('Leaflet markers: not using Leaflet, skipping')
         return
@@ -1553,38 +1553,38 @@ export default {
 
       const markers = []
       console.log('Leaflet markers: processing', this.deviceMarkers.length, 'device markers')
-      
+
       this.deviceMarkers.forEach((item, index) => {
         console.log(`Leaflet markers: processing item ${index}:`, item)
-        
+
         if (!item.lnglat || item.lnglat.length !== 2) {
           console.log(`Leaflet markers: skipping invalid entry ${index}`, item)
           return
         }
         let lng = item.lnglat[0]
         let lat = item.lnglat[1]
-        
+
         // Convert to numbers if they are strings
         if (typeof lng === 'string') lng = parseFloat(lng)
         if (typeof lat === 'string') lat = parseFloat(lat)
-        
+
         console.log(`Leaflet markers: item ${index} coordinates: lng=${lng}, lat=${lat}`)
-        
+
         if (!Number.isFinite(lng) || !Number.isFinite(lat)) {
           console.log(`Leaflet markers: invalid coordinates for entry ${index}`, item.lnglat)
           return
         }
-        
+
         // Create marker with Leaflet's [lat, lng] order
         console.log(`Leaflet markers: creating marker at [${lat}, ${lng}]`)
         const marker = L.marker([lat, lng])
-        
+
         if (item.device) {
           const popupContent = `
             <div>
               <p><b>${this.$t('list.device.map.tooltip.deviceCode')}:</b> ${item.device.code || 'N/A'}</p>
               <p><b>${this.$t('list.device.map.tooltip.batteryCode')}:</b> ${item.device.bms_bt || 'N/A'}</p>
-              <p><b>${this.$t('list.device.map.tooltip.locationTime')}:</b> ${item.device.location_time || 'N/A'}</p>
+              <p><b>${this.$t('list.device.map.tooltip.locationTime')}:</b> ${item.device.location_time ? this.formatTime(item.device.location_time) : 'N/A'}</p>
             </div>
           `
           marker.bindPopup(popupContent)
@@ -1594,12 +1594,12 @@ export default {
       })
 
       console.log('Leaflet markers: created', markers.length, 'markers')
-      
+
       if (markers.length > 0) {
         console.log('Leaflet markers: adding', markers.length, 'markers to cluster group')
         this.leafletClusterGroup.addLayers(markers)
         console.log('Leaflet markers: markers added successfully')
-        
+
         // Verify markers were added
         console.log('Leaflet markers: cluster group now has', this.leafletClusterGroup.getLayers().length, 'layers')
       } else {
@@ -1758,12 +1758,12 @@ export default {
         this.showAlarm = false
         this.showLocationHistory = false
         this.showMap = true
-        
+
         // Clear markers first
         this.showMarkers = false
         this.deviceMarkers = []
         this.markersFound = 0
-        
+
         // Refresh the map display
         this.refresh_map = false
         this.$nextTick(() => {
