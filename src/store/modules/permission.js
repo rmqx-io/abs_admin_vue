@@ -9,17 +9,18 @@ import { asyncRouterMap, constantRouterMap } from '@/config/router.config'
  */
 function hasPermission (permission, route) {
   if (route.meta && route.meta.permission) {
-    // console.info('hasPermission:',JSON.stringify(route.meta.permission));
-    // console.info('hasPermission2:',JSON.stringify(permission));
-
-    let flag = false
-    for (let i = 0, len = permission.length; i < len; i++) {
-      flag = route.meta.permission.includes(permission[i])
-      if (flag) {
-        return true
+    return permission.some(p => {
+      if (typeof p === 'string' || typeof p === 'number') {
+        return route.meta.permission.includes(p)
       }
-    }
-    return false
+      if (p && typeof p.permissionId !== 'undefined') {
+        return route.meta.permission.includes(p.permissionId)
+      }
+      if (p && typeof p.permissionName !== 'undefined') {
+        return route.meta.permission.includes(p.permissionName)
+      }
+      return false
+    })
   }
   return true
 }

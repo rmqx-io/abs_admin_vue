@@ -376,6 +376,11 @@ export const asyncRouterMap = [
  */
 export const constantRouterMap = [
   {
+    path: '/',
+    redirect: '/dashboard/dashboard',
+    hidden: true
+  },
+  {
     path: '/user',
     component: UserLayout,
     redirect: '/user/login',

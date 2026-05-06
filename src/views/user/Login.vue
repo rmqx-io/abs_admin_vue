@@ -272,6 +272,7 @@ export default {
       this.isLoginError = false
     },
     requestFailed (err) {
+      console.log('login failed', err)
       this.isLoginError = true
       this.$notification['error']({
         message: '错误',

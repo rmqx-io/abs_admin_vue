@@ -383,7 +383,7 @@ const userNav = (options) => {
         'show': true
       },
       'component': 'RouteView',
-      'redirect': '/dashboard/workplace'
+      'redirect': '/dashboard/dashboard'
     },
     {
       'name': 'workplace',
