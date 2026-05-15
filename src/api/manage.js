@@ -2,7 +2,7 @@ import request from '@/utils/request'
 import request_no_timeout from '@/utils/request'
 import { method } from 'lodash'
 
-const prefix = '/admin'
+const prefix = ''
 
 export const api = {
   sys_dict_page: `${prefix}/sys_dict_page`,

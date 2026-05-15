@@ -48,7 +48,7 @@
       </a-row>
       <a-row :gutter="24">
         <a-col :sm="24" :md="12" style="margin-bottom: 16px;">
-          <a-statistic title="Processed Requests" :value="dbProxyMetrics.processed_requests" precision="0">
+          <a-statistic title="Processed Requests" :value="dbProxyMetrics.processed_requests" :precision="0">
             <template #suffix>
               <a-icon type="check-circle" />
             </template>
@@ -276,7 +276,7 @@ export default {
   methods: {
     fetchStatus () {
       this.loading = true
-      getAction('/admin/tools/system_status').then(res => {
+      getAction('/tools/system_status').then(res => {
         if (res.code === 'SUCCESS') {
           const data = res.data || {}
           const { db_configurations, db_proxy_runtime_flags, db_operation_metrics, pipeline_metrics, ...componentStatuses } = data
