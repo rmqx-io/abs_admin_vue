@@ -69,9 +69,9 @@ export default {
     initMap() {
       // Leaflet uses [lat, lng] format, while AMap uses [lng, lat]
       const latLng = [this.center[1], this.center[0]]
-      
+
       console.log('Initializing Leaflet map at:', latLng, 'zoom:', this.zoom)
-      
+
       this.map = L.map(this.$refs.mapContainer, {
         center: latLng,
         zoom: this.zoom,

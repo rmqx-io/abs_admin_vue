@@ -253,7 +253,7 @@ export default {
     },
     updateLeafletMarkers() {
       console.log('DeviceMap: updateLeafletMarkers called, useLeaflet:', this.useLeaflet, 'deviceMarkers.length:', this.deviceMarkers.length)
-      
+
       if (!this.useLeaflet || !this.leafletMap) {
         return
       }
@@ -270,34 +270,34 @@ export default {
 
       const markers = []
       console.log('DeviceMap: processing', this.deviceMarkers.length, 'device markers')
-      
+
       this.deviceMarkers.forEach((item, index) => {
         if (!item.lnglat || item.lnglat.length !== 2) {
           console.log(`DeviceMap: skipping invalid entry ${index}`, item)
           return
         }
-        
+
         let lng = item.lnglat[0]
         let lat = item.lnglat[1]
-        
+
         // Convert to numbers if they are strings
         if (typeof lng === 'string') lng = parseFloat(lng)
         if (typeof lat === 'string') lat = parseFloat(lat)
-        
+
         console.log(`DeviceMap: item ${index} coordinates: lng=${lng}, lat=${lat}`)
-        
+
         if (!Number.isFinite(lng) || !Number.isFinite(lat)) {
           console.log(`DeviceMap: invalid coordinates for entry ${index}`, item.lnglat)
           return
         }
-        
+
         // Create marker with Leaflet's [lat, lng] order
         const marker = L.marker([lat, lng])
-        
+
         // Add marker to map directly to test if it's visible
         marker.addTo(this.leafletMap)
         console.log(`DeviceMap: marker ${index} added directly to map at [${lat}, ${lng}]`)
-        
+
         if (item.device || item.title) {
           const popupContent = `
             <div>
@@ -312,26 +312,26 @@ export default {
       })
 
       console.log('DeviceMap: created', markers.length, 'markers')
-      
+
       // Test: Check if the map container has the correct size
       const mapSize = this.leafletMap.getSize()
       console.log('DeviceMap: map container size:', mapSize)
-      
+
       if (mapSize.x === 0 || mapSize.y === 0) {
         console.warn('DeviceMap: map container has zero size, invalidating size')
         this.leafletMap.invalidateSize()
       }
-      
+
       if (markers.length > 0) {
         // Don't add to cluster for now, keep them on the map directly for testing
         // this.leafletClusterGroup.addLayers(markers)
-        
+
         // Pan to the first marker
         const firstMarker = markers[0]
         const latlng = firstMarker.getLatLng()
         console.log('DeviceMap: panning to first marker at:', latlng)
         this.leafletMap.setView(latlng, 13)
-        
+
         // Check if marker is actually visible in DOM
         setTimeout(() => {
           const markerElements = document.querySelectorAll('.leaflet-marker-icon')

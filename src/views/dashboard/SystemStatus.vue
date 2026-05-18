@@ -1,7 +1,13 @@
 <template>
   <page-header-wrapper>
     <a-row :gutter="24">
-      <a-col :sm="24" :md="12" :xl="8" v-for="(item, key) in componentStatusData" :key="key" style="margin-bottom: 24px;">
+      <a-col
+:sm="24"
+:md="12"
+:xl="8"
+v-for="(item, key) in componentStatusData"
+:key="key"
+style="margin-bottom: 24px;">
         <a-card :title="key.toUpperCase()" :bordered="false">
           <div slot="extra">
             <a-tag :color="getStatusColor(item.status)">
@@ -109,7 +115,7 @@
         </a-col>
       </a-row>
     </a-card>
-    
+
     <a-card v-if="dbOperationMetrics" title="DB Operation Metrics (Proxy)" :bordered="false" style="margin-bottom: 24px;">
       <a-row :gutter="24" style="margin-bottom: 24px;">
         <a-col :sm="24" :md="12">
@@ -131,14 +137,14 @@
           </a-statistic>
         </a-col>
       </a-row>
-      
+
       <a-tabs default-active-key="mysql" style="margin-top: 16px;">
         <a-tab-pane key="mysql" tab="MySQL Slow Ops">
-          <a-table 
+          <a-table
             v-if="dbOperationMetrics.top_slow_ops_mysql && dbOperationMetrics.top_slow_ops_mysql.length > 0"
-            :columns="opColumns" 
-            :data-source="dbOperationMetrics.top_slow_ops_mysql" 
-            :pagination="false" 
+            :columns="opColumns"
+            :data-source="dbOperationMetrics.top_slow_ops_mysql"
+            :pagination="false"
             size="small"
             row-schema="db-op-row"
           >
@@ -148,11 +154,11 @@
           </div>
         </a-tab-pane>
         <a-tab-pane key="tarantool" tab="Tarantool Slow Ops">
-          <a-table 
+          <a-table
             v-if="dbOperationMetrics.top_slow_ops_tarantool && dbOperationMetrics.top_slow_ops_tarantool.length > 0"
-            :columns="opColumns" 
-            :data-source="dbOperationMetrics.top_slow_ops_tarantool" 
-            :pagination="false" 
+            :columns="opColumns"
+            :data-source="dbOperationMetrics.top_slow_ops_tarantool"
+            :pagination="false"
             size="small"
             row-schema="db-op-row"
           >
@@ -162,11 +168,11 @@
           </div>
         </a-tab-pane>
         <a-tab-pane key="failures" tab="Latest Failures">
-          <a-table 
+          <a-table
             v-if="dbOperationMetrics.latest_failures && dbOperationMetrics.latest_failures.length > 0"
-            :columns="failureColumns" 
-            :data-source="dbOperationMetrics.latest_failures" 
-            :pagination="{ pageSize: 10 }" 
+            :columns="failureColumns"
+            :data-source="dbOperationMetrics.latest_failures"
+            :pagination="{ pageSize: 10 }"
             size="small"
             row-key="time"
           >
@@ -234,24 +240,24 @@ export default {
         { title: 'Kind', dataIndex: 'kind', key: 'kind', width: '10%' },
         { title: 'Result', dataIndex: 'result', key: 'result', width: '10%' },
         { title: 'Count', dataIndex: 'count', key: 'count', width: '10%' },
-        { 
-          title: 'Avg (ms)', 
-          dataIndex: 'avg_latency_ms', 
-          key: 'avg_latency_ms', 
+        {
+          title: 'Avg (ms)',
+          dataIndex: 'avg_latency_ms',
+          key: 'avg_latency_ms',
           width: '10%',
           customRender: (text) => text !== undefined ? Number(text).toFixed(2) : '0.00'
         },
-        { 
-          title: 'P95 (ms)', 
-          dataIndex: 'p95_latency_ms', 
-          key: 'p95_latency_ms', 
+        {
+          title: 'P95 (ms)',
+          dataIndex: 'p95_latency_ms',
+          key: 'p95_latency_ms',
           width: '10%',
           customRender: (text) => text !== undefined ? Number(text).toFixed(2) : '0.00'
         },
-        { 
-          title: 'P99 (ms)', 
-          dataIndex: 'p99_latency_ms', 
-          key: 'p99_latency_ms', 
+        {
+          title: 'P99 (ms)',
+          dataIndex: 'p99_latency_ms',
+          key: 'p99_latency_ms',
           width: '10%',
           customRender: (text) => text !== undefined ? Number(text).toFixed(2) : '0.00'
         },
@@ -261,10 +267,10 @@ export default {
         { title: 'DB', dataIndex: 'db', key: 'db', width: '8%' },
         { title: 'Op', dataIndex: 'op', key: 'op', width: '12%' },
         { title: 'Path', dataIndex: 'path', key: 'path', width: '8%' },
-        { 
-          title: 'Error Message', 
-          dataIndex: 'error', 
-          key: 'error', 
+        {
+          title: 'Error Message',
+          dataIndex: 'error',
+          key: 'error',
           scopedSlots: { customRender: 'error' }
         },
       ]
@@ -285,7 +291,7 @@ export default {
           this.dbProxyRuntimeFlags = db_proxy_runtime_flags || {}
           this.dbOperationMetrics = db_operation_metrics
           this.pipelineMetrics = pipeline_metrics || null
-          
+
           // Extract metrics from runtime flags
           if (db_proxy_runtime_flags) {
             this.dbProxyMetrics = {

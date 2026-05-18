@@ -51,7 +51,7 @@ export default {
       console.log('LPolyline tryCreatePolyline attempt:', attempt)
       const maxAttempts = 10
       const delay = attempt * 50 // Increasing delay
-      
+
       setTimeout(() => {
         const map = this.getMap()
         if (map && this.path && this.path.length > 0) {
@@ -70,7 +70,7 @@ export default {
       const map = this.getMap()
       console.log('LPolyline getMap result:', map)
       console.log('LPolyline path:', this.path)
-      
+
       if (!map || !this.path || this.path.length === 0) {
         console.log('Polyline: waiting for map or path', {
           hasMap: !!map,
@@ -81,29 +81,29 @@ export default {
       }
 
       console.log('Creating polyline with path:', this.path)
-      
+
       // Validate and convert coordinates to [lat, lng] format for Leaflet
       const latLngs = this.path
         .filter(point => Array.isArray(point) && point.length >= 2)
         .map(point => {
           const lng = parseFloat(point[0])
           const lat = parseFloat(point[1])
-          
+
           if (!Number.isFinite(lng) || !Number.isFinite(lat)) {
             console.warn('Invalid coordinates:', point)
             return null
           }
-          
+
           // Convert [lng, lat] to [lat, lng] for Leaflet
           return [lat, lng]
         })
         .filter(point => point !== null)
-      
+
       if (latLngs.length === 0) {
         console.warn('No valid coordinates for polyline')
         return
       }
-      
+
       console.log('Converted to latLngs:', latLngs)
 
       this.polyline = L.polyline(latLngs, {

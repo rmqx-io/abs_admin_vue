@@ -65,7 +65,7 @@ export default {
 
         console.log('LMarkerCluster: Map found, creating cluster group')
         this.mapReady = true
-        
+
         // Create cluster group
         this.markerClusterGroup = L.markerClusterGroup({
           maxClusterRadius: this.gridSize,

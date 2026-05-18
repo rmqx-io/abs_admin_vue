@@ -156,7 +156,7 @@
         v-if="table_visible"
         ref="table"
         size="default"
-        :rowKey="(record) => record.id"
+        :rowKey="(record) => record.id || record.code || Math.random().toString()"
         :columns="columns"
         :data="loadData"
         :alert="true"
@@ -755,6 +755,10 @@ export default {
         return getDeviceList(arg)
           .then(res => {
             console.log('device list', res)
+            if (!this.isAutoRefreshing) {
+              this.setupAutoRefresh()
+            }
+            this.isAutoRefreshing = false
             return {
               pageSize: res.data.page_size,
               pageNo: res.data.page_no,
@@ -762,6 +766,10 @@ export default {
               totalPage: pages,
               data: res.data.records
             }
+          })
+          .catch(err => {
+            this.isAutoRefreshing = false
+            throw err
           })
       },
       selectedRowKeys: [],
@@ -785,6 +793,8 @@ export default {
       exportError: null,
       exportedCount: null,
       totalExportCount: null,
+      autoRefreshTimer: null,
+      isAutoRefreshing: false,
     }
   },
 
@@ -803,6 +813,9 @@ export default {
   },
   beforeDestroy() {
     this.clearLeafletCluster()
+    if (this.autoRefreshTimer) {
+      clearTimeout(this.autoRefreshTimer)
+    }
   },
   computed: {
     isEnglish() {
@@ -989,7 +1002,19 @@ export default {
         // this.$refs.sendBtCode.refresh()
       // }, 100)
     },
-    handleRefreshOnlineStatusPage () {
+    setupAutoRefresh() {
+      if (this.autoRefreshTimer) {
+        clearTimeout(this.autoRefreshTimer)
+      }
+      this.autoRefreshTimer = setTimeout(() => {
+        console.log('Auto refresh online status')
+        this.handleRefreshOnlineStatusPage(true)
+      }, 3000)
+    },
+    handleRefreshOnlineStatusPage (isAuto = false) {
+        if (isAuto) {
+          this.isAutoRefreshing = true
+        }
         const arg = Object.assign({}, this.queryData)
         arg.page_no = arg.pageNo
         arg.page_size = arg.pageSize
@@ -1001,11 +1026,16 @@ export default {
         }
         refreshDevicePage(arg).then(res => {
           console.log('refreshDevicePage', res)
-          this.$message.info(res.data)
-          this.refreshTable(true)
+          if (isAuto !== true) {
+            this.$message.info(res.data)
+          }
+          this.refreshTable(!isAuto)
         }).catch(err => {
           console.log('refreshDevicePage', err)
-          this.$message.error(err.msg)
+          this.isAutoRefreshing = false
+          if (isAuto !== true) {
+            this.$message.error(err.msg)
+          }
         })
     },
     handleRefreshOnlineStatusAll () {
