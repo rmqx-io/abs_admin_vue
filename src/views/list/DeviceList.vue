@@ -1006,10 +1006,13 @@ export default {
       if (this.autoRefreshTimer) {
         clearTimeout(this.autoRefreshTimer)
       }
+      // Temporarily disabled
+      /*
       this.autoRefreshTimer = setTimeout(() => {
         console.log('Auto refresh online status')
         this.handleRefreshOnlineStatusPage(true)
       }, 3000)
+      */
     },
     handleRefreshOnlineStatusPage (isAuto = false) {
         if (isAuto) {
