@@ -54,17 +54,33 @@
 
       <a-form>
         <a-row :gutter="48">
-          <a-col :md="8" :sm="24">
+          <a-col :md="10" :sm="24">
             <a-form-item :label="$t('Status')">
               <a-radio-group v-model="deviceStatus" @change="onDeviceStatusChange">
-                <a-radio-button value="total">{{ $t('Total') }} ({{ this.statusCount.total }})</a-radio-button>
-                <a-radio-button value="online">{{ $t('Online') }} ({{ this.statusCount.online }})</a-radio-button>
-                <a-radio-button value="offline">{{ $t('Offline') }} ({{ this.statusCount.offline }})</a-radio-button>
-                <a-radio-button value="standby">{{ $t('Standby' ) }} ({{ this.statusCount.standby }})</a-radio-button>
+                <a-radio-button class="status-btn-total" value="total">
+                  <span class="status-dot total"></span>
+                  <span class="status-label">{{ $t('Total') }}</span>
+                  <span class="status-count-badge total">{{ statusCount.total }}</span>
+                </a-radio-button>
+                <a-radio-button class="status-btn-online" value="online">
+                  <span class="status-dot online"></span>
+                  <span class="status-label">{{ $t('Online') }}</span>
+                  <span class="status-count-badge online">{{ statusCount.online }}</span>
+                </a-radio-button>
+                <a-radio-button class="status-btn-offline" value="offline">
+                  <span class="status-dot offline"></span>
+                  <span class="status-label">{{ $t('Offline') }}</span>
+                  <span class="status-count-badge offline">{{ statusCount.offline }}</span>
+                </a-radio-button>
+                <a-radio-button class="status-btn-standby" value="standby">
+                  <span class="status-dot standby"></span>
+                  <span class="status-label">{{ $t('Standby') }}</span>
+                  <span class="status-count-badge standby">{{ statusCount.standby }}</span>
+                </a-radio-button>
               </a-radio-group>
             </a-form-item>
           </a-col>
-          <a-col :md="4" :sm="12">
+          <a-col :md="5" :sm="12">
             <a-form-item :label="$t('No')">
               <a-input
                 v-model="queryData.device_id"
@@ -73,7 +89,7 @@
               />
             </a-form-item>
           </a-col>
-          <a-col :md="4" :sm="12">
+          <a-col :md="5" :sm="12">
             <a-form-item :label="$t('Organization')">
               <a-tree-select
                 show-search
@@ -84,37 +100,35 @@
               ></a-tree-select>
             </a-form-item>
           </a-col>
-          <a-col :md='4' :sm='12'>
-            <div v-if='!showMoreParam' style='margin-bottom: 10px'>
-              <a class="ant-dropdown-link" @click='showMoreParam = true'>{{ $t('list.device.filters.moreParams') }}<a-icon type="down"/></a>
-            </div>
-            <div v-if='showMoreParam'>
-              <a
-                class="ant-dropdown-link"
-                @click='() => { showMoreParam = false; queryData.bt_code = ""; queryData.iccid = ""; queryData.soh = ""; queryData.soc = ""; queryData.alarm = "" }'
-              >{{ $t('list.device.filters.collapseParams') }}<a-icon type="up"/></a>
+          <a-col :md="4" :sm="12">
+            <div class="more-params-wrapper">
+              <div v-if="!showMoreParam">
+                <a class="ant-dropdown-link" @click="showMoreParam = true">{{ $t('list.device.filters.moreParams') }}<a-icon type="down"/></a>
+              </div>
+              <div v-if="showMoreParam">
+                <a
+                  class="ant-dropdown-link"
+                  @click="() => { showMoreParam = false; queryData.bt_code = ''; queryData.iccid = ''; queryData.soh = ''; queryData.soc = ''; queryData.alarm = '' }"
+                >{{ $t('list.device.filters.collapseParams') }}<a-icon type="up"/></a>
+              </div>
             </div>
           </a-col>
         </a-row>
-        <a-row :gutter='48'>
-          <div v-if='showMoreParam'>
-            <a-col :md='4' :sm='12'><a-form-item :label="$t('BT Code')"><a-input v-model="queryData.bt_code" placeholder=""/></a-form-item></a-col>
-            <a-col :md='4' :sm='12'><a-form-item :label="$t('ICCID')"><a-input v-model="queryData.iccid" placeholder=""/></a-form-item></a-col>
-            <a-col :md='4' :sm='12'><a-form-item :label="$t('SOH')"><a-input v-model="queryData.soh" placeholder=""/></a-form-item></a-col>
-            <a-col :md='4' :sm='12'><a-form-item :label="$t('SOC')"><a-input v-model="queryData.soc" placeholder=""/></a-form-item></a-col>
-<!--            <a-col :md='4' :sm='12'><a-form-item :label="$t('Alarm')"><a-input v-model="queryData.alarm" placeholder=""/></a-form-item></a-col>-->
-          </div>
+        <a-row :gutter="48">
+          <template v-if="showMoreParam">
+            <a-col :md="6" :sm="12"><a-form-item :label="$t('BT Code')"><a-input v-model="queryData.bt_code" placeholder=""/></a-form-item></a-col>
+            <a-col :md="6" :sm="12"><a-form-item :label="$t('ICCID')"><a-input v-model="queryData.iccid" placeholder=""/></a-form-item></a-col>
+            <a-col :md="6" :sm="12"><a-form-item :label="$t('SOH')"><a-input v-model="queryData.soh" placeholder=""/></a-form-item></a-col>
+            <a-col :md="6" :sm="12"><a-form-item :label="$t('SOC')"><a-input v-model="queryData.soc" placeholder=""/></a-form-item></a-col>
+          </template>
         </a-row>
-        <a-row>
-          <a-col v-if="!showAlarm" :md="!advanced && 4 || 12" :sm="12">
-            <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
-              <a-button type="primary" @click="refreshTable(true)">{{ $t('common.search') }}</a-button>
-              <!--                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>-->
-              <!--              <a @click="toggleAdvanced" style="margin-left: 8px">-->
-              <!--                {{ advanced ? '收起' : '展开' }}-->
-              <!--                <a-icon :type="advanced ? 'up' : 'down'"/>-->
-              <!--              </a>-->
-            </span>
+        <a-row :gutter="48">
+          <a-col v-if="!showAlarm" :md="3" :sm="12">
+            <a-form-item>
+              <a-button type="primary" style="width: 100%" @click="refreshTable(true)">
+                <a-icon type="search" />{{ $t('common.search') }}
+              </a-button>
+            </a-form-item>
           </a-col>
           <!-- checkbox for contains_search -->
           <a-col :md="4" :sm="12">
@@ -122,10 +136,6 @@
               <a-checkbox v-model="queryData.contains_search">{{ $t('list.device.filters.fuzzySearch') }}</a-checkbox>
             </a-form-item>
           </a-col>
-          <!--          <a-col :md="8" :sm="24">-->
-          <!--            <a-checkbox v-model="showMap" @change="onMapChange">显示地图</a-checkbox>-->
-          <!--            <a-checkbox v-model="showAlarm" @change="onAlarmChange">显示告警</a-checkbox>-->
-          <!--          </a-col>-->
         </a-row>
       </a-form>
     </div>
@@ -2291,154 +2301,488 @@ export default {
 
 /* Enhanced UI Styles */
 .table-page-search-wrapper {
-  padding: 24px 24px 0;
-  background: #fff;
-  margin-bottom: 16px;
-  border-radius: 4px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  padding: 24px 24px 8px;
+  background: rgba(255, 255, 255, 0.95);
+  margin-bottom: 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.03), 0 8px 16px -6px rgba(0, 0, 0, 0.02);
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
 }
 
-.table-operator {
-  margin-bottom: 18px;
-  display: flex;
+.table-page-search-wrapper:hover,
+.table-page-search-wrapper:focus-within {
+  border-color: rgba(59, 130, 246, 0.25);
+  box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.04), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+}
+
+/* Premium Segment Control for Radio Buttons */
+.table-page-search-wrapper .ant-form-item .ant-radio-group {
+  background-color: #f1f5f9;
+  padding: 4px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  border: none;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 4px;
 }
 
-.table-operator .ant-btn {
-  margin-right: 0;
-}
-
-.ant-card {
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-}
-
-.ant-tabs-nav {
-  margin-bottom: 16px;
-}
-
-.ant-form-item {
-  margin-bottom: 16px;
-}
-
-.ant-radio-group {
-  margin-bottom: 8px;
-}
-
-.ant-radio-button-wrapper {
-  min-width: 100px;
-  text-align: center;
-}
-
-.ant-radio-group {
-  margin-bottom: 8px;
-}
-
-.ant-radio-button-wrapper {
-  min-width: 100px;
-  text-align: center;
-}
-
-.map-container {
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-}
-
-.popup {
-  position: absolute;
-  z-index: 1;
-  background: white;
-  padding: 12px;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.alarm-container {
-  background: #fff;
-  padding: 24px;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-}
-
-.ant-modal {
-  height: -webkit-fill-available;
-  max-width: 90vw;
-  max-height: 90vh;
-}
-
-.ant-modal-content {
-  max-width: 90vw;
-  margin: auto;
-  overflow: auto;
-  border-radius: 8px;
-}
-
-.ant-table-wrapper {
-  background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.ant-table {
-  border-radius: 8px;
-}
-
-.ant-table-thead > tr > th {
-  background: #fafafa;
-  font-weight: 600;
-}
-
-.ant-btn {
-  border-radius: 4px;
+.table-page-search-wrapper .ant-form-item .ant-radio-button-wrapper {
+  background: transparent;
+  border: none !important;
+  color: #64748b;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   height: 32px;
-  padding: 0 16px;
-  font-size: 14px;
+  line-height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 550;
+  position: relative;
+  text-align: center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.ant-btn .anticon {
+.table-page-search-wrapper .ant-form-item .ant-radio-button-wrapper::before {
+  display: none !important;
+}
+
+.table-page-search-wrapper .ant-form-item .ant-radio-button-wrapper-checked {
+  font-weight: 600;
+}
+
+.table-page-search-wrapper .ant-form-item .ant-radio-button-wrapper:hover:not(.ant-radio-button-wrapper-checked) {
+  color: #0f172a;
+}
+
+/* Modern Input, Tree-select, and Select element styles */
+.table-page-search-wrapper .ant-input,
+.table-page-search-wrapper .ant-select-selection,
+.table-page-search-wrapper .ant-select,
+.table-page-search-wrapper .ant-tree-select .ant-select-selection {
+  border-radius: 8px !important;
+  border: 1.5px solid #e2e8f0 !important;
+  background-color: #f8fafc !important;
+  height: 38px !important;
+  line-height: 38px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  color: #1e293b;
+  font-weight: 500;
+  box-shadow: none !important;
+}
+
+.table-page-search-wrapper .ant-input::placeholder {
+  color: #94a3b8;
+}
+
+.table-page-search-wrapper .ant-input:hover,
+.table-page-search-wrapper .ant-select-selection:hover,
+.table-page-search-wrapper .ant-select:hover,
+.table-page-search-wrapper .ant-tree-select .ant-select-selection:hover {
+  border-color: #cbd5e1 !important;
+}
+
+.table-page-search-wrapper .ant-input:focus,
+.table-page-search-wrapper .ant-select-focused .ant-select-selection,
+.table-page-search-wrapper .ant-select-selection:focus,
+.table-page-search-wrapper .ant-select-open .ant-select-selection,
+.table-page-search-wrapper .ant-tree-select-open .ant-select-selection {
+  border-color: #3b82f6 !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 3.5px rgba(59, 130, 246, 0.15) !important;
+}
+
+.table-page-search-wrapper .ant-select-selection--single {
+  height: 38px !important;
+  line-height: 38px !important;
+}
+
+.table-page-search-wrapper .ant-select-selection__rendered {
+  line-height: 34px !important;
+  margin-left: 12px !important;
+  margin-right: 12px !important;
+}
+
+/* Custom Labels Style */
+.table-page-search-wrapper .ant-form-item-label {
+  line-height: 1.5;
+  padding-bottom: 6px;
+}
+
+.table-page-search-wrapper .ant-form-item-label > label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  letter-spacing: 0.01em;
+}
+
+/* More Parameters Link Refinement */
+.table-page-search-wrapper .ant-dropdown-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  background-color: #f1f5f9;
+  color: #475569;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  margin-top: 4px;
+}
+
+.table-page-search-wrapper .ant-dropdown-link:hover {
+  background-color: #e2e8f0;
+  color: #1e293b;
+  text-decoration: none;
+}
+
+.table-page-search-wrapper .ant-dropdown-link .anticon {
+  margin-left: 6px;
+  transition: transform 0.2s ease;
+}
+
+/* Submit and Search buttons styling */
+.table-page-search-submitButtons .ant-btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  height: 38px !important;
+  padding: 0 24px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em;
+  color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(29, 78, 216, 0.25) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transform: translateY(0);
+}
+
+.table-page-search-submitButtons .ant-btn-primary:hover,
+.table-page-search-submitButtons .ant-btn-primary:focus {
+  background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%) !important;
+  box-shadow: 0 6px 16px rgba(29, 78, 216, 0.35) !important;
+  transform: translateY(-1.5px);
+  color: #ffffff !important;
+}
+
+.table-page-search-submitButtons .ant-btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(29, 78, 216, 0.2) !important;
+}
+
+/* Checkbox Style */
+.table-page-search-wrapper .ant-checkbox-wrapper {
+  font-weight: 550;
+  color: #475569;
+  font-size: 13px;
+  transition: color 0.2s ease;
+}
+
+.table-page-search-wrapper .ant-checkbox-wrapper:hover {
+  color: #1e293b;
+}
+
+.table-page-search-wrapper .ant-checkbox-inner {
+  border-radius: 4px;
+  border: 1.5px solid #cbd5e1;
+  width: 18px;
+  height: 18px;
+  transition: all 0.2s ease;
+}
+
+.table-page-search-wrapper .ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* Operator Area & Buttons styling */
+.table-operator {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  background: #f8fafc;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+}
+
+.table-operator .ant-btn-primary {
+  background: #ffffff !important;
+  color: #2563eb !important;
+  border: 1.5px solid #bfdbfe !important;
+  border-radius: 8px !important;
+  height: 36px !important;
+  padding: 0 16px !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.03) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transform: translateY(0);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-operator .ant-btn-primary .anticon {
   margin-right: 6px;
 }
 
-.ant-input,
-.ant-select,
-.ant-tree-select {
-  border-radius: 4px;
+.table-operator .ant-btn-primary:hover,
+.table-operator .ant-btn-primary:focus {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.22) !important;
 }
 
-.ant-form-item-label {
-  font-weight: 500;
+.table-operator .ant-btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15) !important;
+}
+
+/* Distinguish Add/Edit as the primary positive action (Emerald Green) */
+.table-operator .ant-btn-primary[icon='plus'],
+.table-operator .ant-btn-primary:first-child {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25) !important;
+}
+
+.table-operator .ant-btn-primary[icon='plus']:hover,
+.table-operator .ant-btn-primary[icon='plus']:focus,
+.table-operator .ant-btn-primary:first-child:hover,
+.table-operator .ant-btn-primary:first-child:focus {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35) !important;
+  transform: translateY(-1.5px);
+}
+
+.table-operator .ant-btn-primary[icon='plus']:active,
+.table-operator .ant-btn-primary:first-child:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Tabs UI clean design */
+.ant-tabs-bar {
+  border-bottom: 2px solid #f1f5f9 !important;
+  margin-bottom: 20px !important;
+}
+
+.ant-tabs-nav .ant-tabs-tab {
+  font-size: 14px;
+  font-weight: 550;
+  color: #64748b;
+  transition: all 0.2s ease;
+  padding: 12px 16px !important;
+  margin-right: 16px !important;
+}
+
+.ant-tabs-nav .ant-tabs-tab:hover {
+  color: #3b82f6;
+}
+
+.ant-tabs-nav .ant-tabs-tab-active {
+  color: #3b82f6 !important;
+  font-weight: 600;
+}
+
+.ant-tabs-ink-bar {
+  background-color: #3b82f6 !important;
+  height: 3px !important;
+  border-radius: 3px 3px 0 0;
 }
 
 .export-status {
   margin-top: 10px;
-  padding: 8px 12px;
-  background-color: #f8f8f8;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #666;
+  padding: 10px 14px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  font-size: 13.5px;
+  color: #475569;
+  border: 1px solid #e2e8f0;
   word-break: break-all;
 }
 
 .export-status span {
-  margin-right: 10px;
+  margin-right: 12px;
 }
 
 .export-error-actions {
   margin: 10px 0;
-  padding: 8px 12px;
+  padding: 10px 14px;
   background-color: #fff1f0;
-  border: 1px solid #ffccc7;
-  border-radius: 4px;
+  border: 1.5px solid #ffccc7;
+  border-radius: 8px;
   display: flex;
   justify-content: flex-end;
+  align-items: center;
 }
 
 .export-error-actions .ant-btn {
   margin-left: 10px;
+}
+
+/* Premium Segmented Controls and Status Colors */
+.more-params-wrapper {
+  margin-top: 29px;
+  display: flex;
+  align-items: center;
+  height: 38px;
+}
+
+/* Status Indicator Dots inside segment controls */
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.status-dot.total {
+  background-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.status-dot.online {
+  background-color: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+}
+
+.status-dot.offline {
+  background-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15);
+}
+
+.status-dot.standby {
+  background-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
+}
+
+/* Elegant badges for status counts */
+.status-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  height: 18px;
+  min-width: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  border-radius: 10px;
+  margin-left: 8px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Default / Unchecked segment colors */
+.status-count-badge.total {
+  background-color: rgba(59, 130, 246, 0.08);
+  color: #3b82f6;
+}
+
+.status-count-badge.online {
+  background-color: rgba(16, 185, 129, 0.08);
+  color: #10b981;
+}
+
+.status-count-badge.offline {
+  background-color: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+}
+
+.status-count-badge.standby {
+  background-color: rgba(245, 158, 11, 0.08);
+  color: #d97706;
+}
+
+/* Checked States - Custom text and shadows for each segment */
+.table-page-search-wrapper .ant-form-item .status-btn-total.ant-radio-button-wrapper-checked {
+  color: #2563eb !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.12), 0 2px 4px rgba(37, 99, 235, 0.06) !important;
+}
+
+.table-page-search-wrapper .ant-form-item .status-btn-online.ant-radio-button-wrapper-checked {
+  color: #10b981 !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.12), 0 2px 4px rgba(16, 185, 129, 0.06) !important;
+}
+
+.table-page-search-wrapper .ant-form-item .status-btn-offline.ant-radio-button-wrapper-checked {
+  color: #ef4444 !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.12), 0 2px 4px rgba(239, 68, 68, 0.06) !important;
+}
+
+.table-page-search-wrapper .ant-form-item .status-btn-standby.ant-radio-button-wrapper-checked {
+  color: #d97706 !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.12), 0 2px 4px rgba(245, 158, 11, 0.06) !important;
+}
+
+/* Active Badge Colors when selected */
+.status-btn-total.ant-radio-button-wrapper-checked .status-count-badge.total {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+.status-btn-online.ant-radio-button-wrapper-checked .status-count-badge.online {
+  background-color: #10b981;
+  color: #ffffff;
+}
+
+.status-btn-offline.ant-radio-button-wrapper-checked .status-count-badge.offline {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+.status-btn-standby.ant-radio-button-wrapper-checked .status-count-badge.standby {
+  background-color: #d97706;
+  color: #ffffff;
+}
+
+/* Pulse/Transform Animations for active status indicators */
+.status-btn-total.ant-radio-button-wrapper-checked .status-dot.total {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+}
+
+.status-btn-online.ant-radio-button-wrapper-checked .status-dot.online {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+  animation: status-pulse-green 2s infinite;
+}
+
+.status-btn-offline.ant-radio-button-wrapper-checked .status-dot.offline {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+}
+
+.status-btn-standby.ant-radio-button-wrapper-checked .status-dot.standby {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+}
+
+@keyframes status-pulse-green {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
 }
 </style>
