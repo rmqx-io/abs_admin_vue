@@ -605,6 +605,8 @@ import LMap from '@/components/leaflet/LMap.vue'
 import LPolyline from '@/components/leaflet/LPolyline.vue'
 import LCircleMarker from '@/components/leaflet/LCircleMarker.vue'
 
+const apiBaseUrl = process.env.VUE_APP_API_BASE_URL || ''
+
 function interpolate(u, begin, end) {
   if (u < 0) u = 0
   if (u > 1) u = 1
@@ -1940,6 +1942,37 @@ export default {
       arg.location_only = false
       arg.device_status = this.deviceStatus
 
+      const buildExportUrl = (params) => {
+        const baseUrl = apiBaseUrl.replace(/\/$/, '')
+        return `${baseUrl}${api.device_export}?${params}`
+      }
+
+      const readResponseText = async (response) => {
+        if (response && typeof response.text === 'function') {
+          return response.text()
+        }
+        return ''
+      }
+
+      const assertExportResponse = async (response, expectedType, stepName) => {
+        if (!response.ok) {
+          const errorText = await readResponseText(response)
+          throw new Error(`${stepName}失败，HTTP ${response.status}${errorText ? `: ${errorText.slice(0, 120)}` : ''}`)
+        }
+
+        const contentType = response.headers && typeof response.headers.get === 'function'
+          ? (response.headers.get('content-type') || '')
+          : ''
+        if (expectedType === 'json' && !contentType.includes('json')) {
+          const errorText = await readResponseText(response)
+          throw new Error(`${stepName}返回了非 JSON 响应，请检查接口地址或登录状态${errorText ? `: ${errorText.slice(0, 80)}` : ''}`)
+        }
+        if (expectedType === 'csv' && contentType && !contentType.includes('csv')) {
+          const errorText = await readResponseText(response)
+          throw new Error(`${stepName}返回了非 CSV 响应，请检查接口地址或登录状态${errorText ? `: ${errorText.slice(0, 80)}` : ''}`)
+        }
+      }
+
       // 添加带超时的fetch函数
       const fetchWithTimeout = async (url, options, timeout = 30000) => {
         const controller = new AbortController();
@@ -1972,7 +2005,7 @@ export default {
       countParams.set('count_only', 'true')
       countParams.set('page_size', '1')
 
-      const countResponse = await fetchWithTimeout(`${api.device_export}?${countParams}`, {
+      const countResponse = await fetchWithTimeout(buildExportUrl(countParams), {
         method: 'GET',
         headers: {
           'Access-Token': storage.get(ACCESS_TOKEN),
@@ -1981,9 +2014,7 @@ export default {
         }
       }, 15000) // 15秒超时
 
-      if (!countResponse.ok) {
-        throw new Error(`HTTP error! status: ${countResponse.status}`)
-      }
+      await assertExportResponse(countResponse, 'json', '获取导出总数')
 
       const countData = await countResponse.json()
       console.log('countData', countData)
@@ -2027,7 +2058,7 @@ export default {
 
         // this.$message.info(`正在处理第 ${currentSlice}/${totalSlices} 批`)
 
-        const sliceResponse = await fetchWithTimeout(`${api.device_export}?${sliceParams}`, {
+        const sliceResponse = await fetchWithTimeout(buildExportUrl(sliceParams), {
           method: 'GET',
           headers: {
             'Access-Token': storage.get(ACCESS_TOKEN),
@@ -2036,9 +2067,7 @@ export default {
           }
         }, 60000) // 60秒超时，导出数据可能需要更长时间
 
-        if (!sliceResponse.ok) {
-          throw new Error(`HTTP error in slice ${currentSlice}! status: ${sliceResponse.status}`)
-        }
+        await assertExportResponse(sliceResponse, 'csv', `导出第 ${currentSlice} 批`)
 
         const sliceText = await sliceResponse.text()
 
