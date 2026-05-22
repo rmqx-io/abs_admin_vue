@@ -37,6 +37,7 @@
       <a-tabs
         v-model="activeTab"
         @change="onTabChange"
+        class="device-list-tabs"
       >
         <a-tab-pane key="table">
           <template #tab><a-icon type="table" /><span>{{ $t('list.device.tabs.table') }}</span></template>
@@ -2570,34 +2571,80 @@ export default {
   box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2) !important;
 }
 
-/* Tabs UI clean design */
-.ant-tabs-bar {
-  border-bottom: 2px solid #f1f5f9 !important;
-  margin-bottom: 20px !important;
+/* Premium Modern Line Tabs UI */
+.device-list-tabs {
+  margin-bottom: 24px;
 }
 
-.ant-tabs-nav .ant-tabs-tab {
+.device-list-tabs .ant-tabs-bar {
+  border-bottom: 2px solid #e2e8f0 !important;
+  margin-bottom: 24px !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  display: block !important;
+}
+
+.device-list-tabs .ant-tabs-nav-container {
+  margin-bottom: -2px !important; /* Elegant overlap to cover the border line cleanly */
+}
+
+.device-list-tabs .ant-tabs-nav .ant-tabs-tab {
   font-size: 14px;
   font-weight: 550;
   color: #64748b;
-  transition: all 0.2s ease;
-  padding: 12px 16px !important;
+  padding: 10px 16px 14px 16px !important;
   margin-right: 16px !important;
+  margin-left: 0 !important;
+  border-radius: 6px 6px 0 0 !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  border: none !important;
+  background: transparent !important;
 }
 
-.ant-tabs-nav .ant-tabs-tab:hover {
-  color: #3b82f6;
+.device-list-tabs .ant-tabs-nav .ant-tabs-tab i,
+.device-list-tabs .ant-tabs-nav .ant-tabs-tab .anticon {
+  margin-right: 0 !important;
+  font-size: 16px;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s ease;
+  color: #64748b;
 }
 
-.ant-tabs-nav .ant-tabs-tab-active {
-  color: #3b82f6 !important;
-  font-weight: 600;
+.device-list-tabs .ant-tabs-nav .ant-tabs-tab:hover {
+  color: #2563eb !important;
+  background-color: rgba(37, 99, 235, 0.04) !important;
 }
 
-.ant-tabs-ink-bar {
-  background-color: #3b82f6 !important;
+.device-list-tabs .ant-tabs-nav .ant-tabs-tab:hover i,
+.device-list-tabs .ant-tabs-nav .ant-tabs-tab:hover .anticon {
+  color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.device-list-tabs .ant-tabs-nav .ant-tabs-tab-active {
+  color: #2563eb !important;
+  font-weight: 650;
+  background-color: transparent !important;
+}
+
+.device-list-tabs .ant-tabs-nav .ant-tabs-tab-active i,
+.device-list-tabs .ant-tabs-nav .ant-tabs-tab-active .anticon {
+  color: #2563eb !important;
+  transform: scale(1.05);
+}
+
+/* Glowing sliding active underline */
+.device-list-tabs .ant-tabs-ink-bar {
+  display: block !important;
+  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%) !important;
   height: 3px !important;
-  border-radius: 3px 3px 0 0;
+  border-radius: 3px 3px 0 0 !important;
+  box-shadow: 0 -1px 6px rgba(37, 99, 235, 0.3) !important;
+  bottom: 0 !important;
 }
 
 .export-status {
