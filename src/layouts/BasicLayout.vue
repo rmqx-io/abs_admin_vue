@@ -20,9 +20,11 @@
           我们推荐使用这种方式进行 LOGO 和 title 自定义
     -->
     <template v-slot:menuHeaderRender>
-      <div>
-        <img src='../assets/logo.png' style='width: 40px;height: 30px'/>
-        <h1>{{ title }}</h1>
+      <div class="custom-menu-header">
+        <div class="logo-wrapper">
+          <img src="../assets/logo.png" alt="Logo" class="logo-img" />
+        </div>
+        <h1 class="logo-title">{{ title }}</h1>
       </div>
     </template>
     <!-- 1.0.0+ 版本 pro-layout 提供 API,
