@@ -70,16 +70,34 @@ export default {
   .container {
     width: 100%;
     min-height: 100%;
-    background: #f0f2f5 url(~@/assets/background.svg) no-repeat 50%;
-    background-size: 100%;
-    //padding: 50px 0 84px;
+    background: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.05) 0%, rgba(240, 242, 245, 1) 90%);
     position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    /* Subtle background grid pattern */
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+      background-size: 20px 20px;
+      pointer-events: none;
+      z-index: 0;
+    }
 
     .user-layout-lang {
       width: 100%;
       height: 40px;
       line-height: 44px;
       text-align: right;
+      z-index: 10;
 
       .select-lang-trigger {
         cursor: pointer;
@@ -95,6 +113,7 @@ export default {
 
     .user-layout-content {
       padding: 32px 0 24px;
+      z-index: 1;
 
       .top {
         text-align: center;
@@ -140,8 +159,22 @@ export default {
 
       .main {
         min-width: 260px;
-        width: 368px;
+        width: 380px;
         margin: 0 auto;
+        padding: 40px 32px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+        z-index: 1;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        &:hover {
+          box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08);
+          transform: translateY(-2px);
+        }
       }
 
       .footer {

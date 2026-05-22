@@ -23,6 +23,7 @@ canvas {
 }
 
 body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -240,10 +241,88 @@ ol {
   padding: 10px;
 }
 
-.ant-table table { font-size: 12px; }
-.ant-table-tbody{
-  padding: 0 !important;
+.ant-table table {
+  font-size: 13px;
+  border-collapse: separate;
 }
-.ant-table-tbody > tr > td{
-  padding: 1px !important;
+
+.ant-table-thead > tr > th {
+  background: #f8fafc !important;
+  font-weight: 600;
+  color: #334155 !important;
+  padding: 12px 16px !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.ant-table-tbody > tr > td {
+  padding: 10px 16px !important;
+  color: #475569 !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  transition: background-color 0.2s ease;
+}
+
+.ant-table-row:hover > td {
+  background: rgba(16, 185, 129, 0.03) !important;
+}
+
+/* Custom premium scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.24);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Premium interactive cards */
+.ant-card {
+  border-radius: 12px !important;
+  border: 1px solid #f1f5f9 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.ant-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06) !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Pulsing Status Badges */
+.ant-badge-status-processing {
+  background-color: #10b981 !important;
+  position: relative;
+}
+.ant-badge-status-processing::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1px solid #10b981;
+  content: '';
+  animation: antStatusProcessing 1.6s infinite ease-in-out;
+}
+
+@keyframes antStatusProcessing {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
 }

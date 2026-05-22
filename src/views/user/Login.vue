@@ -290,21 +290,115 @@ export default {
     font-size: 14px;
   }
 
+  /deep/ .ant-input {
+    border-radius: 8px !important;
+    border: 1px solid #d9d9d9;
+    transition: all 0.2s ease;
+    
+    &:focus, &:hover {
+      border-color: #10b981 !important;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1) !important;
+    }
+  }
+
+  /deep/ .ant-input-affix-wrapper .ant-input {
+    &:focus, &:hover {
+      border-color: #10b981 !important;
+      box-shadow: none !important;
+    }
+  }
+  
+  /deep/ .ant-input-affix-wrapper:hover .ant-input:not(.ant-input-disabled) {
+    border-color: #10b981 !important;
+  }
+  
+  /deep/ .ant-input-affix-wrapper-focused {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1) !important;
+  }
+
   .getCaptcha {
     display: block;
     width: 100%;
     height: 40px;
+    border-radius: 8px !important;
+    border: 1px solid #10b981 !important;
+    color: #10b981 !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    
+    &:hover, &:focus {
+      background: rgba(16, 185, 129, 0.04) !important;
+      border-color: #059669 !important;
+      color: #059669 !important;
+    }
   }
 
-  .forge-password {
-    font-size: 14px;
+  .forge-password, .register {
+    color: #10b981 !important;
+    font-weight: 500;
+    transition: color 0.2s ease;
+    
+    &:hover {
+      color: #059669 !important;
+      text-decoration: underline;
+    }
   }
 
   button.login-button {
     padding: 0 15px;
     font-size: 16px;
-    height: 40px;
+    height: 44px;
     width: 100%;
+    border-radius: 8px !important;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
+    transition: all 0.3s ease !important;
+
+    &:hover, &:focus {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35) !important;
+      transform: translateY(-1px);
+    }
+    
+    &:active {
+      transform: translateY(1px);
+    }
+  }
+
+  /deep/ .ant-tabs-nav .ant-tabs-tab {
+    font-size: 15px;
+    font-weight: 500;
+    color: #64748b;
+    
+    &:hover {
+      color: #10b981;
+    }
+  }
+  
+  /deep/ .ant-tabs-nav .ant-tabs-tab-active {
+    color: #10b981 !important;
+    font-weight: 600;
+  }
+  
+  /deep/ .ant-tabs-ink-bar {
+    background-color: #10b981 !important;
+    height: 3px !important;
+    border-radius: 2px;
+  }
+
+  /deep/ .ant-checkbox-checked .ant-checkbox-inner {
+    background-color: #10b981 !important;
+    border-color: #10b981 !important;
+  }
+  
+  /deep/ .ant-checkbox-wrapper:hover .ant-checkbox-inner,
+  /deep/ .ant-checkbox:hover .ant-checkbox-inner,
+  /deep/ .ant-checkbox-input:focus + .ant-checkbox-inner {
+    border-color: #10b981 !important;
   }
 
   .user-login-other {
@@ -321,7 +415,7 @@ export default {
       transition: color 0.3s;
 
       &:hover {
-        color: #1890ff;
+        color: #10b981;
       }
     }
 
