@@ -135,7 +135,7 @@
         <a-button type='primary' icon='plus' @click='handleAdd'>{{ $t('list.device.actions.addEdit') }}</a-button>
         <a-button type='primary' @click='handleBatchCommandManager'>{{ $t('list.device.actions.commandManager') }}</a-button>
         <a-button type='primary' @click='handleSelectParams'>{{ $t('list.device.actions.productionTest') }}</a-button>
-        <a-button type='primary' @click='handleExport'>{{ $t('list.device.actions.export') }}</a-button>
+        <a-button type='primary' data-testid='device-export-button' @click='handleExport'>{{ $t('list.device.actions.export') }}</a-button>
         <a-button type='primary' @click='handleImport'>{{ $t('list.device.actions.import') }}</a-button>
         <a-button type='primary' @click='handleSendBtCode'>{{ $t('list.device.actions.sendBtCode') }}</a-button>
         <a-button type='primary' @click='handleRefreshOnlineStatusPage'>{{ $t('list.device.actions.refreshOnlineStatus') }}</a-button>
