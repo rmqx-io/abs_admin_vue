@@ -674,15 +674,15 @@ export default {
                       date: timestamp
                     },
                     {
-                      value: item.power_transistor_temperature,
+                      value: parseFloat(item.power_transistor_temperature) <= -273 ? null : item.power_transistor_temperature,
                       date: timestamp
                     },
                     {
-                      value: item.battery_temperature,
+                      value: parseFloat(item.battery_temperature) <= -273 ? null : item.battery_temperature,
                       date: timestamp
                     },
                     {
-                      value: item.battery_box_temperature,
+                      value: parseFloat(item.battery_box_temperature) <= -273 ? null : item.battery_box_temperature,
                       date: timestamp
                     }
                   ])

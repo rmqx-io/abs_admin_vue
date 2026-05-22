@@ -84,7 +84,11 @@ export default {
                             res += '<br/>'
                             // a dot with corresponding color
                             res += '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + params[i].color + ';"></span>'
-                            res += params[i].seriesName + '</span> : ' + params[i].value[1]
+                            var val = params[i].value[1]
+                            if (val === null || val === undefined) {
+                                val = '-'
+                            }
+                            res += params[i].seriesName + '</span> : ' + val
                         }
                         setTimeout(function () {
                             callback(ticket, res)
@@ -128,6 +132,7 @@ export default {
                     data: chartData[key].map((item) => [item.time, item.value]),
                     type: 'line',
                     smooth: true,
+                    connectNulls: true,
                     symbol: 'none',
                     name: key
                 })

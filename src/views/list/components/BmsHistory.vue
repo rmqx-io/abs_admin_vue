@@ -137,17 +137,17 @@ export default {
                                 })
                             bmsTemperatureList.push(
                                 {
-                                    value: item.battery_temperature,
+                                    value: parseFloat(item.battery_temperature) === -273.1 ? null : item.battery_temperature,
                                     time: timestamp
                                 })
                             bmsBoxTemperatureList.push(
                                 {
-                                    value: item.battery_box_temperature,
+                                    value: parseFloat(item.battery_box_temperature) === -273.1 ? null : item.battery_box_temperature,
                                     time: timestamp
                                 })
                             bmsPowerTransistorTemperatureList.push(
                                 {
-                                    value: item.power_transistor_temperature,
+                                    value: parseFloat(item.power_transistor_temperature) === -273.1 ? null : item.power_transistor_temperature,
                                     time: timestamp
                                 })
                             item.single_battery_voltage_arr.split(',').forEach((voltage, index) => {

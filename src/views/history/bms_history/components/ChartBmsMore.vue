@@ -31,6 +31,7 @@
             name: '电池' + index,
             type: 'line',
             smooth: true,
+            connectNulls: true,
             data: [], // 最终是一个类型 如电池1，多个[时间，数值] 共20个
             markPoint: {
               data: [
@@ -73,6 +74,9 @@
                 var param = params[i]
                 var xValue = getDateStr(param.value[0]) // x轴的名称
                 var yValue = param.value[1] // Y
+                if (yValue === null || yValue === undefined) {
+                  yValue = '-'
+                }
                 // eslint-disable-next-line no-unused-vars
                 var seriesName = param.seriesName // 图例名称
                 // var value = param.value //y轴值

@@ -358,6 +358,12 @@ export const asyncRouterMap = [
             name: 'TestConfirmDialog',
             component: () => import('@/views/TestConfirmDialog'),
             meta: { title: 'Confirm Dialog Test', keepAlive: true, permission: ['setting'] }
+          },
+          {
+            path: '/test/bms-history',
+            name: 'TestBmsHistory',
+            component: () => import('@/views/BmsHistoryTest'),
+            meta: { title: 'BMS History Test', keepAlive: true, permission: ['setting'] }
           }
         ]
       }
