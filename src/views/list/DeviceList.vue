@@ -699,15 +699,11 @@ export default {
       is_sysadmin: false,
       device_create_form_visible: false,
       table_visible: true,
-      showMap: false,
       isGettingDeviceLocation: false,
       getDevicesLocationPages: 1,
       getDevicesLocationPageNo: 0,
       markersFound: 0,
       showMarkers: false,
-      showTableTab: true,
-      showAlarm: false,
-      showLocationHistory: false,
       send_command_form_visible: false,
         select_params: false,
       send_bt_code_visible: false,
@@ -831,6 +827,18 @@ export default {
     }
   },
   computed: {
+    showTableTab() {
+      return this.activeTab === 'table'
+    },
+    showMap() {
+      return this.activeTab === 'map'
+    },
+    showAlarm() {
+      return this.activeTab === 'alarm'
+    },
+    showLocationHistory() {
+      return this.activeTab === 'location-history'
+    },
     isEnglish() {
       const isEnglish = this.$i18n.locale.startsWith('en')
       console.log('i18n.locale', this.$i18n.locale)
@@ -1803,22 +1811,19 @@ export default {
     },
     onTabChange(tab) {
       console.log('tab change', tab)
-      if (tab !== 'map' && this.useLeaflet) {
-        this.clearLeafletCluster()
-      }
-      if (tab === 'map') {
+      if (tab !== 'map') {
+        this.showMarkers = false
+        if (this.useLeaflet) {
+          this.clearLeafletCluster()
+        }
+      } else {
         console.log('show map')
-        this.showTableTab = false
-        this.showAlarm = false
-        this.showLocationHistory = false
-        this.showMap = true
-
         // Clear markers first
         this.showMarkers = false
         this.deviceMarkers = []
         this.markersFound = 0
 
-        // Refresh the map display
+        // Refresh the map display by toggling refresh_map to force re-render
         this.refresh_map = false
         this.$nextTick(() => {
           this.refresh_map = true
@@ -1829,31 +1834,6 @@ export default {
             }
           }, 500)
         })
-        // refresh map to make sure it is displayed, by hide and show
-        this.refresh_map = false
-        this.$nextTick(() => {
-            this.refresh_map = true
-          }
-        )
-      } else if (tab === 'alarm') {
-        console.log('show alarm')
-        this.showTableTab = false
-        this.showMap = false
-        this.showMarkers = false
-        this.showLocationHistory = false
-        this.showAlarm = true
-      } else if (tab === 'location-history') {
-        this.showTableTab = false
-        this.showMap = false
-        this.showAlarm = false
-        this.showLocationHistory = true
-      } else {
-        console.log('show table')
-        this.showTableTab = true
-        this.showMap = false
-        this.showMarkers = false
-        this.showAlarm = false
-        this.showLocationHistory = false
       }
     },
     getClusterStyle(context) {
