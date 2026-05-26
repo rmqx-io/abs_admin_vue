@@ -1883,7 +1883,7 @@ export default {
       // }
     },
     formatTime(time) {
-      return moment.utc(time).format('YYYY-MM-DD HH:mm:ss')
+      return moment.parseZone(time).format('YYYY-MM-DD HH:mm:ss')
     },
     localTime(time) {
       return moment.utc(time).local().format('YYYY-MM-DD HH:mm:ss')
