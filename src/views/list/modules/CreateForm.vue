@@ -23,13 +23,10 @@
 一行一个设备' />
         </a-form-item>
         <a-form-item label="运营单位">
-          <a-tree-select
-            show-search
-            tree-default-expand-all
-            :filterTreeNode="filterTreeNode"
-            :treeData="orgList"
+          <org-select
+            :org-list="orgList"
             v-decorator="['organization_id', { rules: [ {required: true} ]}]"
-          ></a-tree-select>
+          ></org-select>
         </a-form-item>
         <a-form-item label="设备类型">
           <a-select
@@ -58,6 +55,7 @@
 
 <script>
 import pick from 'lodash.pick'
+import { OrgSelect } from '@/components'
 import TagSelectOption from '@/components/TagSelect/TagSelectOption'
 import { getAdminOrgTree, getBatteryModelList, getDeviceModelList } from '@/api/manage'
 
@@ -65,7 +63,7 @@ import { getAdminOrgTree, getBatteryModelList, getDeviceModelList } from '@/api/
 const fields = ['id', 'code', 'organization_id', 'storehouse_name', 'battery_id', 'model_id', 'bms_bt', 'h_ver', 's_ver', 'iccid']
 
 export default {
-  components: { TagSelectOption },
+  components: { TagSelectOption, OrgSelect },
   props: {
     visible: {
       type: Boolean,
@@ -115,17 +113,11 @@ export default {
     })
   },
   methods: {
-    filterTreeNode (input, option) {
-      return (
-        option.data.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0
-      )
-    },
     getAdminOrgList () {
       return getAdminOrgTree(this.queryParam)
         .then(res => {
           console.log('org list', res)
-          this.orgList = []
-          this.orgList.push(res.data)
+          this.orgList = res.data ? [res.data] : []
         })
     },
     getDeviceModelListOptions () {

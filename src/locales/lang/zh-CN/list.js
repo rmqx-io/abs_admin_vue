@@ -38,6 +38,7 @@ export default {
   'list.device.filters.moreParams': '更多参数',
   'list.device.filters.collapseParams': '收起参数',
   'list.device.filters.fuzzySearch': '模糊搜索',
+  'list.device.filters.orgPlaceholder': '请选择组织',
   'list.device.actions.addEdit': '添加/修改',
   'list.device.actions.commandManager': '下发指令管理',
   'list.device.actions.productionTest': '生产测试',

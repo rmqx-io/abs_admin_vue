@@ -165,14 +165,10 @@
           </a-input-password>
         </a-form-item>
         <a-form-item label="上级组织">
-          <a-tree-select
+          <org-select
             v-model='dialogData.organization_id'
-            show-search
-            tree-default-expand-all
-            :filterTreeNode="filterTreeNode"
-            :treeData="orgList"
-          >
-          </a-tree-select>
+            :org-list="orgList"
+          />
         </a-form-item>
         <a-form-item label='角色集'>
           <a-tree
@@ -201,6 +197,7 @@ import {
   sys_user_update,
   getAdminOrgTree
 } from '@/api/manage'
+import { OrgSelect } from '@/components'
 import { showMsg } from '@/utils/data'
 
 const columns = [
@@ -246,6 +243,9 @@ const columns = [
 ]
 
 export default {
+  components: {
+    OrgSelect
+  },
   mounted() {
     this.fetch()
     this.getAllRole()
@@ -282,11 +282,6 @@ export default {
     this.getAdminOrgList()
   },
   methods: {
-    filterTreeNode (input, option) {
-      return (
-        option.data.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0
-      )
-    },
     handleTableChange(pagination, filters, sorter) {
       console.log(pagination)
       const pager = { ...this.pagination }
@@ -444,8 +439,7 @@ export default {
       return getAdminOrgTree(this.queryParam)
         .then(res => {
           console.log('org list', res)
-          this.orgList = []
-          this.orgList.push(res.data)
+          this.orgList = res.data ? [res.data] : []
         })
     }
   }

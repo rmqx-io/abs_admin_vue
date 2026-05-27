@@ -92,13 +92,11 @@
           </a-col>
           <a-col :md="5" :sm="12">
             <a-form-item :label="$t('Organization')">
-              <a-tree-select
-                show-search
-                tree-default-expand-all
-                :filterTreeNode="filterTreeNode"
-                :treeData="orgList"
+              <org-select
                 v-model="queryData.organization_id"
-              ></a-tree-select>
+                :org-list="orgList"
+                :placeholder="$t('list.device.filters.orgPlaceholder')"
+              />
             </a-form-item>
           </a-col>
           <a-col :md="4" :sm="12">
@@ -580,7 +578,7 @@
 <script>
 // import VueAMap from 'vue-amap'
 import moment from 'moment'
-import { STable, Ellipsis } from '@/components'
+import { STable, Ellipsis, OrgSelect } from '@/components'
 import {
   addUpdateDeviceBatch,
   getAdminOrgTree,
@@ -630,7 +628,7 @@ function interpolate(u, begin, end) {
 export default {
   name: 'TableList',
   components: {
-      SelectParams,
+    SelectParams,
     SendCommandManager,
     SendBtCode,
     SendCommandManagerDevices,
@@ -638,6 +636,7 @@ export default {
     STable,
     Ellipsis,
     CreateForm,
+    OrgSelect,
     SendCommandForm,
     StepByStepModal,
     BatteryInfo,
@@ -788,6 +787,7 @@ export default {
       center: [113.94, 22.52],
       // amapManager,
       orgList: [],
+      orgListLoading: false,
       statusCount: {},
       deviceStatus: 'online',
       showBatchCommandManager: false,
@@ -1424,24 +1424,22 @@ export default {
           this.$message.error('Failed to load location data: ' + (err.message || 'Unknown error'));
         });
     },
-    filterTreeNode(input, option) {
-      return (
-        option.data.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0
-      )
-    },
     getAdminOrgList() {
+      this.orgListLoading = true
       return getAdminOrgTree(this.queryParam)
         .then(res => {
           console.log('org list', res)
-          this.orgList = []
-          this.orgList.push(res.data)
+          this.orgList = res.data ? [res.data] : []
         })
         .catch(err => {
-          console.log('org list', err)
+          console.log('org list error', err)
           // retry after 3s
           setTimeout(() => {
             this.getAdminOrgList()
           }, 3000)
+        })
+        .finally(() => {
+          this.orgListLoading = false
         })
     },
     getDeviceLocation(arg, page_no) {
