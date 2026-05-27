@@ -97,6 +97,11 @@
                 :org-list="orgList"
                 :placeholder="$t('list.device.filters.orgPlaceholder')"
               />
+              <div class="recent-org-shortcuts" v-if="recentOrgs && recentOrgs.length > 0">
+                <span v-for="org in recentOrgs" :key="org.id" class="recent-org-tag" @click="queryData.organization_id = org.id">
+                  {{ org.name }}
+                </span>
+              </div>
             </a-form-item>
           </a-col>
           <a-col :md="4" :sm="12">
@@ -787,6 +792,7 @@ export default {
       center: [113.94, 22.52],
       // amapManager,
       orgList: [],
+      recentOrgs: [],
       orgListLoading: false,
       statusCount: {},
       deviceStatus: 'online',
@@ -816,6 +822,7 @@ export default {
     }
   },
   mounted() {
+    this.recentOrgs = storage.get('recent_orgs') || []
     this.syncFormFromRouteQuery()
     this.getStatusCount()
     this.getAdminOrgList()
@@ -1000,6 +1007,36 @@ export default {
     // }
   },
   methods: {
+    findOrgInTree(nodes, id) {
+      if (!nodes) return null
+      for (const node of nodes) {
+        if (node.id === id || node.value === id) {
+          return node
+        }
+        const children = node.children || node.childs
+        if (children && children.length > 0) {
+          const found = this.findOrgInTree(children, id)
+          if (found) return found
+        }
+      }
+      return null
+    },
+    addRecentOrg(id) {
+      if (!id) return
+      const org = this.findOrgInTree(this.orgList, id)
+      if (org) {
+        const name = org.title || org.name
+        const recent = [...this.recentOrgs]
+        const index = recent.findIndex(item => item.id === id)
+        if (index > -1) {
+          // If already exists, move to top if name is the same, or update name
+          recent.splice(index, 1)
+        }
+        recent.unshift({ id, name })
+        this.recentOrgs = recent.slice(0, 3)
+        storage.set('recent_orgs', this.recentOrgs)
+      }
+    },
     handleAdd () {
       console.log('handle add')
       this.device_create_form_data = null
@@ -1430,6 +1467,9 @@ export default {
         .then(res => {
           console.log('org list', res)
           this.orgList = res.data ? [res.data] : []
+          if (this.queryData.organization_id) {
+            this.addRecentOrg(this.queryData.organization_id)
+          }
         })
         .catch(err => {
           console.log('org list error', err)
@@ -2208,6 +2248,9 @@ export default {
     },
     'queryData.organization_id'(newVal) {
       if (!this.isSyncingFromRoute) this.updateRouteQuery()
+      if (newVal) {
+        this.addRecentOrg(newVal)
+      }
     },
     $route() {
       this.syncFormFromRouteQuery()
@@ -2809,5 +2852,28 @@ export default {
   100% {
     box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
   }
+}
+
+.recent-org-shortcuts {
+  margin-top: 4px;
+  line-height: 22px;
+}
+.recent-org-tag {
+  display: inline-block;
+  height: auto;
+  margin-right: 8px;
+  padding: 0 7px;
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+  background: #fafafa;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.recent-org-tag:hover {
+  color: #1890ff;
+  border-color: #1890ff;
 }
 </style>
