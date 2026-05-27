@@ -132,6 +132,10 @@ export default {
       immediate: true,
       handler(val) {
         this.generateFlatData(val)
+        // Defaultly expand first level nodes
+        if (val && val.length > 0 && this.expandedKeys.length === 0) {
+          this.expandedKeys = val.map(node => node.value !== undefined ? node.value : node.id)
+        }
       }
     },
     value: {
