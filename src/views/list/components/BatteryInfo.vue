@@ -218,12 +218,50 @@ export default {
           return getBatteryInfo(this.deviceId, res.data.bms_type, arg)
             .then(res => {
               this.bms_loading = false
+              const rawData = res.data || [];
+              
+              // 1. Calculate count of valid cell voltages for each record
+              const counts = rawData.map(record => {
+                if (!record.single_battery_voltage_arr) return 0;
+                const parts = record.single_battery_voltage_arr.split(',').map(s => s.trim());
+                const validParts = parts.filter(p => p !== '' && p !== '-' && !isNaN(parseFloat(p)));
+                return validParts.length;
+              });
+
+              // 2. Find the mode of the cell counts (most frequent count)
+              const frequency = {};
+              let maxFreq = 0;
+              let modeCount = 0;
+              counts.forEach(c => {
+                frequency[c] = (frequency[c] || 0) + 1;
+                if (frequency[c] > maxFreq) {
+                  maxFreq = frequency[c];
+                  modeCount = c;
+                }
+              });
+
+              // 3. Filter out abnormal and cell-count-deviating records
+              const filteredData = rawData.filter(record => {
+                const isAbnormalBasic =
+                  (!record.single_battery_voltage_arr ||
+                   record.single_battery_voltage_arr === '0' ||
+                   record.single_battery_voltage_arr === '-') &&
+                  record.battery_capacity_soc === 0 &&
+                  record.battery_voltage === 0;
+                if (isAbnormalBasic) return false;
+
+                const parts = record.single_battery_voltage_arr
+                  ? record.single_battery_voltage_arr.split(',').map(s => s.trim()).filter(p => p !== '' && p !== '-' && !isNaN(parseFloat(p)))
+                  : [];
+                return parts.length === modeCount;
+              });
+
               return {
                 pageSize: 1000,
                 pageNo: 0,
                 totalCount: 1,
                 totalPage: 1,
-                data: res.data
+                data: filteredData
               }
             }).catch(err => {
               console.log('load bms data failed', err)
