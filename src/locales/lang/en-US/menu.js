@@ -52,5 +52,6 @@ export default {
   'menu.setting.app-user': 'App Account Management',
   'menu.tools': 'Tools',
   'menu.tools.alarm-config': 'Alarm Configuration',
+  'menu.tools.device-tracing': 'Device Tracing',
   'menu.test': 'Test'
 }

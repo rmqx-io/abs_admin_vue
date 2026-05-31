@@ -226,8 +226,13 @@ export default {
       this.loading = true
       console.log('parameter', parameter)
       console.log('queryData', this.queryData)
-      console.log('start_date', this.queryData.start_date)
-      const arg = Object.assign(parameter, this.queryData)
+      const arg = Object.assign({}, parameter, this.queryData)
+      if (arg.start_date && moment.isMoment(arg.start_date)) {
+        arg.start_date = arg.start_date.format('YYYY-MM-DD HH:mm:ss')
+      }
+      if (arg.end_date && moment.isMoment(arg.end_date)) {
+        arg.end_date = arg.end_date.format('YYYY-MM-DD HH:mm:ss')
+      }
       arg.page_no = arg.pageNo
       arg.page_size = arg.pageSize
       delete arg.pageNo

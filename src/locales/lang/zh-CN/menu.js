@@ -51,7 +51,8 @@ export default {
   'menu.setting.role': '角色管理',
   'menu.setting.res': '权限管理',
   'menu.setting.app-user': 'App账号管理',
-  'menu.tools': '工具',
-  'menu.tools.alarm-config': '告警配置',
-  'menu.test': '测试'
+    'menu.tools': '工具',
+    'menu.tools.alarm-config': '告警配置',
+    'menu.tools.device-tracing': '设备在线追踪',
+    'menu.test': '测试'
 }

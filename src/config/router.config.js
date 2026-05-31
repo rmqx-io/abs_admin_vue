@@ -332,6 +332,17 @@ export const asyncRouterMap = [
               permission: ['setting']
             }
           },
+          {
+            path: '/tools/device-tracing',
+            name: 'tools_device_tracing',
+            component: () => import('@/views/tools/DeviceTracing'),
+            meta: {
+              title: 'menu.tools.device-tracing',
+              hidden: false,
+              keepAlive: true,
+              permission: ['setting']
+            }
+          },
           // system status page (added for convenience)
           {
             path: '/tools/system-status',

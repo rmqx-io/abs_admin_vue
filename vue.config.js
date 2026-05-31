@@ -5,15 +5,15 @@ const GitRevision = new GitRevisionPlugin()
 const buildDate = JSON.stringify(new Date().toLocaleString())
 const createThemeColorReplacerPlugin = require('./config/plugin.config')
 
-function resolve (dir) {
+function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
 // check Git
-function getGitHash () {
+function getGitHash() {
   try {
     return GitRevision.version()
-  } catch (e) {}
+  } catch (e) { }
   return 'unknown'
 }
 
@@ -161,12 +161,14 @@ const vueConfig = {
     // }
     proxy: {
       '/admin': {
-        target: 'http://localhost:8000/',
+        target: 'http://localhost:8015/',
+        // target: 'http://e.iov18.com/',
         ws: false,
         changeOrigin: true
       },
       '/api': {
-        target: 'http://localhost:8000/',
+        target: 'http://localhost:8015/',
+        // target: 'http://e.iov18.com/',
         ws: false,
         changeOrigin: true
       }

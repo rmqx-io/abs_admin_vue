@@ -82,9 +82,10 @@ export const api = {
 
   tools: `${prefix}/tools`,
   tools_alarm_config: `${prefix}/tools/alarm_config`,
+  device_tracing: `${prefix}/tracing/device`,
 }
 
-export function getAction (url, parameter) {
+export function getAction(url, parameter) {
   return request({
     url: url,
     method: 'get',
@@ -92,7 +93,7 @@ export function getAction (url, parameter) {
   })
 }
 
-export function getUserList (parameter) {
+export function getUserList(parameter) {
   return request({
     url: api.user,
     method: 'get',
@@ -100,7 +101,7 @@ export function getUserList (parameter) {
   })
 }
 
-export function getRoleList (parameter) {
+export function getRoleList(parameter) {
   return request({
     url: api.role,
     method: 'get',
@@ -108,7 +109,7 @@ export function getRoleList (parameter) {
   })
 }
 
-export function getServiceList (parameter) {
+export function getServiceList(parameter) {
   return request({
     url: api.service,
     method: 'get',
@@ -116,7 +117,7 @@ export function getServiceList (parameter) {
   })
 }
 
-export function getDeviceList (arg) {
+export function getDeviceList(arg) {
   return request({
     url: api.device,
     method: 'post',
@@ -124,7 +125,7 @@ export function getDeviceList (arg) {
   })
 }
 
-export function getAppUserDeviceBind (arg) {
+export function getAppUserDeviceBind(arg) {
   return request({
     url: api.app_user_device_bind,
     method: 'get',
@@ -132,7 +133,7 @@ export function getAppUserDeviceBind (arg) {
   })
 }
 
-export function unbindAppUserDevice (arg) {
+export function unbindAppUserDevice(arg) {
   return request({
     url: api.app_user_device_unbind,
     method: 'get',
@@ -140,7 +141,7 @@ export function unbindAppUserDevice (arg) {
   })
 }
 
-export function exportDeviceList (arg) {
+export function exportDeviceList(arg) {
   return request({
     url: api.device_export,
     method: 'post',
@@ -148,7 +149,7 @@ export function exportDeviceList (arg) {
   })
 }
 
-export function getExportDeviceList (parameters) {
+export function getExportDeviceList(parameters) {
   return request_no_timeout({
     url: api.device_export,
     method: 'get',
@@ -156,7 +157,7 @@ export function getExportDeviceList (parameters) {
   })
 }
 
-export function getDeviceAlarm (arg) {
+export function getDeviceAlarm(arg) {
   return request({
     url: api.device_alarm,
     method: 'post',
@@ -164,7 +165,7 @@ export function getDeviceAlarm (arg) {
   })
 }
 
-export function getDeviceAlarmPostgres (arg) {
+export function getDeviceAlarmPostgres(arg) {
   return request({
     url: api.device_alarm_postgres,
     method: 'post',
@@ -172,7 +173,7 @@ export function getDeviceAlarmPostgres (arg) {
   })
 }
 
-export function getBmsAlarmCount (parameters) {
+export function getBmsAlarmCount(parameters) {
   return request({
     url: api.bms_alarm_count,
     method: 'get',
@@ -180,14 +181,14 @@ export function getBmsAlarmCount (parameters) {
   })
 }
 
-export function getDeviceAlarmTypes (deviceType) {
-return request({
+export function getDeviceAlarmTypes(deviceType) {
+  return request({
     url: api.device_alarm_types + '/' + deviceType,
     method: 'get'
   })
 }
 
-export function addDevice (arg) {
+export function addDevice(arg) {
   return request({
     url: api.add_device,
     method: 'post',
@@ -195,7 +196,7 @@ export function addDevice (arg) {
   })
 }
 
-export function addUpdateDeviceBatch (arg) {
+export function addUpdateDeviceBatch(arg) {
   return request({
     url: api.add_update_device_batch,
     method: 'post',
@@ -203,7 +204,7 @@ export function addUpdateDeviceBatch (arg) {
   })
 }
 
-export function updateDevice (arg) {
+export function updateDevice(arg) {
   return request({
     url: api.update_device,
     method: 'post',
@@ -211,7 +212,7 @@ export function updateDevice (arg) {
   })
 }
 
-export function getDevicePacketLog (deviceId, parameter) {
+export function getDevicePacketLog(deviceId, parameter) {
   return request({
     url: api.device_packet_log + '/' + deviceId,
     method: 'post',
@@ -219,7 +220,7 @@ export function getDevicePacketLog (deviceId, parameter) {
   })
 }
 
-export function devicePacketParse (packet) {
+export function devicePacketParse(packet) {
   return request({
     url: api.device_packet_parse,
     method: 'post',
@@ -227,7 +228,7 @@ export function devicePacketParse (packet) {
   })
 }
 
-export function getPermissions (parameter) {
+export function getPermissions(parameter) {
   return request({
     url: api.permissionNoPager,
     method: 'get',
@@ -235,7 +236,7 @@ export function getPermissions (parameter) {
   })
 }
 
-export function getOrgList (arg) {
+export function getOrgList(arg) {
   return request({
     url: api.org,
     method: 'post',
@@ -243,7 +244,7 @@ export function getOrgList (arg) {
   })
 }
 
-export function addOrg (arg) {
+export function addOrg(arg) {
   return request({
     url: api.add_org,
     method: 'post',
@@ -251,7 +252,7 @@ export function addOrg (arg) {
   })
 }
 
-export function getAdminOrgTree (parameter) {
+export function getAdminOrgTree(parameter) {
   return request({
     url: api.org_tree,
     method: 'get',
@@ -259,7 +260,7 @@ export function getAdminOrgTree (parameter) {
   })
 }
 
-export function getStatusCount (parameter) {
+export function getStatusCount(parameter) {
   return request({
     url: api.device + '/status/count',
     method: 'get',
@@ -267,7 +268,7 @@ export function getStatusCount (parameter) {
   })
 }
 
-export function getDeviceModelList (arg) {
+export function getDeviceModelList(arg) {
   return request({
     url: api.device_model,
     method: 'post',
@@ -275,7 +276,7 @@ export function getDeviceModelList (arg) {
   })
 }
 
-export function getBatteryModelList (arg) {
+export function getBatteryModelList(arg) {
   return request({
     url: api.battery_model,
     method: 'post',
@@ -283,7 +284,7 @@ export function getBatteryModelList (arg) {
   })
 }
 
-export function getBatteryInfo (deviceId, bmsType, arg) {
+export function getBatteryInfo(deviceId, bmsType, arg) {
   return request({
     url: api.battery_info + '/' + deviceId + '/' + bmsType,
     method: 'post',
@@ -291,7 +292,7 @@ export function getBatteryInfo (deviceId, bmsType, arg) {
   })
 }
 
-export function getBatteryInfoLatest (deviceId, bmsType, arg) {
+export function getBatteryInfoLatest(deviceId, bmsType, arg) {
   return request({
     url: api.battery_info_latest + '/' + deviceId + '/' + bmsType,
     method: 'post',
@@ -299,14 +300,14 @@ export function getBatteryInfoLatest (deviceId, bmsType, arg) {
   })
 }
 
-export function getBatteryInfoLatestCql (deviceId, bmsType, arg) {
+export function getBatteryInfoLatestCql(deviceId, bmsType, arg) {
   return request({
     url: api.battery_info_latest + '/' + deviceId + '/' + bmsType + '/cql',
     method: 'post',
   })
 }
 
-export function setBmsConfig (deviceId, arg) {
+export function setBmsConfig(deviceId, arg) {
   return request({
     url: api.bms_config + '/' + deviceId,
     method: 'post',
@@ -314,14 +315,14 @@ export function setBmsConfig (deviceId, arg) {
   })
 }
 
-export function getBmsConfigDataTypes (bmsType) {
+export function getBmsConfigDataTypes(bmsType) {
   return request({
     url: api.bms_config_data_types + '/' + bmsType,
     method: 'get'
   })
 }
 
-export function getBmsConfigDataTypesMap (bmsType) {
+export function getBmsConfigDataTypesMap(bmsType) {
   return request({
     url: api.bms_config_data_types_map + '/' + bmsType,
     method: 'get'
@@ -349,7 +350,7 @@ export function getBmsTypeInt(deviceId) {
 export function getBmsType(deviceId) {
   // Implementing a cache for bms_type
   // if (getBmsType.cache && getBmsType.cache[deviceId]) {
-    // return Promise.resolve(getBmsType.cache[deviceId]);
+  // return Promise.resolve(getBmsType.cache[deviceId]);
   // }
 
   return request({
@@ -365,7 +366,7 @@ export function getBmsType(deviceId) {
   });
 }
 
-export function getLocation (deviceId, arg) {
+export function getLocation(deviceId, arg) {
   return request({
     url: api.location + '/' + deviceId,
     method: 'post',
@@ -373,14 +374,14 @@ export function getLocation (deviceId, arg) {
   })
 }
 
-export function refreshOnlineStatus (deviceId) {
+export function refreshOnlineStatus(deviceId) {
   return request({
     url: api.refresh_online_status + '/' + deviceId,
     method: 'get'
   })
 }
 
-export function refreshDevicePage (arg) {
+export function refreshDevicePage(arg) {
   return request({
     url: api.refresh_online_status_page,
     method: 'post',
@@ -388,7 +389,7 @@ export function refreshDevicePage (arg) {
   })
 }
 
-export function refreshDeviceOnlineStatusAll () {
+export function refreshDeviceOnlineStatusAll() {
   return request({
     url: api.refresh_online_status_all,
     method: 'post',
@@ -396,7 +397,7 @@ export function refreshDeviceOnlineStatusAll () {
   })
 }
 
-export function getOrgTree (parameter) {
+export function getOrgTree(parameter) {
   return request({
     url: api.orgTree,
     method: 'get',
@@ -404,14 +405,14 @@ export function getOrgTree (parameter) {
   })
 }
 
-export function getSendCommandList (provider) {
+export function getSendCommandList(provider) {
   return request({
     url: api.send_command_list + '/' + provider,
     method: 'get'
   })
 }
 
-export function getBatchSendCommandList (arg) {
+export function getBatchSendCommandList(arg) {
   return request({
     url: api.send_batch_command_list,
     method: 'post',
@@ -419,7 +420,7 @@ export function getBatchSendCommandList (arg) {
   })
 }
 
-export function getBatchSendCommandDevices (arg) {
+export function getBatchSendCommandDevices(arg) {
   return request({
     url: api.send_batch_command_devices,
     method: 'post',
@@ -427,7 +428,7 @@ export function getBatchSendCommandDevices (arg) {
   })
 }
 
-export function sendCommand (deviceId, arg) {
+export function sendCommand(deviceId, arg) {
   return request({
     url: api.send_command + '/' + deviceId,
     method: 'post',
@@ -435,7 +436,7 @@ export function sendCommand (deviceId, arg) {
   })
 }
 
-export function sendFmBmsCommand (deviceId, arg) {
+export function sendFmBmsCommand(deviceId, arg) {
   return request({
     url: api.send_fm_bms_command + '/' + deviceId,
     method: 'post',
@@ -443,7 +444,7 @@ export function sendFmBmsCommand (deviceId, arg) {
   })
 }
 
-export function sendCommandSetBtCode (deviceId, btCode, arg) {
+export function sendCommandSetBtCode(deviceId, btCode, arg) {
   return request({
     url: api.send_bt_command + '/' + deviceId + '/' + btCode,
     method: 'post',
@@ -451,7 +452,7 @@ export function sendCommandSetBtCode (deviceId, btCode, arg) {
   })
 }
 
-export function sendCommandSetBtCodes (arg) {
+export function sendCommandSetBtCodes(arg) {
   return request({
     url: api.send_bt_commands,
     method: 'post',
@@ -459,7 +460,7 @@ export function sendCommandSetBtCodes (arg) {
   })
 }
 
-export function batchSendCommand (arg) {
+export function batchSendCommand(arg) {
   return request({
     url: api.send_batch_command,
     method: 'post',
@@ -469,7 +470,7 @@ export function batchSendCommand (arg) {
 
 // id == 0 add     post
 // id != 0 update  put
-export function saveService (parameter) {
+export function saveService(parameter) {
   return request({
     url: api.service,
     method: parameter.id === 0 ? 'post' : 'put',
@@ -477,7 +478,7 @@ export function saveService (parameter) {
   })
 }
 
-export function saveSub (sub) {
+export function saveSub(sub) {
   return request({
     url: '/sub',
     method: sub.id === 0 ? 'post' : 'put',
@@ -485,7 +486,7 @@ export function saveSub (sub) {
   })
 }
 
-export function res_page (arg) {
+export function res_page(arg) {
   return request({
     url: api.sys_res_page,
     method: 'post',
@@ -493,7 +494,7 @@ export function res_page (arg) {
   })
 }
 
-export function res_add (arg) {
+export function res_add(arg) {
   return request({
     url: api.sys_res_add,
     method: 'post',
@@ -501,7 +502,7 @@ export function res_add (arg) {
   })
 }
 
-export function res_update (arg) {
+export function res_update(arg) {
   return request({
     url: api.sys_res_update,
     method: 'post',
@@ -509,7 +510,7 @@ export function res_update (arg) {
   })
 }
 
-export function res_delete (arg) {
+export function res_delete(arg) {
   return request({
     url: api.sys_res_delete,
     method: 'post',
@@ -517,7 +518,7 @@ export function res_delete (arg) {
   })
 }
 
-export function res_all (arg) {
+export function res_all(arg) {
   return request({
     url: api.sys_res_all,
     method: 'post',
@@ -525,7 +526,7 @@ export function res_all (arg) {
   })
 }
 
-export function sys_res_layer_top (arg) {
+export function sys_res_layer_top(arg) {
   return request({
     url: api.sys_res_layer_top,
     method: 'post',
@@ -533,7 +534,7 @@ export function sys_res_layer_top (arg) {
   })
 }
 
-export function role_page (arg) {
+export function role_page(arg) {
   return request({
     url: api.sys_role_page,
     method: 'post',
@@ -541,7 +542,7 @@ export function role_page (arg) {
   })
 }
 
-export function role_add (arg) {
+export function role_add(arg) {
   return request({
     url: api.sys_role_add,
     method: 'post',
@@ -549,7 +550,7 @@ export function role_add (arg) {
   })
 }
 
-export function role_update (arg) {
+export function role_update(arg) {
   return request({
     url: api.sys_role_update,
     method: 'post',
@@ -557,7 +558,7 @@ export function role_update (arg) {
   })
 }
 
-export function role_delete (arg) {
+export function role_delete(arg) {
   return request({
     url: api.sys_role_delete,
     method: 'post',
@@ -565,7 +566,7 @@ export function role_delete (arg) {
   })
 }
 
-export function sys_user_page (arg) {
+export function sys_user_page(arg) {
   return request({
     url: api.sys_user_page,
     method: 'post',
@@ -573,7 +574,7 @@ export function sys_user_page (arg) {
   })
 }
 
-export function sys_user_remove (arg) {
+export function sys_user_remove(arg) {
   return request({
     url: api.sys_user_remove,
     method: 'post',
@@ -581,7 +582,7 @@ export function sys_user_remove (arg) {
   })
 }
 
-export function sys_user_add (arg) {
+export function sys_user_add(arg) {
   return request({
     url: api.sys_user_add,
     method: 'post',
@@ -589,7 +590,7 @@ export function sys_user_add (arg) {
   })
 }
 
-export function sys_user_update (arg) {
+export function sys_user_update(arg) {
   return request({
     url: api.sys_user_update,
     method: 'post',
@@ -605,7 +606,7 @@ export function sys_role_layer_top(arg) {
   })
 }
 
-export function dictPage (arg) {
+export function dictPage(arg) {
   return request({
     url: api.sys_dict_page,
     method: 'post',
@@ -613,7 +614,7 @@ export function dictPage (arg) {
   })
 }
 
-export function dictAdd (arg) {
+export function dictAdd(arg) {
   return request({
     url: api.sys_dict_add,
     method: 'post',
@@ -621,7 +622,7 @@ export function dictAdd (arg) {
   })
 }
 
-export function dictUpdate (arg) {
+export function dictUpdate(arg) {
   return request({
     url: api.sys_dict_update,
     method: 'post',
@@ -629,7 +630,7 @@ export function dictUpdate (arg) {
   })
 }
 
-export function dictDelete (arg) {
+export function dictDelete(arg) {
   return request({
     url: api.sys_dict_delete,
     method: 'post',
@@ -637,10 +638,40 @@ export function dictDelete (arg) {
   })
 }
 
-export function reloadPlugin () {
+export function reloadPlugin() {
   return request({
     url: api.reload_plugin,
     method: 'get'
+  })
+}
+
+export function enableDeviceTracing(deviceId, config) {
+  return request({
+    url: api.device_tracing + '/' + deviceId + '/enable',
+    method: 'post',
+    data: config
+  })
+}
+
+export function disableDeviceTracing(deviceId) {
+  return request({
+    url: api.device_tracing + '/' + deviceId,
+    method: 'delete'
+  })
+}
+
+export function getDeviceTracingRecords(deviceId, parameters) {
+  return request({
+    url: api.device_tracing + '/' + deviceId,
+    method: 'get',
+    params: parameters
+  })
+}
+
+export function clearDeviceTracingRecords(deviceId) {
+  return request({
+    url: api.device_tracing + '/' + deviceId + '/records',
+    method: 'delete'
   })
 }
 
