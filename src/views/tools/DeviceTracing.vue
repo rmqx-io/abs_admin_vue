@@ -5,9 +5,9 @@
       <div class="denied-content">
         <a-icon type="warning" class="denied-icon" />
         <h1 class="denied-title">{{ $t('menu.exception.not-permission') }}</h1>
-        <p class="denied-desc">Only members of the sysadmin group are authorized to configure and view online device tracing records.</p>
+        <p class="denied-desc">{{ $t('deviceTracing.accessDeniedDesc') }}</p>
         <a-button type="primary" size="large" @click="goHome">
-          Return to Dashboard
+          {{ $t('deviceTracing.returnToDashboard') }}
         </a-button>
       </div>
     </a-card>
@@ -18,16 +18,16 @@
       <div class="workspace-header">
         <div class="header-main">
           <div class="title-section">
-            <h1 class="header-title">Online Device Tracing Control</h1>
-            <p class="header-subtitle">Real-time distributed execution telemetry across JT808 Broker, database queues, batchers, and DB proxy.</p>
+            <h1 class="header-title">{{ $t('deviceTracing.title') }}</h1>
+            <p class="header-subtitle">{{ $t('deviceTracing.subtitle') }}</p>
           </div>
           <!-- Pulse Banner -->
           <div :class="['status-banner', isTracingActive ? 'banner-active' : 'banner-inactive']">
             <div class="banner-pulse"></div>
             <div class="banner-text">
-              <span class="banner-status-label">{{ isTracingActive ? 'Active Tracing Engaged' : 'Tracing Suspended' }}</span>
+              <span class="banner-status-label">{{ isTracingActive ? $t('deviceTracing.activeTracing') : $t('deviceTracing.tracingSuspended') }}</span>
               <span v-if="isTracingActive && expiryCountdown" class="banner-expiry">
-                Expires in: <span class="countdown-clock">{{ expiryCountdown }}</span>
+                {{ $t('deviceTracing.expiresIn') }}<span class="countdown-clock">{{ expiryCountdown }}</span>
               </span>
             </div>
           </div>
@@ -39,13 +39,13 @@
         <div class="control-pane">
           <a-card :bordered="false" class="premium-card control-card">
             <div class="card-glow"></div>
-            <h2 class="section-title">Telemetry Configuration</h2>
+            <h2 class="section-title">{{ $t('deviceTracing.telemetryConfig') }}</h2>
             
             <a-form layout="vertical" class="premium-form">
-              <a-form-item label="Device SIM ID / Code">
+              <a-form-item :label="$t('deviceTracing.deviceSimId')">
                 <a-input 
                   v-model="config.deviceId" 
-                  placeholder="e.g. 058215000251" 
+                  :placeholder="$t('deviceTracing.deviceSimIdPlaceholder')" 
                   size="large"
                   class="premium-input"
                   :disabled="isTracingActive"
@@ -54,18 +54,18 @@
                 </a-input>
               </a-form-item>
 
-              <a-form-item label="Capture Duration (TTL)">
+              <a-form-item :label="$t('deviceTracing.captureDuration')">
                 <a-select v-model="config.ttlMinutes" size="large" class="premium-select" :disabled="isTracingActive">
-                  <a-select-option :value="5">5 Minutes</a-select-option>
-                  <a-select-option :value="15">15 Minutes</a-select-option>
-                  <a-select-option :value="30">30 Minutes</a-select-option>
-                  <a-select-option :value="60">1 Hour</a-select-option>
-                  <a-select-option :value="120">2 Hours</a-select-option>
-                  <a-select-option :value="720">12 Hours</a-select-option>
+                  <a-select-option :value="5">{{ $t('deviceTracing.duration5Min') }}</a-select-option>
+                  <a-select-option :value="15">{{ $t('deviceTracing.duration15Min') }}</a-select-option>
+                  <a-select-option :value="30">{{ $t('deviceTracing.duration30Min') }}</a-select-option>
+                  <a-select-option :value="60">{{ $t('deviceTracing.duration1Hour') }}</a-select-option>
+                  <a-select-option :value="120">{{ $t('deviceTracing.duration2Hours') }}</a-select-option>
+                  <a-select-option :value="720">{{ $t('deviceTracing.duration12Hours') }}</a-select-option>
                 </a-select>
               </a-form-item>
 
-              <a-form-item label="Max Captured Records Limit">
+              <a-form-item :label="$t('deviceTracing.maxRecords')">
                 <a-input-number 
                   v-model="config.maxRecords" 
                   :min="10" 
@@ -76,10 +76,10 @@
                 />
               </a-form-item>
 
-              <a-form-item label="Capture Raw Package Body">
+              <a-form-item :label="$t('deviceTracing.captureRawPayload')">
                 <div class="switch-row">
                   <a-switch v-model="config.includePayload" :disabled="isTracingActive" />
-                  <span class="switch-desc">High performance overhead</span>
+                  <span class="switch-desc">{{ $t('deviceTracing.highPerformanceOverhead') }}</span>
                 </div>
               </a-form-item>
 
@@ -95,7 +95,7 @@
                   :loading="btnLoading"
                   :disabled="!config.deviceId"
                 >
-                  <a-icon type="play-circle" /> Engaged Device Tracing
+                  <a-icon type="play-circle" /> {{ $t('deviceTracing.engageTracing') }}
                 </a-button>
 
                 <a-button 
@@ -107,15 +107,15 @@
                   @click="stopTrace"
                   :loading="btnLoading"
                 >
-                  <a-icon type="stop" /> Suspend Tracing
+                  <a-icon type="stop" /> {{ $t('deviceTracing.suspendTracing') }}
                 </a-button>
 
                 <div class="secondary-actions">
                   <a-button size="large" class="btn-clear" @click="clearRecords" :disabled="!config.deviceId">
-                    <a-icon type="delete" /> Clear Records
+                    <a-icon type="delete" /> {{ $t('deviceTracing.clearRecords') }}
                   </a-button>
                   <a-button size="large" class="btn-refresh" @click="fetchRecords(true)" :disabled="!config.deviceId" :loading="recordsLoading">
-                    <a-icon type="reload" /> Pull Logs
+                    <a-icon type="reload" /> {{ $t('deviceTracing.pullLogs') }}
                   </a-button>
                 </div>
               </div>
@@ -124,23 +124,23 @@
 
           <!-- Metrics summary -->
           <a-card :bordered="false" class="premium-card metrics-card mt-4">
-            <h2 class="section-title">Telemetry Summary</h2>
+            <h2 class="section-title">{{ $t('deviceTracing.telemetrySummary') }}</h2>
             <div class="metrics-grid">
               <div class="metric-item">
                 <div class="metric-val">{{ metrics.captured }}</div>
-                <div class="metric-lbl">Captured</div>
+                <div class="metric-lbl">{{ $t('deviceTracing.captured') }}</div>
               </div>
               <div class="metric-item">
                 <div class="metric-val">{{ metrics.avgLatency }} ms</div>
-                <div class="metric-lbl">Avg Processing</div>
+                <div class="metric-lbl">{{ $t('deviceTracing.avgProcessing') }}</div>
               </div>
               <div class="metric-item">
                 <div class="metric-val">{{ metrics.avgQueue }} ms</div>
-                <div class="metric-lbl">Avg Queue Wait</div>
+                <div class="metric-lbl">{{ $t('deviceTracing.avgQueueWait') }}</div>
               </div>
               <div class="metric-item">
                 <div class="metric-val text-red">{{ metrics.dropped }}</div>
-                <div class="metric-lbl">Dropped</div>
+                <div class="metric-lbl">{{ $t('deviceTracing.dropped') }}</div>
               </div>
             </div>
           </a-card>
@@ -150,11 +150,11 @@
         <div class="telemetry-pane">
           <a-card :bordered="false" class="premium-card log-card">
             <div class="log-header">
-              <h2 class="section-title">Execution Journey Timeline</h2>
+              <h2 class="section-title">{{ $t('deviceTracing.journeyTimeline') }}</h2>
               
               <div class="log-controls">
                 <span class="live-label">
-                  <a-badge :status="liveMode ? 'processing' : 'default'" /> Live Stream
+                  <a-badge :status="liveMode ? 'processing' : 'default'" /> {{ $t('deviceTracing.liveStream') }}
                 </span>
                 <a-switch v-model="liveMode" size="small" @change="toggleLiveMode" :disabled="!config.deviceId" />
               </div>
@@ -163,15 +163,15 @@
             <!-- Record Stream -->
             <div class="record-stream-container">
               <div v-if="recordsLoading && records.length === 0" class="spinner-overlay">
-                <a-spin size="large" tip="Streaming distributed telemetry records..." />
+                <a-spin size="large" :tip="$t('deviceTracing.streamingTip')" />
               </div>
 
               <div v-else-if="records.length === 0" class="empty-journey">
                 <div class="empty-artwork">
                   <a-icon type="deployment-unit" class="empty-art-icon" />
                 </div>
-                <h3 class="empty-title">Ready for Telemetry</h3>
-                <p class="empty-desc">Enable tracing and dispatch JT808 packets from your device. Real-time path traversal telemetry will stream below automatically.</p>
+                <h3 class="empty-title">{{ $t('deviceTracing.readyForTelemetry') }}</h3>
+                <p class="empty-desc">{{ $t('deviceTracing.readyDesc') }}</p>
               </div>
 
               <!-- Journey Timeline -->
@@ -212,15 +212,15 @@
                     <!-- Latency Chips Row -->
                     <div class="latency-chips" v-if="rec.elapsed_us || rec.elapsed_queue_us || rec.elapsed_exec_us">
                       <div v-if="rec.elapsed_us" class="latency-chip total-latency">
-                        <span class="chip-label">Total Duration:</span>
+                        <span class="chip-label">{{ $t('deviceTracing.totalDuration') }}</span>
                         <span class="chip-value">{{ formatUs(rec.elapsed_us) }}</span>
                       </div>
                       <div v-if="rec.elapsed_queue_us" class="latency-chip queue-latency">
-                        <span class="chip-label">Queue Delay:</span>
+                        <span class="chip-label">{{ $t('deviceTracing.queueDelay') }}</span>
                         <span class="chip-value">{{ formatUs(rec.elapsed_queue_us) }}</span>
                       </div>
                       <div v-if="rec.elapsed_exec_us" class="latency-chip db-latency">
-                        <span class="chip-label">Storage execution:</span>
+                        <span class="chip-label">{{ $t('deviceTracing.storageExecution') }}</span>
                         <span class="chip-value">{{ formatUs(rec.elapsed_exec_us) }}</span>
                       </div>
                     </div>
@@ -229,7 +229,7 @@
                     <div v-if="rec.details || rec.trace_id" class="details-section">
                       <details class="details-collapsible">
                         <summary class="details-summary">
-                          <span>Metadata & Trace Details</span>
+                          <span>{{ $t('deviceTracing.metadataDetails') }}</span>
                           <span class="trace-uuid">Trace ID: {{ rec.trace_id }}</span>
                         </summary>
                         <div class="details-body">
@@ -353,13 +353,17 @@ export default {
           this.isTracingActive = false
           this.liveMode = false
           this.stopTimers()
-          this.$message.info('Device tracing session expired.')
+          this.$message.info(this.$t('deviceTracing.sessionExpired'))
           localStorage.removeItem('active_tracing_state')
         } else {
           const hours = Math.floor(remaining / 3600000).toString().padStart(2, '0')
           const minutes = Math.floor((remaining % 3600000) / 60000).toString().padStart(2, '0')
           const seconds = Math.floor((remaining % 60000) / 1000).toString().padStart(2, '0')
-          this.expiryCountdown = `${hours}h ${minutes}m ${seconds}s`
+          if (this.$i18n.locale === 'zh-CN') {
+            this.expiryCountdown = `${hours}小时 ${minutes}分 ${seconds}秒`
+          } else {
+            this.expiryCountdown = `${hours}h ${minutes}m ${seconds}s`
+          }
         }
       }, 1000)
     },
@@ -414,11 +418,11 @@ export default {
 
         this.startCountdownTimer()
         this.startLiveStreaming()
-        this.$message.success('Device tracing engaged successfully')
+        this.$message.success(this.$t('deviceTracing.engagedSuccess'))
         this.fetchRecords(true)
       } catch (err) {
         console.error('Failed to engage device tracing:', err)
-        this.$message.error('Failed to start device tracing')
+        this.$message.error(this.$t('deviceTracing.engagedFailed'))
       } finally {
         this.btnLoading = false
       }
@@ -435,10 +439,10 @@ export default {
         this.expiryCountdown = ''
         this.stopTimers()
         localStorage.removeItem('active_tracing_state')
-        this.$message.success('Device tracing suspended')
+        this.$message.success(this.$t('deviceTracing.suspendedSuccess'))
       } catch (err) {
         console.error('Failed to stop device tracing:', err)
-        this.$message.error('Failed to suspend device tracing')
+        this.$message.error(this.$t('deviceTracing.suspendedFailed'))
       } finally {
         this.btnLoading = false
       }
@@ -451,10 +455,10 @@ export default {
         this.records = []
         this.lastSeq = 0
         this.updateMetrics()
-        this.$message.success('Records database cleared')
+        this.$message.success(this.$t('deviceTracing.clearedSuccess'))
       } catch (err) {
         console.error('Failed to clear tracing records:', err)
-        this.$message.error('Failed to clear records')
+        this.$message.error(this.$t('deviceTracing.clearedFailed'))
       }
     },
 
@@ -604,6 +608,7 @@ export default {
   margin: 0 0 4px 0;
   background: linear-gradient(90deg, #58a6ff, #1f6feb);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 .header-subtitle {
