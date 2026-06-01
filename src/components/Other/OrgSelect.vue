@@ -32,7 +32,12 @@
           @search="onSearch"
           allow-clear
         />
-        
+
+        <div class="tree-toolbar">
+          <a-button type="link" size="small" icon="plus-square" @click="expandAll">展开全部</a-button>
+          <a-button type="link" size="small" icon="minus-square" @click="collapseAll">折叠全部</a-button>
+        </div>
+
         <div class="tree-wrapper" :style="{ maxHeight: '450px', overflowY: 'auto' }">
           <a-empty v-if="!treeData || treeData.length === 0" />
           <a-tree
@@ -140,6 +145,16 @@ export default {
     },
     fullPathLabel() {
       return this.selectedNode.fullName || ''
+    },
+    allKeys() {
+      const collect = (nodes, keys = []) => {
+        nodes.forEach(node => {
+          keys.push(node.value)
+          if (node.children && node.children.length) collect(node.children, keys)
+        })
+        return keys
+      }
+      return collect(this.treeData)
     }
   },
   watch: {
@@ -222,6 +237,14 @@ export default {
         this.expandedKeys = this.orgList.map(node => node.value !== undefined ? node.value : node.id)
         this.autoExpandParent = false
       }
+    },
+    expandAll() {
+      this.expandedKeys = [...this.allKeys]
+      this.autoExpandParent = false
+    },
+    collapseAll() {
+      this.expandedKeys = []
+      this.autoExpandParent = false
     }
   }
 }
@@ -251,6 +274,12 @@ export default {
 }
 .clear-icon:hover {
   color: rgba(0,0,0,.45);
+}
+.tree-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-bottom: 6px;
 }
 .tree-wrapper {
   border: 1px solid #e8e8e8;
