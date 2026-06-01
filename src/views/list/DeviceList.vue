@@ -202,9 +202,9 @@
 
         <span slot="organization_info" slot-scope="text, record">
           <template>
-            {{ $t('list.device.info.organization') }}: <span>{{ record.organization_name }}</span>
+            {{ $t('list.device.info.organization') }}: <span>{{ displayOrganizationName(record) }}</span>
             <br />
-            {{ $t('list.device.info.storehouse') }}: <span>{{ record.storehouse_name }}</span>
+            {{ $t('list.device.info.storehouse') }}: <span>{{ record.storehouse_name && record.storehouse_name !== 'NULL' ? record.storehouse_name : '' }}</span>
           </template>
         </span>
 
@@ -1007,6 +1007,18 @@ export default {
     // }
   },
   methods: {
+    displayOrganizationName(record) {
+      if (record.organization_name && record.organization_name !== 'NULL') {
+        return record.organization_name
+      }
+      if (record.organization_id) {
+        const org = this.findOrgInTree(this.orgList, record.organization_id)
+        if (org) {
+          return org.title || org.name
+        }
+      }
+      return record.organization_name || ''
+    },
     findOrgInTree(nodes, id) {
       if (!nodes) return null
       for (const node of nodes) {
