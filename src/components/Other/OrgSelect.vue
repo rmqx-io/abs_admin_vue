@@ -115,7 +115,22 @@ export default {
           return match || (node.children && node.children.length > 0)
         })
       }
-      return filterTree(gData)
+      const filtered = filterTree(gData)
+
+      // Collect all keys present in the filtered tree so we can expand them all
+      const collectKeys = (nodes, keys = []) => {
+        nodes.forEach(node => {
+          keys.push(node.value)
+          if (node.children && node.children.length) collectKeys(node.children, keys)
+        })
+        return keys
+      }
+      this.$nextTick(() => {
+        this.expandedKeys = collectKeys(filtered)
+        this.autoExpandParent = true
+      })
+
+      return filtered
     },
     selectedNode() {
       return this.flatData.find(item => item.value === this.value) || {}
@@ -201,38 +216,12 @@ export default {
       }
     },
     onSearch(val) {
+      // Expansion is handled reactively by the searchText watcher via treeData.
+      // Reset when cleared.
       if (!val) {
-        this.expandedKeys = []
-        return
+        this.expandedKeys = this.orgList.map(node => node.value !== undefined ? node.value : node.id)
+        this.autoExpandParent = false
       }
-      
-      const expanded = []
-      const getParentKey = (key, tree) => {
-        let parentKey
-        for (let i = 0; i < tree.length; i++) {
-          const node = tree[i]
-          if (node.children) {
-            if (node.children.some(item => item.value === key)) {
-              parentKey = node.value
-            } else if (getParentKey(key, node.children)) {
-              parentKey = getParentKey(key, node.children)
-            }
-          }
-        }
-        return parentKey
-      }
-
-      this.flatData.forEach(item => {
-        if (item.title.toLowerCase().indexOf(val.toLowerCase()) > -1) {
-          const parentKey = getParentKey(item.value, this.treeData)
-          if (parentKey && !expanded.includes(parentKey)) {
-            expanded.push(parentKey)
-          }
-        }
-      })
-      
-      this.expandedKeys = [...new Set(expanded)]
-      this.autoExpandParent = true
     }
   }
 }
