@@ -31,6 +31,10 @@ export default {
     height: {
       type: String,
       default: '70vh'
+    },
+    zoomControl: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -56,11 +60,14 @@ export default {
   watch: {
     center(newCenter) {
       if (this.map && newCenter && newCenter.length === 2) {
-        this.map.setView([newCenter[1], newCenter[0]], this.zoom)
+        const currentCenter = this.map.getCenter()
+        if (Math.abs(currentCenter.lng - newCenter[0]) > 0.00001 || Math.abs(currentCenter.lat - newCenter[1]) > 0.00001) {
+          this.map.setView([newCenter[1], newCenter[0]], this.zoom)
+        }
       }
     },
     zoom(newZoom) {
-      if (this.map) {
+      if (this.map && this.map.getZoom() !== newZoom) {
         this.map.setZoom(newZoom)
       }
     }
@@ -75,7 +82,7 @@ export default {
       this.map = L.map(this.$refs.mapContainer, {
         center: latLng,
         zoom: this.zoom,
-        zoomControl: true
+        zoomControl: this.zoomControl
       })
 
       // Add OpenStreetMap tiles

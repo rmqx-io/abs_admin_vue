@@ -38,6 +38,7 @@ import {
   TimePicker,
   Upload,
   Progress,
+  Slider,
   Skeleton,
   Popconfirm,
   PageHeader,
@@ -96,6 +97,7 @@ Vue.use(DatePicker)
 Vue.use(TimePicker)
 Vue.use(Upload)
 Vue.use(Progress)
+Vue.use(Slider)
 Vue.use(Skeleton)
 Vue.use(Popconfirm)
 Vue.use(PageHeader)

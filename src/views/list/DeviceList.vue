@@ -356,117 +356,23 @@
         @ok="handleBatteryInfoOk"
       />
 
-      <div
-        v-if="map_visible && !table_visible"
-        style="width: 100%"
+      <a-modal
+        :visible="map_visible"
+        :footer="null"
+        :closable="false"
+        :keyboard="true"
+        :maskClosable="false"
+        width="100%"
+        wrapClassName="full-screen-modal"
+        :destroyOnClose="true"
+        @cancel="handleMapClose"
       >
-        <div><a @click="handleMapClose()">{{ $t('list.device.map.back') }}</a></div>
-        <div><br /></div>
-        <div>{{ $t('list.device.map.device', { deviceId: device_id }) }}</div>
-        <div><br /></div>
-        <a-spin :spinning="map_loading">
-          <a-form>
-            <a-row :gutter="48">
-              <a-col :md="4" :sm="24">
-                <a-form-item :aria-label="$t('list.device.map.startDate')">
-                  <a-date-picker v-model="queryData.start_date" style="width: 100%" :placeholder="$t('list.device.map.startDate')"/>
-                </a-form-item>
-              </a-col>
-              <a-col :md="4" :sm="24">
-                <a-form-item :aria-label="$t('list.device.map.startTime')">
-                  <a-time-picker v-model="queryData.start_time" style="width: 100%" :placeholder="$t('list.device.map.startTime')"/>
-                </a-form-item>
-              </a-col>
-            </a-row>
-            <a-row :gutter="48">
-              <a-col :md="4" :sm="24">
-                <a-form-item :aria-label="$t('list.device.map.endDate')">
-                  <a-date-picker
-                    v-model="queryData.end_date"
-                    style="width: 100%"
-                    :placeholder="$t('list.device.map.endDate')"
-                  />
-                </a-form-item>
-              </a-col>
-              <a-col :md="4" :sm="24">
-                <a-form-item :aria-label="$t('list.device.map.endTime')">
-                  <a-time-picker
-                    v-model="queryData.end_time"
-                    style="width: 100%"
-                    :placeholder="$t('list.device.map.endTime')"
-                  />
-                </a-form-item>
-              </a-col>
-              <a-col :md="4" :sm="24">
-                <a-button type="primary" @click="refreshMap(device_id)">{{ $t('list.device.map.search') }}</a-button>
-              </a-col>
-            </a-row>
-          </a-form>
-        </a-spin>
-        <!-- AMap for Chinese users -->
-        <amap
-          v-if="refresh_map && !useLeaflet"
-          ref="map"
-          :zoom="zoom"
-          :center="center"
-          style='height: 70vh'
-          @complete="onMapComplete"
-        >
-          <amap-polyline
-            v-if="polyline.path && polyline.path.length > 0"
-            :path="polyline.path"
-            stroke-color="#3366FF"
-            :stroke-opacity="1"
-            :stroke-weight="6"
-            stroke-style="solid"
-            :line-join="'round'"
-          />
-          <amap-circle-marker
-            v-for="(marker, index) in polyline.markers"
-            :key="index"
-            :center="marker"
-            :radius="5"
-            stroke-color="#FF33FF"
-            :stroke-opacity="1"
-            :stroke-weight="2"
-            fill-color="#FF99FF"
-            :fill-opacity="0.8"
-            :z-index="10"
-          />
-        </amap>
-        <!-- Leaflet for English users -->
-        <l-map
-          v-if="refresh_map && useLeaflet"
-          ref="leafletMap"
-          :zoom="zoom"
-          :center="center"
-          height="70vh"
-          @ready="onLeafletMapReady"
-          @complete="onMapComplete"
-        >
-          <!-- Main polyline - render when map is ready and data available -->
-          <l-polyline
-            v-if="leafletMapReady && polyline.path && polyline.path.length > 0"
-            :key="'polyline-' + polyline.path.length + '-ready'"
-            :path="polyline.path"
-            :stroke-color="'#3366FF'"
-            :stroke-opacity="1"
-            :stroke-weight="6"
-          />
-          <l-circle-marker
-            v-for="(marker, index) in polyline.markers"
-            :key="index"
-            :center="marker"
-            :radius="5"
-            stroke-color="#FF33FF"
-            :stroke-opacity="1"
-            :stroke-weight="2"
-            fill-color="#FF99FF"
-            :fill-opacity="0.8"
-          />
-        </l-map>
-      </div>
-    </div>
+        <device-playback-panel
+          v-if="map_visible"
+          :device-id="device_id"
+          @back="handleMapClose"
+        />
+      </a-modal>
 
     <div v-if='packet_log_visible'>
       <a-modal
@@ -576,8 +482,9 @@
       :query-params="queryData"
       @view-history="handleLocationHistory"
     />
+  </div>
   </a-card>
-<!--  </page-header-wrapper>-->
+<!--  </page-header-wrapper-->
 </template>
 
 <script>
@@ -611,6 +518,7 @@ import DeviceAlarm from '@/views/list/components/DeviceAlarm'
 import PacketLog from '@/views/list/components/PacketLog'
 import LocationHistory from '@/views/list/components/LocationHistory'
 import LocationHistoryTable from './components/LocationHistoryTable'
+import DevicePlaybackPanel from '@/views/list/components/DevicePlaybackPanel'
 
 // Leaflet components
 import L from 'leaflet'
@@ -648,6 +556,7 @@ export default {
     PacketLog,
     LocationHistory,
     LocationHistoryTable,
+    DevicePlaybackPanel,
     LMap,
     LPolyline,
     LCircleMarker
@@ -1332,12 +1241,10 @@ export default {
     },
     handleMapClose() {
       this.map_visible = false
-      this.table_visible = true
     },
     handleMap(record) {
       this.device_id = record.code
       this.map_visible = true
-      this.table_visible = false
       this.refreshMap(record.code)
     },
     handleSendCommand(record) {
@@ -2887,5 +2794,76 @@ export default {
 .recent-org-tag:hover {
   color: #1890ff;
   border-color: #1890ff;
+}
+
+/* Full Screen Modal Styling */
+.full-screen-modal {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+}
+
+.full-screen-modal .ant-modal {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100vh !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+}
+
+.full-screen-modal .ant-modal-content {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+  display: flex;
+  flex-direction: column;
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+.full-screen-modal .ant-modal-body {
+  flex: 1 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+}
+
+/* Floating custom styled close button for premium map experience */
+.full-screen-modal .ant-modal-close {
+  top: 14px !important;
+  right: 16px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-radius: 50% !important;
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  z-index: 1000 !important;
+}
+
+.full-screen-modal .ant-modal-close:hover {
+  background: #ffffff !important;
+  transform: scale(1.08) !important;
+  color: #1890ff !important;
+}
+
+.full-screen-modal .ant-modal-close-x {
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  font-size: 16px !important;
+  color: rgba(0, 0, 0, 0.65) !important;
 }
 </style>
