@@ -58,7 +58,7 @@
           <a-col :md="10" :sm="24">
             <a-form-item :label="$t('Status')">
               <a-radio-group v-model="deviceStatus" @change="onDeviceStatusChange">
-                <a-radio-button class="status-btn-total" value="total">
+                <a-radio-button class="status-btn-total" value="total" data-testid="device-status-total">
                   <span class="status-dot total"></span>
                   <span class="status-label">{{ $t('Total') }}</span>
                   <span class="status-count-badge total">{{ statusCount.total }}</span>
@@ -84,6 +84,7 @@
           <a-col :md="5" :sm="12">
             <a-form-item :label="$t('No')">
               <a-input
+                data-testid="device-search-input"
                 v-model="queryData.device_id"
                 placeholder=""
                 @keyup.enter.native="refreshTable(true)"
@@ -129,7 +130,7 @@
         <a-row :gutter="48">
           <a-col v-if="!showAlarm" :md="3" :sm="12">
             <a-form-item>
-              <a-button type="primary" style="width: 100%" @click="refreshTable(true)">
+              <a-button data-testid="device-search-button" type="primary" style="width: 100%" @click="refreshTable(true)">
                 <a-icon type="search" />{{ $t('common.search') }}
               </a-button>
             </a-form-item>
@@ -272,7 +273,7 @@
               </a>
               <a-menu slot="overlay">
                 <a-menu-item v-if='is_sysadmin'>
-                  <a v-if="is_sysadmin" @click="handleEdit(record)">{{ $t('common.edit') }}</a>
+                  <a v-if="is_sysadmin" data-testid="device-edit-button" @click="handleEdit(record)">{{ $t('common.edit') }}</a>
                 </a-menu-item>
                 <a-menu-item>
                   <a @click="handleMap(record)">{{ $t('list.device.menu.historyRoute') }}</a>
@@ -726,7 +727,7 @@ export default {
     // getRoleList({ t: new Date() })
     const role = storage.get(ROLE)
     console.log('role', role)
-    if (role === 'sysadmin') {
+    if (role === 'sysadmin' || role === 'org-manager') {
       this.is_sysadmin = true
     }
   },

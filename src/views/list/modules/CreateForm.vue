@@ -24,6 +24,7 @@
         </a-form-item>
         <a-form-item label="运营单位">
           <org-select
+            data-testid="device-organization-selector"
             :org-list="orgList"
             v-decorator="['organization_id', { rules: [ {required: true} ]}]"
           ></org-select>
