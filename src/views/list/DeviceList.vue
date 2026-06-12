@@ -1976,7 +1976,7 @@ export default {
       }
 
       // Set up for sliced export
-      const SLICE_SIZE = 10
+      const SLICE_SIZE = 100
       const totalSlices = Math.ceil(totalCount / SLICE_SIZE)
       let currentSlice = 1
       let exportedCount = 0
