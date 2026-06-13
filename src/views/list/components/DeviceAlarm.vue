@@ -1,7 +1,6 @@
 <template>
-  <a-locale-provider :locale="locale">
-    <div>
-      <a-form>
+  <div>
+    <a-form>
         <div v-if='!showMoreParam' style='margin-bottom: 10px'>
           <a-row :gutter='48'>
             <a-col :md='8' :sm='24'>
@@ -112,7 +111,6 @@
         @ok="handleBatteryInfoOk"
       />
     </div>
-  </a-locale-provider>
 </template>
 
 <script>
@@ -125,7 +123,6 @@ import {
   getDeviceAlarmPostgres
 } from '@/api/manage'
 import BatteryInfo from '@/views/list/components/BatteryInfo'
-import zhCN from 'ant-design-vue/lib/locale-provider/zh_CN'
 
 moment.locale('zh-cn');
 
@@ -151,7 +148,6 @@ export default {
   },
   data () {
     return {
-      locale: zhCN,
       table_visible: true,
       battery_detail_visible: false,
       device_id: null,

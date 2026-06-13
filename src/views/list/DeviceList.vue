@@ -393,6 +393,7 @@
         />
       </a-modal>
     </div>
+    </div>
 
     <div
       v-if="showMap"
@@ -483,7 +484,6 @@
       :query-params="queryData"
       @view-history="handleLocationHistory"
     />
-  </div>
   </a-card>
 <!--  </page-header-wrapper-->
 </template>
