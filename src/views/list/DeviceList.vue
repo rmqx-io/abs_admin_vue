@@ -1276,10 +1276,13 @@ export default {
           let status = '设备状态:'
           if (res.data) {
             status += '在线'
+            this.$set(record, 'online', true)
           } else {
             status += '离线'
+            this.$set(record, 'online', false)
           }
           this.$message.info(`${record.code} 刷新成功. ${status}`)
+          this.getStatusCount()
         }).catch(err => {
         console.log('refresh online status', err)
         this.$message.error(err.data.message)
