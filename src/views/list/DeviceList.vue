@@ -720,6 +720,7 @@ export default {
       totalExportCount: null,
       autoRefreshTimer: null,
       isAutoRefreshing: false,
+      justMounted: false,
     }
   },
 
@@ -736,6 +737,14 @@ export default {
     this.syncFormFromRouteQuery()
     this.getStatusCount()
     this.getAdminOrgList()
+    this.justMounted = true
+  },
+  activated() {
+    if (this.justMounted) {
+      this.justMounted = false
+    } else {
+      this.getAdminOrgList()
+    }
   },
   beforeDestroy() {
     this.clearLeafletCluster()
