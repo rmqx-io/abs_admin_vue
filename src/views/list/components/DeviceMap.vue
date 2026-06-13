@@ -75,6 +75,7 @@ export default {
   },
   data () {
     return {
+      isDestroyed: false,
       isGettingDeviceLocation: false,
       getDevicesLocationPages: 1,
       getDevicesLocationPageNo: 0,
@@ -139,6 +140,9 @@ export default {
       this.getDeviceLocation(arg, 1)
     },
     getDeviceLocation (arg, page_no) {
+      if (this.isDestroyed) {
+        return
+      }
       // get all device location
       console.log('loadData request arg:', arg)
       arg.page_no = page_no
@@ -146,6 +150,9 @@ export default {
       console.log('getDeviceLocation', arg, 'page_no', page_no)
       getDeviceList(arg)
         .then(res => {
+          if (this.isDestroyed) {
+            return
+          }
           console.log('device list', res)
 
           const pages = Math.ceil(res.data.total / res.data.page_size)
@@ -192,7 +199,7 @@ export default {
               }
             )
           } else {
-            if (this.isVisible) {
+            if (this.isVisible && !this.isDestroyed) {
               this.getDeviceLocation(arg, page_no + 1)
             }
           }
@@ -404,6 +411,9 @@ export default {
     }
   },
   beforeDestroy() {
+    console.log('Before destroy')
+    this.isDestroyed = true
+    this.isGettingDeviceLocation = false
     this.destroyObserver()
     this.clearLeafletCluster()
   }
