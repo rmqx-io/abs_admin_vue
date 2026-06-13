@@ -1403,6 +1403,12 @@ export default {
         })
     },
     getDeviceLocation(arg, page_no) {
+      if (this.activeTab !== 'map') {
+        this.isGettingDeviceLocation = false
+        this.getDevicesLocationPages = 1
+        this.getDevicesLocationPageNo = 0
+        return
+      }
       // get all device location
       console.log('loadData request arg:', arg)
       arg.page_no = page_no
@@ -1410,6 +1416,12 @@ export default {
       console.log('getDeviceLocation', arg, 'page_no', page_no)
       getDeviceList(arg)
         .then(res => {
+          if (this.activeTab !== 'map') {
+            this.isGettingDeviceLocation = false
+            this.getDevicesLocationPages = 1
+            this.getDevicesLocationPageNo = 0
+            return
+          }
           console.log('device list', res)
 
           const pages = Math.ceil(res.data.total / res.data.page_size)
@@ -1771,6 +1783,7 @@ export default {
       console.log('tab change', tab)
       if (tab !== 'map') {
         this.showMarkers = false
+        this.isGettingDeviceLocation = false
         if (this.useLeaflet) {
           this.clearLeafletCluster()
         }
