@@ -940,8 +940,9 @@ export default {
     },
     findOrgInTree(nodes, id) {
       if (!nodes) return null
+      const targetId = String(id)
       for (const node of nodes) {
-        if (node.id === id || node.value === id) {
+        if (String(node.id) === targetId || String(node.value) === targetId) {
           return node
         }
         const children = node.children || node.childs
@@ -954,16 +955,17 @@ export default {
     },
     addRecentOrg(id) {
       if (!id) return
-      const org = this.findOrgInTree(this.orgList, id)
+      const orgId = String(id)
+      const org = this.findOrgInTree(this.orgList, orgId)
       if (org) {
         const name = org.title || org.name
         const recent = [...this.recentOrgs]
-        const index = recent.findIndex(item => item.id === id)
+        const index = recent.findIndex(item => String(item.id) === orgId)
         if (index > -1) {
           // If already exists, move to top if name is the same, or update name
           recent.splice(index, 1)
         }
-        recent.unshift({ id, name })
+        recent.unshift({ id: orgId, name })
         this.recentOrgs = recent.slice(0, 3)
         storage.set('recent_orgs', this.recentOrgs)
       }
@@ -2151,7 +2153,7 @@ export default {
       // Update form fields from URL
       this.deviceStatus = query.deviceStatus || 'online'
       this.queryData.device_id = query.device_id || ''
-      this.queryData.organization_id = query.organization_id ? parseInt(query.organization_id) : null
+      this.queryData.organization_id = query.organization_id ? String(query.organization_id) : null
 
       this.isSyncingFromRoute = false
     },
