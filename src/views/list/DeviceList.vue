@@ -348,14 +348,23 @@
 
       <step-by-step-modal v-if="table_visible" ref="modal" @ok="handleCreateFormOk"/>
 
-      <battery-info
-        v-if="battery_detail_visible"
-        ref="batteryInfo"
-        :device-id="device_id"
-        :bms-bt="bms_bt"
+      <a-modal
+        :visible="battery_detail_visible"
+        width="90vw"
+        centered
+        :footer="null"
+        :destroyOnClose="true"
         @cancel="handleBatteryInfoCancel"
-        @ok="handleBatteryInfoOk"
-      />
+      >
+        <battery-info
+          v-if="battery_detail_visible"
+          ref="batteryInfo"
+          :device-id="device_id"
+          :bms-bt="bms_bt"
+          @cancel="handleBatteryInfoCancel"
+          @ok="handleBatteryInfoOk"
+        />
+      </a-modal>
 
       <a-modal
         :visible="map_visible"
@@ -1230,7 +1239,6 @@ export default {
       this.device_id = record.code
       this.bms_bt = record.bms_bt
       this.battery_detail_visible = true
-      this.table_visible = false
       console.log(this.$refs)
       // batteryInfo 因为不可见，在这个循环里面，还没有被创建，所以 refs 里面没有
       // 需要在下一个循环里面执行 batteryInfo 的代码
