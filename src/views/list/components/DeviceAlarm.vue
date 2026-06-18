@@ -102,14 +102,23 @@
         </span>
       </s-table>
 
-      <battery-info
-        v-if="battery_detail_visible"
-        ref="batteryInfo"
-        :device-id="device_id"
-        :bms-bt="bms_bt"
+      <a-modal
+        :visible="battery_detail_visible"
+        width="90vw"
+        centered
+        :footer="null"
+        :destroyOnClose="true"
         @cancel="handleBatteryInfoCancel"
-        @ok="handleBatteryInfoOk"
-      />
+      >
+        <battery-info
+          v-if="battery_detail_visible"
+          ref="batteryInfo"
+          :device-id="device_id"
+          :bms-bt="bms_bt"
+          @cancel="handleBatteryInfoCancel"
+          @ok="handleBatteryInfoOk"
+        />
+      </a-modal>
     </div>
 </template>
 
@@ -359,7 +368,6 @@ export default {
         console.error('getDeviceList error', err)
       })
       this.battery_detail_visible = true
-      this.table_visible = false
       this.$nextTick(() => {
         console.log('record.device_id', record.device_id)
         this.$refs.batteryInfo.getBatteryInfoHandle(record.device_id)
