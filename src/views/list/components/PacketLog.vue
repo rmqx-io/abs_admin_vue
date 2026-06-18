@@ -88,13 +88,18 @@
               <div class="packet-content">{{ byteArrayToHexArray(record.packet).join(' ') }}</div>
               <div v-if="record.packet_parse" style="margin-top: 8px;">
                 <a-collapse :bordered="false" class="packet-collapse">
-                  <a-collapse-panel key="1" header="解析结果">
-                    <div class="packet-parse-content">{{ record.packet_parse }}</div>
+                  <a-collapse-panel key="1" header="解析结果 (点击折叠)">
+                    <div class="packet-parse-summary-list">
+                      <div v-for="(item, idx) in record.packet_parse" :key="idx" class="packet-parse-item">
+                        <div class="parse-meta-info">
+                          <span v-if="item.device_id">设备ID: <strong>{{ item.device_id }}</strong></span>
+                          <span v-if="item.data_code" style="margin-left: 12px;">命令代码: <strong>{{ item.data_code }}</strong></span>
+                        </div>
+                        <pre class="packet-parse-json">{{ formatJson(item.body) }}</pre>
+                      </div>
+                    </div>
                   </a-collapse-panel>
                 </a-collapse>
-              </div>
-              <div v-else style="margin-top: 4px; font-size: 12px; color: #999;">
-                点击查看解析结果
               </div>
             </template>
           </span>
@@ -106,15 +111,36 @@
         </div>
       </div>
       <a-modal
-        title="协议日志"
-        width='90vw'
-        center
-        :visible='packet_parse_visible'
-        @cancel='handlePacketParseCancel'
-        @ok='handlePacketParseCancel'
+        title="协议解析详情"
+        width="70vw"
+        :visible="packet_parse_visible"
+        @cancel="handlePacketParseCancel"
+        @ok="handlePacketParseCancel"
+        :footer="null"
+        destroyOnClose
       >
-        <div>
-          {{ this.packet_parse }}
+        <div class="parse-details-container">
+          <div v-for="(item, idx) in packet_parse" :key="idx" class="parse-card-wrapper">
+            <a-card :bordered="true" class="parse-main-card">
+              <template slot="title">
+                <div class="card-title-flex">
+                  <span class="device-id-label">设备ID: <strong class="highlight-text">{{ item.device_id || '未知' }}</strong></span>
+                  <a-tag color="blue" class="custom-tag">数据类型: {{ item.data_code || '未知' }}</a-tag>
+                </div>
+              </template>
+              <!-- JSON VIEW -->
+              <div class="raw-json-dashboard">
+                <div class="json-header">解析数据:</div>
+                <pre class="json-block">{{ formatJson(item.body) }}</pre>
+              </div>
+
+              <!-- Raw Hex Block -->
+              <div class="raw-hex-section" style="margin-top: 16px;">
+                <div class="hex-title">原始 16 进制报文:</div>
+                <div class="hex-body">{{ formatHex(item.packet) }}</div>
+              </div>
+            </a-card>
+          </div>
         </div>
       </a-modal>
     </div>
@@ -157,7 +183,7 @@ export default {
       queryData: {
         time: [moment.utc().local().subtract(1, 'day'), moment.utc().local()]
       },
-      packet_parse: '',
+      packet_parse: [],
       packet_parse_visible: false
     }
   },
@@ -283,23 +309,55 @@ export default {
       return {
         on: {
           click: (event) => {
+            // Avoid triggering details modal when clicking on collapse panels or tags
+            if (event.target.closest('.ant-collapse') || event.target.closest('.ant-tag')) {
+              return
+            }
             console.log('rowClick packet', record.packet)
             const arg = { packet: '' + record.packet }
             // parse packet
             devicePacketParse(arg).then(res => {
               console.log('rowClick packet parse', res)
+              const parsedData = (res.data || []).map(item => {
+                let parsedBody = null
+                if (item.body) {
+                  try {
+                    parsedBody = JSON.parse(item.body)
+                  } catch (e) {
+                    console.error('Failed to parse body JSON', e)
+                  }
+                }
+                return {
+                  ...item,
+                  parsedBody
+                }
+              })
               // store parse result in the record
-              this.$set(record, 'packet_parse', res.data)
+              this.$set(record, 'packet_parse', parsedData)
               // still show parse result in a popup view
-              this.packet_parse = res.data
-              // this.packet_parse_visible = true
+              this.packet_parse = parsedData
+              this.packet_parse_visible = true
             }).catch(err => {
               console.log('rowClick packet parse err', err)
-              this.$message.error(err)
+              this.$message.error(err.message || err)
             })
           }
         }
       }
+    },
+
+    formatJson (body) {
+      if (!body) return ''
+      try {
+        const obj = typeof body === 'string' ? JSON.parse(body) : body
+        return JSON.stringify(obj, null, 2)
+      } catch (e) {
+        return body
+      }
+    },
+    formatHex (packet) {
+      if (!packet) return ''
+      return packet.replace(/(.{2})/g, '$1 ').trim().toUpperCase()
     }
   }
 }
@@ -350,6 +408,7 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 .fullscreen-modal .vm-titlebar {
   flex-shrink: 0;
@@ -372,5 +431,126 @@ export default {
 .fullscreen-modal .fullscreen-modal-footer {
   border-top: 1px solid #e5e5e5;
   padding: 15px;
+}
+
+/* Polished Parse Styles */
+.parse-details-container {
+  padding: 12px;
+  background-color: #f0f2f5;
+  border-radius: 8px;
+  max-height: 75vh;
+  overflow-y: auto;
+}
+
+.parse-card-wrapper {
+  margin-bottom: 16px;
+}
+
+.parse-main-card {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.card-title-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.device-id-label {
+  font-size: 15px;
+  color: #333;
+}
+
+.highlight-text {
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.custom-tag {
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+.json-header {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #555;
+  font-size: 13px;
+}
+
+.json-block {
+  background: #fdfdfd;
+  color: #333;
+  padding: 16px;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  max-height: 400px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+
+.raw-hex-section {
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.hex-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+.hex-body {
+  font-family: monospace;
+  font-size: 12px;
+  word-wrap: break-word;
+  word-break: break-all;
+  color: #555;
+  letter-spacing: 1px;
+}
+
+.packet-parse-item {
+  padding: 8px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.packet-parse-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.parse-meta-info {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.packet-parse-json {
+  background: #fafafa;
+  color: #444;
+  padding: 10px;
+  border: 1px solid #eaeaea;
+  border-radius: 4px;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  max-height: 200px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-all;
+  margin: 0;
 }
 </style>
