@@ -120,7 +120,8 @@ import { STable } from '@/components'
 import {
   getDeviceAlarmTypes,
   getDeviceAlarm,
-  getDeviceAlarmPostgres
+  getDeviceAlarmPostgres,
+  getDeviceList
 } from '@/api/manage'
 import BatteryInfo from '@/views/list/components/BatteryInfo'
 
@@ -347,14 +348,21 @@ export default {
     },
     handleBatteryInfo(record) {
       console.log('record', record)
-      console.log('record.code', record.code)
-      this.device_id = record.code
+      console.log('record.device_id', record.device_id)
+      this.device_id = record.device_id
       this.bms_bt = record.bms_bt
+      getDeviceList({ device_id: record.device_id, page_no: 1, page_size: 1 }).then(res => {
+        if (res.data && res.data.records && res.data.records.length > 0) {
+          this.bms_bt = res.data.records[0].bms_bt
+        }
+      }).catch(err => {
+        console.error('getDeviceList error', err)
+      })
       this.battery_detail_visible = true
       this.table_visible = false
       this.$nextTick(() => {
-        console.log('record.code', record.code)
-        this.$refs.batteryInfo.getBatteryInfoHandle(record.code)
+        console.log('record.device_id', record.device_id)
+        this.$refs.batteryInfo.getBatteryInfoHandle(record.device_id)
       })
     },
     handleBatteryInfoCancel() {
