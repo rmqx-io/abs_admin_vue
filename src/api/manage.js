@@ -26,6 +26,7 @@ export const api = {
   sys_user_page: `${prefix}/sys_user_page`,
   sys_user_add: `${prefix}/sys_user_add`,
   sys_user_update: `${prefix}/sys_user_update`,
+  sys_user_change_password: `${prefix}/sys_user_change_password`,
   sys_user_remove: `${prefix}/sys_user_remove`,
   sys_role_layer_top: `${prefix}/sys_role_layer_top`,
 
@@ -593,6 +594,14 @@ export function sys_user_add(arg) {
 export function sys_user_update(arg) {
   return request({
     url: api.sys_user_update,
+    method: 'post',
+    data: arg
+  })
+}
+
+export function sys_user_change_password(arg) {
+  return request({
+    url: api.sys_user_change_password,
     method: 'post',
     data: arg
   })

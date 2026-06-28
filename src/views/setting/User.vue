@@ -117,6 +117,9 @@
                 <a style='color: #1890ff' @click='handleEdit(scope)'>编辑</a>
               </a-menu-item>
               <a-menu-item>
+                <a style='color: #1890ff' @click='handleChangePassword(scope)'>修改密码</a>
+              </a-menu-item>
+              <a-menu-item>
                 <a style='color:#f5222d' @click='handleDelete(scope)'>删除</a>
               </a-menu-item>
             </a-menu>
@@ -206,6 +209,44 @@
       </a-form>
 
     </a-modal>
+
+    <a-modal
+      title='修改密码'
+      cancelText='取消'
+      okText='确定'
+      v-if='pwdVisible'
+      v-model='pwdVisible'
+      :width='500'
+      :maskClosable='false'
+      @ok='handleSavePassword'
+    >
+      <a-form
+        labelAlign='right'
+        v-bind='{
+          labelCol: { sm: { span: 5 } },
+          wrapperCol: { sm: { span: 19 } },
+        }'
+      >
+        <a-form-item label='账号'>
+          <a-input v-model='pwdData.account' :disabled='true' />
+        </a-form-item>
+        <a-form-item label='姓名'>
+          <a-input v-model='pwdData.name' :disabled='true' />
+        </a-form-item>
+        <a-form-item label='新密码'>
+          <a-input-password
+            v-model='pwdData.password'
+            placeholder='请输入新密码'>
+          </a-input-password>
+        </a-form-item>
+        <a-form-item label='确认新密码'>
+          <a-input-password
+            v-model='pwdData.password_confirm'
+            placeholder='请再次输入新密码'>
+          </a-input-password>
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 
 </template>
@@ -217,7 +258,8 @@ import {
   sys_user_remove,
   sys_user_page,
   sys_user_update,
-  getAdminOrgTree
+  getAdminOrgTree,
+  sys_user_change_password
 } from '@/api/manage'
 import { OrgSelect } from '@/components'
 import { showMsg } from '@/utils/data'
@@ -298,6 +340,14 @@ export default {
       },
       visible: false,
       dialogMode: 'add',
+      pwdVisible: false,
+      pwdData: {
+        id: null,
+        account: '',
+        name: '',
+        password: '',
+        password_confirm: ''
+      },
       all_role: [],
       orgList: [],
       roleNameList: []
@@ -486,6 +536,36 @@ export default {
           console.log('org list', res)
           this.orgList = res.data ? [res.data] : []
         })
+    },
+    handleChangePassword: function(scope) {
+      this.pwdData = {
+        id: scope.id,
+        account: scope.account,
+        name: scope.name,
+        password: '',
+        password_confirm: ''
+      }
+      this.pwdVisible = true
+    },
+    handleSavePassword: function() {
+      if (!this.pwdData.password) {
+        this.$message.info('请输入新密码!')
+        return
+      }
+      if (this.pwdData.password !== this.pwdData.password_confirm) {
+        this.$message.info('密码不一致!')
+        return
+      }
+      sys_user_change_password({
+        id: this.pwdData.id,
+        password: this.pwdData.password
+      }).then((res) => {
+        this.$message.success('密码修改成功!')
+        this.pwdVisible = false
+        this.fetch()
+      }).catch(err => {
+        console.error(err)
+      })
     }
   }
 }
