@@ -33,6 +33,28 @@
         >
         </a-input>
       </a-form-item>
+      <a-form-item>
+        <org-select
+          v-model='queryData.organization_id'
+          :org-list='orgList'
+          placeholder='选择组织'
+          style='width: 180px'
+        >
+        </org-select>
+      </a-form-item>
+      <a-form-item>
+        <a-select
+          mode='combobox'
+          v-model='queryData.role_name'
+          placeholder='请输入或选择角色'
+          :allowClear='true'
+          style='width: 180px'
+        >
+          <a-select-option v-for='name in roleNameList' :key='name' :value='name'>
+            {{ name }}
+          </a-select-option>
+        </a-select>
+      </a-form-item>
       <a-form-item
         :wrapper-col='{ span: 12, offset: 5 }'
       >
@@ -261,6 +283,8 @@ export default {
         id: null,
         account: null,
         name: null,
+        organization_id: null,
+        role_name: null,
         page_no: 1,
         page_size: 5
       },
@@ -275,7 +299,8 @@ export default {
       visible: false,
       dialogMode: 'add',
       all_role: [],
-      orgList: []
+      orgList: [],
+      roleNameList: []
     }
   },
   created () {
@@ -312,6 +337,9 @@ export default {
       }
       if (arg.name === '') {
         arg.name = null
+      }
+      if (arg.role_name === '') {
+        arg.role_name = null
       }
       // 取分页数据
       sys_user_page(arg).then((res) => {
@@ -423,7 +451,24 @@ export default {
       sys_role_layer_top({})
         .then((res) => {
           this.all_role = res.data
+          this.roleNameList = this.getFlatRoleNames(res.data)
         })
+    },
+    getFlatRoleNames(roles) {
+      let names = []
+      const traverse = (list) => {
+        if (!list) return
+        list.forEach(item => {
+          if (item.name) {
+            names.push(item.name)
+          }
+          if (item.childs) {
+            traverse(item.childs)
+          }
+        })
+      }
+      traverse(roles)
+      return [...new Set(names)]
     },
     onRolesCheck: function(data) {
       const len = data.checked.length
