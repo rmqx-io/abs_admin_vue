@@ -51,12 +51,12 @@
             :replace-fields="{ children: 'children', title: 'title', key: 'value' }"
           >
             <template slot="title" slot-scope="item">
-              <span v-if="item.title.toLowerCase().indexOf(searchText.toLowerCase()) > -1">
+              <span v-if="item.title.toLowerCase().indexOf(searchText.toLowerCase()) > -1" :style="item.selectable === false ? { color: 'rgba(0,0,0,0.25)', cursor: 'not-allowed' } : {}">
                 {{ item.title.substring(0, item.title.toLowerCase().indexOf(searchText.toLowerCase())) }}
                 <span style="color: #f50">{{ searchText }}</span>
                 {{ item.title.substring(item.title.toLowerCase().indexOf(searchText.toLowerCase()) + searchText.length) }}
               </span>
-              <span v-else>{{ item.title }}</span>
+              <span v-else :style="item.selectable === false ? { color: 'rgba(0,0,0,0.25)', cursor: 'not-allowed' } : {}">{{ item.title }}</span>
             </template>
           </a-tree>
         </div>
@@ -80,6 +80,10 @@ export default {
     placeholder: {
       type: String,
       default: '选择机构'
+    },
+    selectableNodeCheck: {
+      type: Function,
+      default: null
     }
   },
   data() {
@@ -96,13 +100,20 @@ export default {
   },
   computed: {
     treeData() {
-      const normalize = (nodes) => {
-        return nodes.map(node => ({
-          ...node,
-          title: node.title || node.name || '',
-          value: node.value !== undefined ? node.value : node.id,
-          children: (node.children || node.childs) ? normalize(node.children || node.childs) : []
-        }))
+      const normalize = (nodes, depth = 0) => {
+        return nodes.map(node => {
+          const value = node.value !== undefined ? node.value : node.id
+          const normalizedNode = {
+            ...node,
+            title: node.title || node.name || '',
+            value: value
+          }
+          if (this.selectableNodeCheck) {
+            normalizedNode.selectable = this.selectableNodeCheck(normalizedNode, depth)
+          }
+          normalizedNode.children = (node.children || node.childs) ? normalize(node.children || node.childs, depth + 1) : []
+          return normalizedNode
+        })
       }
       const data = normalize(this.orgList)
 
@@ -228,6 +239,8 @@ export default {
       this.selectedKeys = selectedKeys
       if (selectedKeys.length > 0) {
         this.tempSelectedId = selectedKeys[0]
+      } else {
+        this.tempSelectedId = null
       }
     },
     onSearch(val) {

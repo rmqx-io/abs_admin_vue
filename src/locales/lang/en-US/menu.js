@@ -53,5 +53,6 @@ export default {
   'menu.tools': 'Tools',
   'menu.tools.alarm-config': 'Alarm Configuration',
   'menu.tools.device-tracing': 'Device Tracing',
+  'menu.tools.scylla-reclaim': 'Scylla Disk Reclaim',
   'menu.test': 'Test'
 }
