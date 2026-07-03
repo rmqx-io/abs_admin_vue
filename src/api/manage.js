@@ -1,6 +1,7 @@
 import request from '@/utils/request'
 import request_no_timeout from '@/utils/request'
 import { method } from 'lodash'
+import moment from 'moment'
 
 const prefix = ''
 
@@ -285,12 +286,101 @@ export function getBatteryModelList(arg) {
   })
 }
 
-export function getBatteryInfo(deviceId, bmsType, arg) {
-  return request({
-    url: api.battery_info + '/' + deviceId + '/' + bmsType,
-    method: 'post',
-    data: arg
-  })
+export async function getBatteryInfo(deviceId, bmsType, arg) {
+  // Parse start/end dates
+  const requestStart = arg.start_date || arg.start_time;
+  const requestEnd = arg.end_date || arg.end_time;
+
+  // fallback if no start/end specified
+  let startMoment = requestStart ? moment(requestStart) : moment().subtract(2, 'hours');
+  let endMoment = requestEnd ? moment(requestEnd) : moment();
+
+  let currentStart = moment(startMoment);
+  const allData = [];
+  const maxIterations = 20;
+  let iterations = 0;
+
+  while (currentStart.isBefore(endMoment) && iterations < maxIterations) {
+    let currentEnd = moment(currentStart).add(8, 'hours');
+    if (currentEnd.isAfter(endMoment)) {
+      currentEnd = moment(endMoment);
+    }
+
+    const payload = {
+      ...arg,
+      start_date: currentStart.format('YYYY-MM-DD HH:mm:ss'),
+      start_time: currentStart.format('YYYY-MM-DD HH:mm:ss'),
+      end_date: currentEnd.format('YYYY-MM-DD HH:mm:ss'),
+      end_time: currentEnd.format('YYYY-MM-DD HH:mm:ss'),
+    };
+
+    try {
+      const res = await request({
+        url: api.battery_info + '/' + deviceId + '/' + bmsType,
+        method: 'post',
+        data: payload
+      });
+
+      if (res && Array.isArray(res.data)) {
+        if (res.data.length > 0) {
+          // Append data
+          allData.push(...res.data);
+
+          // Find the maximum time_tracking timestamp in the returned data
+          let maxTimestamp = 0;
+          for (const item of res.data) {
+            if (item.time_tracking && item.time_tracking > maxTimestamp) {
+              maxTimestamp = item.time_tracking;
+            }
+          }
+
+          if (maxTimestamp > 0) {
+            // Next start time is maxTimestamp + 1 second (1000 ms)
+            let nextStart = moment(maxTimestamp).add(1, 'second');
+            if (nextStart.isAfter(currentStart)) {
+              currentStart = nextStart;
+            } else {
+              // Force progress to the end of the current chunk to avoid infinite loop
+              currentStart = moment(currentEnd);
+            }
+          } else {
+            currentStart = moment(currentEnd);
+          }
+        } else {
+          // No data returned in this chunk, advance to end of chunk
+          currentStart = moment(currentEnd);
+        }
+      } else {
+        // Response format unexpected or failed, stop
+        break;
+      }
+    } catch (err) {
+      console.error('getBatteryInfo chunk query failed:', err);
+      break;
+    }
+
+    iterations++;
+  }
+
+  // De-duplicate final allData by 'id' or 'time_tracking' to be safe
+  const uniqueData = [];
+  const seenIds = new Set();
+  for (const item of allData) {
+    if (item.id) {
+      if (!seenIds.has(item.id)) {
+        seenIds.add(item.id);
+        uniqueData.push(item);
+      }
+    } else {
+      uniqueData.push(item);
+    }
+  }
+
+  return {
+    code: 'SUCCESS',
+    message: 'success',
+    data: uniqueData
+  };
 }
 
 export function getBatteryInfoLatest(deviceId, bmsType, arg) {
