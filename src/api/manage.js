@@ -84,6 +84,17 @@ export const api = {
 
   tools: `${prefix}/tools`,
   tools_alarm_config: `${prefix}/tools/alarm_config`,
+  scylla_reclaim_config: `${prefix}/scylla_reclaim/config`,
+  scylla_reclaim_tables: `${prefix}/scylla_reclaim/tables`,
+  scylla_reclaim_run: `${prefix}/scylla_reclaim/run`,
+  scylla_reclaim_stop: `${prefix}/scylla_reclaim/stop`,
+  scylla_reclaim_status: `${prefix}/scylla_reclaim/status`,
+  scylla_reclaim_realtime_stats: `${prefix}/scylla_reclaim/realtime_stats`,
+
+  scylla_reclaim_logs: `${prefix}/scylla_reclaim/logs`,
+  scylla_reclaim_org_configs: `${prefix}/scylla_reclaim/org_configs`,
+  scylla_reclaim_history: `${prefix}/scylla_reclaim/history`,
+  scylla_reclaim_history_logs: `${prefix}/scylla_reclaim/history`,
   device_tracing: `${prefix}/tracing/device`,
 }
 

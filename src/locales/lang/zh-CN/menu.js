@@ -54,5 +54,6 @@ export default {
     'menu.tools': '工具',
     'menu.tools.alarm-config': '告警配置',
     'menu.tools.device-tracing': '设备在线追踪',
+    'menu.tools.scylla-reclaim': 'Scylla 磁盘回收',
     'menu.test': '测试'
 }

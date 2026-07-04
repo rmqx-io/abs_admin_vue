@@ -333,6 +333,17 @@ export const asyncRouterMap = [
             }
           },
           {
+            path: '/tools/scylla-reclaim',
+            name: 'tools_scylla_reclaim',
+            component: () => import('@/views/tools/ScyllaReclaim'),
+            meta: {
+              title: 'menu.tools.scylla-reclaim',
+              hidden: false,
+              keepAlive: true,
+              permission: ['setting']
+            }
+          },
+          {
             path: '/tools/device-tracing',
             name: 'tools_device_tracing',
             component: () => import('@/views/tools/DeviceTracing'),
