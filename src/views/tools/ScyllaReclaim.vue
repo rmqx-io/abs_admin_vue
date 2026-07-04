@@ -379,7 +379,7 @@
         <h3>全局磁盘空间回收配置 (只读)</h3>
         <span class="subtitle" style="color: #faad14;">
           <a-icon type="warning" style="margin-right: 4px;" />
-          注意：全局配置已设定为只读模式，仅能由系统管理员直接在服务器的 <code>/etc/default/scylla-disk-reclaim</code> 文件中进行修改。
+          注意：全局配置已设定为只读模式，仅能由系统管理员直接在服务器的 <code>/etc/default/scylla-disk-reclaim</code> 或者 <code>./scylla-disk-reclaim.env</code> 文件中进行修改。
         </span>
       </div>
 
