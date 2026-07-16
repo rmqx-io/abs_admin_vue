@@ -53,6 +53,7 @@ export default {
   'menu.setting.app-user': 'App账号管理',
     'menu.tools': '工具',
     'menu.tools.alarm-config': '告警配置',
+    'menu.tools.bms-query-rate-limit': 'BMS查询频率限制',
     'menu.tools.device-tracing': '设备在线追踪',
     'menu.tools.scylla-reclaim': 'Scylla 磁盘回收',
     'menu.test': '测试'

@@ -333,6 +333,17 @@ export const asyncRouterMap = [
             }
           },
           {
+            path: '/tools/bms-query-rate-limit',
+            name: 'tools_bms_query_rate_limit',
+            component: () => import('@/views/tools/BmsQueryRateLimit'),
+            meta: {
+              title: 'menu.tools.bms-query-rate-limit',
+              hidden: false,
+              keepAlive: true,
+              permission: ['setting']
+            }
+          },
+          {
             path: '/tools/scylla-reclaim',
             name: 'tools_scylla_reclaim',
             component: () => import('@/views/tools/ScyllaReclaim'),

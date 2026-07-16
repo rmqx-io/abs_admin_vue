@@ -52,6 +52,7 @@ export default {
   'menu.setting.app-user': 'App Account Management',
   'menu.tools': 'Tools',
   'menu.tools.alarm-config': 'Alarm Configuration',
+  'menu.tools.bms-query-rate-limit': 'BMS Query Rate Limit',
   'menu.tools.device-tracing': 'Device Tracing',
   'menu.tools.scylla-reclaim': 'Scylla Disk Reclaim',
   'menu.test': 'Test'

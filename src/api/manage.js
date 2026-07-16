@@ -84,6 +84,8 @@ export const api = {
 
   tools: `${prefix}/tools`,
   tools_alarm_config: `${prefix}/tools/alarm_config`,
+  device_bms_query: `${prefix}/device/bms/query`,
+  device_bms_query_rate_limit: `${prefix}/device/bms/query/rate_limit`,
   scylla_reclaim_config: `${prefix}/scylla_reclaim/config`,
   scylla_reclaim_tables: `${prefix}/scylla_reclaim/tables`,
   scylla_reclaim_run: `${prefix}/scylla_reclaim/run`,
