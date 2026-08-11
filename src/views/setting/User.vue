@@ -505,7 +505,7 @@ export default {
         })
     },
     getFlatRoleNames(roles) {
-      let names = []
+      const names = []
       const traverse = (list) => {
         if (!list) return
         list.forEach(item => {

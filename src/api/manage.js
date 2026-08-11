@@ -305,8 +305,8 @@ export async function getBatteryInfo(deviceId, bmsType, arg) {
   const requestEnd = arg.end_date || arg.end_time;
 
   // fallback if no start/end specified
-  let startMoment = requestStart ? moment(requestStart) : moment().subtract(2, 'hours');
-  let endMoment = requestEnd ? moment(requestEnd) : moment();
+  const startMoment = requestStart ? moment(requestStart) : moment().subtract(2, 'hours');
+  const endMoment = requestEnd ? moment(requestEnd) : moment();
 
   let currentStart = moment(startMoment);
   const allData = [];
@@ -349,7 +349,7 @@ export async function getBatteryInfo(deviceId, bmsType, arg) {
 
           if (maxTimestamp > 0) {
             // Next start time is maxTimestamp + 1 second (1000 ms)
-            let nextStart = moment(maxTimestamp).add(1, 'second');
+            const nextStart = moment(maxTimestamp).add(1, 'second');
             if (nextStart.isAfter(currentStart)) {
               currentStart = nextStart;
             } else {

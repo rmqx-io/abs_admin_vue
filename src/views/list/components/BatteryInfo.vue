@@ -219,7 +219,7 @@ export default {
             .then(res => {
               this.bms_loading = false
               const rawData = res.data || [];
-              
+
               // 1. Calculate count of valid cell voltages for each record
               const counts = rawData.map(record => {
                 if (!record.single_battery_voltage_arr) return 0;

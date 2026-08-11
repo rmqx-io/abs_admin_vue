@@ -40,12 +40,12 @@
           <a-card :bordered="false" class="premium-card control-card">
             <div class="card-glow"></div>
             <h2 class="section-title">{{ $t('deviceTracing.telemetryConfig') }}</h2>
-            
+
             <a-form layout="vertical" class="premium-form">
               <a-form-item :label="$t('deviceTracing.deviceSimId')">
-                <a-input 
-                  v-model="config.deviceId" 
-                  :placeholder="$t('deviceTracing.deviceSimIdPlaceholder')" 
+                <a-input
+                  v-model="config.deviceId"
+                  :placeholder="$t('deviceTracing.deviceSimIdPlaceholder')"
                   size="large"
                   class="premium-input"
                   :disabled="isTracingActive"
@@ -66,10 +66,10 @@
               </a-form-item>
 
               <a-form-item :label="$t('deviceTracing.maxRecords')">
-                <a-input-number 
-                  v-model="config.maxRecords" 
-                  :min="10" 
-                  :max="10000" 
+                <a-input-number
+                  v-model="config.maxRecords"
+                  :min="10"
+                  :max="10000"
                   size="large"
                   class="premium-input-number"
                   :disabled="isTracingActive"
@@ -85,11 +85,11 @@
 
               <!-- Action buttons -->
               <div class="action-zone">
-                <a-button 
+                <a-button
                   v-if="!isTracingActive"
-                  type="primary" 
-                  size="large" 
-                  block 
+                  type="primary"
+                  size="large"
+                  block
                   class="btn-start"
                   @click="startTrace"
                   :loading="btnLoading"
@@ -98,11 +98,11 @@
                   <a-icon type="play-circle" /> {{ $t('deviceTracing.engageTracing') }}
                 </a-button>
 
-                <a-button 
+                <a-button
                   v-else
-                  type="danger" 
-                  size="large" 
-                  block 
+                  type="danger"
+                  size="large"
+                  block
                   class="btn-stop"
                   @click="stopTrace"
                   :loading="btnLoading"
@@ -151,7 +151,7 @@
           <a-card :bordered="false" class="premium-card log-card">
             <div class="log-header">
               <h2 class="section-title">{{ $t('deviceTracing.journeyTimeline') }}</h2>
-              
+
               <div class="log-controls">
                 <span class="live-label">
                   <a-badge :status="liveMode ? 'processing' : 'default'" /> {{ $t('deviceTracing.liveStream') }}
@@ -176,8 +176,8 @@
 
               <!-- Journey Timeline -->
               <div v-else class="timeline-journey">
-                <div 
-                  v-for="(rec, index) in records" 
+                <div
+                  v-for="(rec, index) in records"
                   :key="rec.seq + '-' + index"
                   :class="['journey-node', 'node-' + rec.outcome.toLowerCase()]"
                 >
@@ -200,7 +200,7 @@
                         <!-- Command ID / Message Type -->
                         <span v-if="rec.packet_cmd" class="cmd-code">{{ rec.packet_cmd }}</span>
                         <span v-if="rec.message_type" class="msg-type">{{ rec.message_type }}</span>
-                        
+
                         <!-- Outcome status badge -->
                         <span :class="['outcome-badge', 'outcome-' + rec.outcome.toLowerCase()]">
                           <a-icon :type="rec.outcome === 'ok' ? 'check-circle' : 'close-circle'" />
@@ -251,11 +251,11 @@
 <script>
 import storage from 'store'
 import { ROLE } from '@/store/mutation-types'
-import { 
-  enableDeviceTracing, 
-  disableDeviceTracing, 
-  getDeviceTracingRecords, 
-  clearDeviceTracingRecords 
+import {
+  enableDeviceTracing,
+  disableDeviceTracing,
+  getDeviceTracingRecords,
+  clearDeviceTracingRecords
 } from '@/api/manage'
 
 export default {
@@ -296,7 +296,7 @@ export default {
     if (role === 'sysadmin') {
       this.isSysadmin = true
     }
-    
+
     // Check if there is an active device trace session saved locally to resume states
     const savedState = localStorage.getItem('active_tracing_state')
     if (savedState) {
@@ -390,9 +390,9 @@ export default {
     async startTrace() {
       if (!this.config.deviceId) return
       this.btnLoading = true
-      
+
       const expiryMs = Date.now() + this.config.ttlMinutes * 60 * 1000
-      
+
       const payload = {
         expiry_time_unix_ms: expiryMs,
         max_records: this.config.maxRecords,
@@ -406,7 +406,7 @@ export default {
         this.liveMode = true
         this.records = []
         this.lastSeq = 0
-        
+
         // Save current session to storage
         localStorage.setItem('active_tracing_state', JSON.stringify({
           deviceId: this.config.deviceId,
@@ -477,7 +477,7 @@ export default {
           // Sort chronologically (oldest first for cascading downward timeline)
           const sorted = [...res.data].sort((a, b) => a.ts_unix_ms - b.ts_unix_ms || a.seq - b.seq)
           this.records = sorted
-          
+
           if (sorted.length > 0) {
             this.lastSeq = sorted[sorted.length - 1].seq
           }

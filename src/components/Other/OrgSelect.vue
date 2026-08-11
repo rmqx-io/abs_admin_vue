@@ -119,7 +119,7 @@ export default {
 
       // If no search, return full tree
       if (!this.searchText) return data
-      
+
       // Filter tree based on search text
       const gData = JSON.parse(JSON.stringify(data))
       const filterTree = (nodes) => {

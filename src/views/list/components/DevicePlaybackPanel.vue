@@ -260,11 +260,11 @@
           </div>
           <!-- Right: Actions -->
           <div class="map-actions">
-            <a-button 
-              size="small" 
-              class="action-btn" 
+            <a-button
+              size="small"
+              class="action-btn"
               :type="autoFollow ? 'primary' : 'default'"
-              @click="autoFollow = !autoFollow" 
+              @click="autoFollow = !autoFollow"
               v-if="playbackActive"
             >
               {{ autoFollow ? '停止跟随' : '跟随设备' }}
@@ -583,9 +583,9 @@ export default {
       const endOfMonth = moment(this.calendarMonth).endOf('month')
       const startDayOfWeek = startOfMonth.day() // Sunday = 0
       const daysInMonth = startOfMonth.daysInMonth()
-      
+
       const days = []
-      
+
       // Filler days from previous month
       const prevMonth = moment(startOfMonth).subtract(1, 'month')
       const daysInPrevMonth = prevMonth.daysInMonth()
@@ -597,7 +597,7 @@ export default {
           mileage: null
         })
       }
-      
+
       // Current month days
       for (let i = 1; i <= daysInMonth; i++) {
         const day = moment(startOfMonth).date(i)
@@ -607,7 +607,7 @@ export default {
           mileage: this.getDailyMileage(day)
         })
       }
-      
+
       // Filler days from next month
       const remaining = 42 - days.length
       const nextMonth = moment(startOfMonth).add(1, 'month')
@@ -619,7 +619,7 @@ export default {
           mileage: null
         })
       }
-      
+
       return days
     }
   },
@@ -731,7 +731,7 @@ export default {
           }
 
           this.points = validPoints
-          
+
           // Cache the daily mileage
           if (validPoints.length > 0) {
             const lastPoint = validPoints[validPoints.length - 1]
@@ -746,7 +746,7 @@ export default {
           this.buildSegments()
           this.computeStops()
           this.autoFollow = true
-          
+
           if (this.currentPoint) {
             this.center = [this.currentPoint.longitude, this.currentPoint.latitude]
           }
@@ -835,14 +835,14 @@ export default {
         this.stops = []
         return
       }
-      
+
       const stops = []
       const limitMs = this.stayLimitMinutes * 60 * 1000
       let startIdx = null
-      
+
       for (let i = 0; i < this.points.length; i++) {
         const isLowSpeed = this.points[i].speed <= 1.0
-        
+
         if (isLowSpeed) {
           if (startIdx === null) {
             startIdx = i
@@ -857,7 +857,7 @@ export default {
           }
         }
       }
-      
+
       // Final segment check
       if (startIdx !== null) {
         const durationMs = moment(this.points[this.points.length - 1].time_tracking).diff(moment(this.points[startIdx].time_tracking))
@@ -865,7 +865,7 @@ export default {
           stops.push(this.createStopObject(stops.length + 1, startIdx, this.points.length - 1, durationMs))
         }
       }
-      
+
       this.stops = stops
       this.fetchAddressForStops()
     },
@@ -889,7 +889,7 @@ export default {
       const hours = Math.floor(duration.asHours())
       const minutes = duration.minutes()
       const seconds = duration.seconds()
-      
+
       const parts = []
       if (hours > 0) parts.push(`${hours}小时`)
       if (minutes > 0 || hours > 0) parts.push(`${minutes}分钟`)
@@ -929,7 +929,7 @@ export default {
           if (data && data.features && data.features.length > 0) {
             const p = data.features[0].properties
             const parts = []
-            
+
             const name = p.name
             const housenumber = p.housenumber
             const street = p.street
@@ -937,7 +937,7 @@ export default {
             const city = p.city
             const state = p.state
             const country = p.country
-            
+
             if (isEn) {
               if (name) parts.push(name)
               if (housenumber) parts.push(housenumber)
@@ -990,7 +990,7 @@ export default {
           if (this.autoFollow) {
             this.center = [this.currentPoint.longitude, this.currentPoint.latitude]
           }
-          
+
           if (this.useLeaflet && this.leafletCurrentMarker) {
             this.leafletCurrentMarker.setLatLng([this.currentPoint.latitude, this.currentPoint.longitude])
             this.leafletCurrentMarker.setPopupContent(`
@@ -1027,8 +1027,8 @@ export default {
       this.autoFollow = false
 
       // Calculate the bounding box for all points
-      let minLng = Infinity, maxLng = -Infinity
-      let minLat = Infinity, maxLat = -Infinity
+      let minLng = Infinity; let maxLng = -Infinity
+      let minLat = Infinity; let maxLat = -Infinity
       for (const p of this.points) {
         if (p.longitude < minLng) minLng = p.longitude
         if (p.longitude > maxLng) maxLng = p.longitude
@@ -1047,9 +1047,9 @@ export default {
       // @amap/amap-vue exposes the underlying AMap.Map via .$map (computed) or
       // .$amap.context.target; $$getInstance / .map are not part of this package's API.
       if (!this.useLeaflet && this.$refs.amap) {
-        const mapInstance = this.$refs.amap.$map
-          || (this.$refs.amap.$amap && this.$refs.amap.$amap.context && this.$refs.amap.$amap.context.target)
-          || (this.$refs.amap.$$getInstance ? this.$refs.amap.$$getInstance() : this.$refs.amap.map)
+        const mapInstance = this.$refs.amap.$map ||
+          (this.$refs.amap.$amap && this.$refs.amap.$amap.context && this.$refs.amap.$amap.context.target) ||
+          (this.$refs.amap.$$getInstance ? this.$refs.amap.$$getInstance() : this.$refs.amap.map)
         if (mapInstance && window.AMap) {
           if (window.AMap.Bounds && window.AMap.LngLat) {
             // Preferred path: explicit bounds object, reliable for repeated calls
@@ -1118,11 +1118,11 @@ export default {
       const current = moment(this.currentPoint.time_tracking)
       const diffMs = current.diff(start)
       const duration = moment.duration(diffMs)
-      
+
       const hours = Math.floor(duration.asHours())
       const minutes = duration.minutes()
       const seconds = duration.seconds()
-      
+
       if (hours > 0) {
         return `${hours}小时${minutes}分${seconds}秒`
       }
@@ -1130,7 +1130,7 @@ export default {
     },
     getDailyMileage (date) {
       if (!this.localDeviceId) return null
-      
+
       const dayKey = date.format('YYYY-MM-DD')
       if (this.mileageCache[this.localDeviceId] && this.mileageCache[this.localDeviceId][dayKey]) {
         return this.mileageCache[this.localDeviceId][dayKey]
@@ -1143,13 +1143,13 @@ export default {
         if (firstPointDate && moment(firstPointDate).isSame(date, 'day')) {
           const totalDistance = this.points[this.points.length - 1].cumulativeDistance
           const formattedMileage = totalDistance > 0 ? totalDistance.toFixed(2) : '0.00'
-          
+
           // Also update cache if we found it through current points
           if (!this.mileageCache[this.localDeviceId]) {
             this.$set(this.mileageCache, this.localDeviceId, {})
           }
           this.$set(this.mileageCache[this.localDeviceId], dayKey, formattedMileage)
-          
+
           return formattedMileage
         }
       }
@@ -1162,10 +1162,10 @@ export default {
     selectCalendarDay (day) {
       const start = moment(day.date).startOf('day')
       const end = moment(day.date).endOf('day')
-      
+
       this.queryData.start_date = start
       this.queryData.end_date = end
-      
+
       this.loadPlayback()
     },
     prevCalendarMonth () {
@@ -1195,10 +1195,10 @@ export default {
         start = moment().subtract(1, 'weeks').startOf('week')
         end = moment().subtract(1, 'weeks').endOf('week')
       }
-      
+
       this.queryData.start_date = start
       this.queryData.end_date = end
-      
+
       this.loadPlayback()
     },
     formatStopDate (dateStr) {
@@ -1214,16 +1214,16 @@ export default {
       this.$nextTick(() => {
         const chartDom = this.$refs.speedChart
         if (!chartDom) return
-        
+
         if (this.myChart) {
           this.myChart.dispose()
         }
-        
+
         this.myChart = echarts.init(chartDom)
-        
+
         const xAxisData = this.points.map(p => moment(p.time_tracking).format('HH:mm:ss'))
         const seriesData = this.points.map(p => p.speed)
-        
+
         const option = {
           tooltip: {
             trigger: 'axis',
@@ -1255,7 +1255,7 @@ export default {
             }
           ]
         }
-        
+
         this.myChart.setOption(option)
       })
     },
@@ -1266,10 +1266,10 @@ export default {
       this.mapType = type
       const mapComponent = this.$refs.amap
       if (!mapComponent) return
-      
+
       const map = mapComponent.$map || (mapComponent.$amap && mapComponent.$amap.context && mapComponent.$amap.context.target)
       if (!map) return
-      
+
       if (type === 'satellite') {
         if (!this.satelliteLayer) {
           this.satelliteLayer = new window.AMap.TileLayer.Satellite()
@@ -1327,7 +1327,7 @@ export default {
     },
     updateLeafletElements () {
       if (!this.useLeaflet || !this.leafletMap) return
-      
+
       if (this.leafletLayers) {
         this.leafletLayers.forEach(layer => this.leafletMap.removeLayer(layer))
       }
@@ -1360,7 +1360,7 @@ export default {
 
         const isEn = this.$i18n.locale && this.$i18n.locale.startsWith('en')
         const detailsText = isEn ? 'Click to view details' : '点击可查看详情'
-        
+
         marker.bindPopup(`
           <div class="stop-info-window">
             <div class="info-row"><b>${isEn ? 'ID' : '序号'}:</b> ${stop.id}</div>
@@ -1371,7 +1371,7 @@ export default {
             <div class="info-action leaflet-detail-btn" style="cursor: pointer; margin-top: 6px;">${detailsText}</div>
           </div>
         `)
-        
+
         this.leafletLayers.push(marker)
       })
 
@@ -1393,7 +1393,7 @@ export default {
             <p><b>定位:</b> ${this.formatStopDateLong(this.currentPoint.time_tracking)}</p>
           </div>
         `)
-        
+
         this.leafletLayers.push(this.leafletCurrentMarker)
       }
     }
@@ -2108,5 +2108,3 @@ export default {
   background-color: rgba(0, 0, 0, 0.06);
 }
 </style>
-
-

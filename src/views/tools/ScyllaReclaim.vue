@@ -35,38 +35,38 @@
 
         <a-col :span="24" :md="10" class="actions-col">
           <div class="control-actions">
-            <a-button 
-              type="danger" 
-              icon="play-circle" 
-              block 
-              size="large" 
-              class="run-btn shadow-btn" 
+            <a-button
+              type="danger"
+              icon="play-circle"
+              block
+              size="large"
+              class="run-btn shadow-btn"
               :loading="runningLoading"
               :disabled="status.is_running"
               @click="confirmRunReclaim"
             >
               立即运行回收
             </a-button>
-            <a-button 
+            <a-button
               v-if="status.is_running"
-              type="danger" 
+              type="danger"
               ghost
-              icon="stop" 
-              block 
-              size="large" 
-              class="stop-btn mt-3" 
+              icon="stop"
+              block
+              size="large"
+              class="stop-btn mt-3"
               :loading="stoppingLoading"
               @click="confirmStopReclaim"
             >
               停止当前任务
             </a-button>
-            <a-button 
-              type="default" 
-              icon="sync" 
-              block 
-              size="large" 
-              class="refresh-btn mt-3" 
-              :loading="loading" 
+            <a-button
+              type="default"
+              icon="sync"
+              block
+              size="large"
+              class="refresh-btn mt-3"
+              :loading="loading"
               @click="fetchStatusAndLogs"
             >
               刷新状态与日志
@@ -115,11 +115,11 @@
       <!-- Per-Table Progress Table -->
       <div v-if="realtimeStats.tables && realtimeStats.tables.length > 0">
         <h4 class="section-title">单表处理进度</h4>
-        <a-table 
-          :columns="tableProgressColumns" 
-          :data-source="realtimeStats.tables" 
+        <a-table
+          :columns="tableProgressColumns"
+          :data-source="realtimeStats.tables"
           row-key="table_name"
-          :pagination="false" 
+          :pagination="false"
           size="middle"
           class="mb-4"
         >
@@ -136,11 +136,11 @@
 
       <!-- Depth-1 Orgs Table -->
       <h4 class="section-title">一级组织处理明细</h4>
-      <a-table 
-        :columns="realtimeStatsColumns" 
-        :data-source="realtimeStats.depth1_orgs" 
+      <a-table
+        :columns="realtimeStatsColumns"
+        :data-source="realtimeStats.depth1_orgs"
         row-key="org_id"
-        :pagination="false" 
+        :pagination="false"
         size="middle"
       >
         <template slot="retention_days" slot-scope="text">
@@ -164,35 +164,35 @@
         </a-button>
       </div>
 
-      <a-table 
-        :columns="orgColumns" 
-        :data-source="filteredOrgList" 
+      <a-table
+        :columns="orgColumns"
+        :data-source="filteredOrgList"
         row-key="id"
-        :pagination="{ pageSize: 5 }" 
+        :pagination="{ pageSize: 5 }"
         :loading="orgLoading"
         size="middle"
       >
         <template slot="scylla_retention_days" slot-scope="text, record">
-          <a-input-number 
-            :value="record.scylla_retention_days" 
-            :min="1" 
+          <a-input-number
+            :value="record.scylla_retention_days"
+            :min="1"
             :max="3650"
             placeholder="默认天数"
-            @change="(val) => handleOrgDaysChange(val, record)" 
+            @change="(val) => handleOrgDaysChange(val, record)"
           />
         </template>
         <template slot="action" slot-scope="text, record">
-          <a-button 
-            type="primary" 
-            size="small" 
-            icon="save" 
+          <a-button
+            type="primary"
+            size="small"
+            icon="save"
             @click="saveOrgConfig(record)"
           >
             保存
           </a-button>
-          <a-button 
-            type="default" 
-            size="small" 
+          <a-button
+            type="default"
+            size="small"
             style="margin-left: 8px;"
             @click="clearOrgConfig(record)"
           >
@@ -209,11 +209,11 @@
         <span class="subtitle">展示最近 20 次执行的清理任务的起止时间、状态、触发类型和影响数据行数</span>
       </div>
 
-      <a-table 
-        :columns="historyColumns" 
-        :data-source="historyList" 
+      <a-table
+        :columns="historyColumns"
+        :data-source="historyList"
         row-key="id"
-        :pagination="{ pageSize: 5 }" 
+        :pagination="{ pageSize: 5 }"
         :loading="historyLoading"
         size="middle"
       >
@@ -227,17 +227,17 @@
           {{ text === 'Manual' ? '手动触发' : '定时计划' }}
         </template>
         <template slot="action" slot-scope="text, record">
-          <a-button 
-            type="link" 
-            icon="file-text" 
+          <a-button
+            type="link"
+            icon="file-text"
             @click="showHistoryLogModal(record)"
           >
             查看历史日志
           </a-button>
-          <a-button 
+          <a-button
             v-if="record.reclaim_stats"
-            type="link" 
-            icon="line-chart" 
+            type="link"
+            icon="line-chart"
             @click="showHistoryStatsModal(record)"
           >
             查看统计
@@ -286,11 +286,11 @@
         <!-- Per-Table Progress Table in History -->
         <div v-if="historyStatsData.tables && historyStatsData.tables.length > 0">
           <h4 class="section-title">单表处理进度</h4>
-          <a-table 
-            :columns="tableProgressColumns" 
-            :data-source="historyStatsData.tables" 
+          <a-table
+            :columns="tableProgressColumns"
+            :data-source="historyStatsData.tables"
             row-key="table_name"
-            :pagination="false" 
+            :pagination="false"
             size="middle"
             class="mb-4"
           >
@@ -306,11 +306,11 @@
         </div>
 
         <h4 class="section-title">一级组织处理明细</h4>
-        <a-table 
-          :columns="realtimeStatsColumns" 
-          :data-source="historyStatsData.depth1_orgs" 
+        <a-table
+          :columns="realtimeStatsColumns"
+          :data-source="historyStatsData.depth1_orgs"
           row-key="org_id"
-          :pagination="false" 
+          :pagination="false"
           size="middle"
         >
           <template slot="retention_days" slot-scope="text">
@@ -364,7 +364,13 @@
         <div class="action-section">
           <a-checkbox v-model="autoScroll" class="console-checkbox">自动滚动到底部</a-checkbox>
           <a-button size="small" icon="delete" class="console-btn" @click="clearLogsView">清空屏幕</a-button>
-          <a-button size="small" type="primary" icon="reload" class="console-btn" :loading="logsLoading" @click="fetchLogs">刷新日志</a-button>
+          <a-button
+size="small"
+type="primary"
+icon="reload"
+class="console-btn"
+:loading="logsLoading"
+@click="fetchLogs">刷新日志</a-button>
         </div>
       </div>
 
@@ -466,9 +472,9 @@
           <a-row :gutter="24" v-if="config.run_forced_compaction">
             <a-col :span="24">
               <a-form-item label="Compaction 表名" :label-col="{ span: 4 }" :wrapper-col="{ span: 19 }">
-                <a-select 
-                  mode="tags" 
-                  v-model="selectedTables" 
+                <a-select
+                  mode="tags"
+                  v-model="selectedTables"
                   placeholder="选择或输入需要执行 Compaction 的表"
                   style="width: 100%"
                   disabled
@@ -1069,7 +1075,7 @@ export default {
               }
               node.depth = depth
               node.isDepth1 = isDepth1
-              
+
               if (node.value !== undefined) {
                 node.id = parseInt(node.value)
               }
