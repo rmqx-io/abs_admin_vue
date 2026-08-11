@@ -61,12 +61,84 @@
             </a-col>
           </a-row>
         </div>
-        <a-row :gutter='48'>
+        <a-row :gutter='48' style="margin-bottom: 16px;">
           <a-col :md="8" :sm="24">
             <a-button type="primary" @click="$refs.alarmtable.refresh(true)">{{ $t('alarm.query') }}</a-button>
+            <a-button style="margin-left: 8px" :loading="exportLoading" icon="export" @click="handleExport">{{ $t('alarm.export') }}</a-button>
           </a-col>
         </a-row>
       </a-form>
+
+      <div v-if="showExportProgress" class="alarm-export-progress-card">
+        <a-alert
+          :type="exportError ? 'error' : (isExportCancelled ? 'warning' : (exportProgress >= 100 ? 'success' : 'info'))"
+          show-icon
+          style="margin-bottom: 16px;"
+        >
+          <template slot="message">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: 600;">
+                <a-icon v-if="exportLoading" type="loading" style="margin-right: 8px;" />
+                {{ exportTitle }}
+              </span>
+              <div>
+                <a-button
+                  v-if="exportLoading"
+                  size="small"
+                  type="danger"
+                  ghost
+                  @click="terminateExport(false)"
+                  style="margin-right: 8px;"
+                >
+                  {{ $t('alarm.terminateExport') }}
+                </a-button>
+                <a-button
+                  v-if="!exportLoading && !exportError"
+                  size="small"
+                  type="link"
+                  @click="showExportProgress = false"
+                >
+                  {{ $t('alarm.close') }}
+                </a-button>
+              </div>
+            </div>
+          </template>
+          <template slot="description">
+            <div style="margin-top: 8px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; color: rgba(0,0,0,0.65);">
+                <span>{{ exportStepText }}</span>
+                <span v-if="totalExportCount > 0" style="font-weight: 500;">
+                  {{ exportedCount }} / {{ totalExportCount }} 条 ({{ exportProgress.toFixed(1) }}%)
+                </span>
+              </div>
+              <a-progress
+                :percent="exportProgress"
+                :status="exportProgressStatus"
+                :show-info="false"
+                stroke-linecap="round"
+                :stroke-color="{
+                  '0%': '#108ee9',
+                  '100%': '#87d068',
+                }"
+              />
+
+              <!-- Action buttons when error occurs -->
+              <div v-if="exportError" style="margin-top: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <a-button type="primary" size="small" icon="redo" :loading="exportLoading" @click="retryExport">
+                  {{ $t('alarm.retry') }}
+                </a-button>
+                <a-button v-if="allExportRecords.length > 0" size="small" icon="download" @click="terminateExport(true)">
+                  {{ $t('alarm.exportPartial', { count: allExportRecords.length }) }}
+                </a-button>
+                <a-button size="small" type="danger" ghost icon="close" @click="terminateExport(false)">
+                  {{ $t('alarm.terminateExport') }}
+                </a-button>
+              </div>
+            </div>
+          </template>
+        </a-alert>
+      </div>
+
       <s-table
         v-if="table_visible"
         ref="alarmtable"
@@ -156,6 +228,23 @@ export default {
       default: () => null
     }
   },
+  watch: {
+    deviceId () {
+      if (this.$refs.alarmtable) {
+        this.$refs.alarmtable.refresh(true)
+      }
+    },
+    deviceStatus () {
+      if (this.$refs.alarmtable) {
+        this.$refs.alarmtable.refresh(true)
+      }
+    },
+    organizationId () {
+      if (this.$refs.alarmtable) {
+        this.$refs.alarmtable.refresh(true)
+      }
+    }
+  },
   data () {
     return {
       table_visible: true,
@@ -168,6 +257,17 @@ export default {
       selectedItems: [],
       prevSelectedItems: [],
       loading: false,
+      exportLoading: false,
+      showExportProgress: false,
+      exportProgress: 0,
+      exportedCount: 0,
+      totalExportCount: 0,
+      totalExportPages: 0,
+      currentExportPage: 1,
+      allExportRecords: [],
+      exportStepText: '',
+      exportError: null,
+      isExportCancelled: false,
       queryData: {
         device_id: null,
         account: null,
@@ -181,6 +281,30 @@ export default {
     }
   },
   computed: {
+    exportTitle () {
+      if (this.exportError) {
+        return this.$t('alarm.exportTitlePaused') || '告警导出异常暂停'
+      }
+      if (this.isExportCancelled) {
+        return this.$t('alarm.exportTitleCancelled') || '告警数据导出已终止'
+      }
+      if (this.exportProgress >= 100) {
+        return this.$t('alarm.exportTitleSuccess') || '告警数据导出完成'
+      }
+      return this.$t('alarm.exportTitleRunning') || '告警数据导出进行中'
+    },
+    exportProgressStatus () {
+      if (this.exportError) {
+        return 'exception'
+      }
+      if (this.exportProgress >= 100) {
+        return 'success'
+      }
+      if (this.exportLoading) {
+        return 'active'
+      }
+      return 'normal'
+    },
     columns() {
       return [
         {
@@ -228,21 +352,20 @@ export default {
       console.log('refs', this.$refs)
       // this.$refs.deviceAlarmTable.refresh()
     },
-    loadData (parameter) {
-      this.loading = true
-      console.log('parameter', parameter)
-      console.log('queryData', this.queryData)
-      const arg = Object.assign({}, parameter, this.queryData)
-      if (arg.start_date && moment.isMoment(arg.start_date)) {
-        arg.start_date = arg.start_date.format('YYYY-MM-DD HH:mm:ss')
+    buildQueryParams (pageNo = 1, pageSize = 10) {
+      const arg = Object.assign({}, this.queryData)
+      if (arg.start_date) {
+        arg.start_date = moment.isMoment(arg.start_date)
+          ? arg.start_date.format('YYYY-MM-DD HH:mm:ss')
+          : moment(arg.start_date).format('YYYY-MM-DD HH:mm:ss')
       }
-      if (arg.end_date && moment.isMoment(arg.end_date)) {
-        arg.end_date = arg.end_date.format('YYYY-MM-DD HH:mm:ss')
+      if (arg.end_date) {
+        arg.end_date = moment.isMoment(arg.end_date)
+          ? arg.end_date.format('YYYY-MM-DD HH:mm:ss')
+          : moment(arg.end_date).format('YYYY-MM-DD HH:mm:ss')
       }
-      arg.page_no = arg.pageNo
-      arg.page_size = arg.pageSize
-      delete arg.pageNo
-      delete arg.pageSize
+      arg.page_no = pageNo
+      arg.page_size = pageSize
       if (this.deviceStatus) {
         arg.device_status = this.deviceStatus
       }
@@ -252,7 +375,7 @@ export default {
       if (this.organizationId) {
         arg.organization_id = this.organizationId
       }
-      if (this.selectedItems.length > 0) {
+      if (this.selectedItems && this.selectedItems.length > 0) {
         arg.alarm_types_index = ''
         this.selectedItems.forEach((item, index) => {
           this.alarm_types.forEach((alarm, i) => {
@@ -266,6 +389,13 @@ export default {
           })
         })
       }
+      return arg
+    },
+    loadData (parameter) {
+      this.loading = true
+      console.log('parameter', parameter)
+      console.log('queryData', this.queryData)
+      const arg = this.buildQueryParams(parameter.pageNo, parameter.pageSize)
       // return getDeviceAlarmPostgres(arg)
       return getDeviceAlarm(arg)
         .then(res => {
@@ -281,6 +411,185 @@ export default {
             data: res.data.records
           }
         })
+        .catch(err => {
+          this.loading = false
+          throw err
+        })
+    },
+    handleExport () {
+      if (this.exportLoading) return
+      this.allExportRecords = []
+      this.currentExportPage = 1
+      this.totalExportCount = 0
+      this.totalExportPages = 0
+      this.exportProgress = 0
+      this.exportedCount = 0
+      this.exportError = null
+      this.isExportCancelled = false
+      this.showExportProgress = true
+      this.exportLoading = true
+      this.processExportLoop()
+    },
+    retryExport () {
+      if (this.exportLoading) return
+      this.exportError = null
+      this.isExportCancelled = false
+      this.exportLoading = true
+      this.processExportLoop()
+    },
+    terminateExport (downloadPartial = false) {
+      this.isExportCancelled = true
+      this.exportLoading = false
+      if (downloadPartial && this.allExportRecords && this.allExportRecords.length > 0) {
+        this.downloadCsvFile(this.allExportRecords, true)
+        this.exportStepText = `已终止导出，已下载前 ${this.allExportRecords.length} 条数据`
+      } else {
+        this.exportStepText = this.$t('alarm.exportCancelledMsg') || '已终止导出操作'
+      }
+      this.exportError = null
+      this.$message.info(this.$t('alarm.exportCancelledMsg') || '已终止导出操作')
+    },
+    async processExportLoop () {
+      this.exportLoading = true
+      this.exportError = null
+
+      try {
+        const BATCH_SIZE = 1000
+
+        // If starting at page 1, load alarm types and initial batch
+        if (this.currentExportPage === 1) {
+          this.exportStepText = this.$t('alarm.exportStepInit') || '正在初始化查询并拉取首批数据...'
+          const alarmPromise = (!this.alarm_types || this.alarm_types.length <= 16)
+            ? this.get_alarm_name()
+            : Promise.resolve()
+          const firstArg = this.buildQueryParams(1, BATCH_SIZE)
+
+          const [_, firstRes] = await Promise.all([
+            alarmPromise,
+            getDeviceAlarm(firstArg)
+          ])
+
+          if (this.isExportCancelled) return
+
+          const total = (firstRes && firstRes.data && firstRes.data.total) || 0
+          const firstRecords = (firstRes && firstRes.data && firstRes.data.records) || []
+
+          if (total === 0 || firstRecords.length === 0) {
+            this.showExportProgress = false
+            this.$message.warning(this.$t('alarm.exportNoData') || '暂无符合条件的告警数据可导出')
+            this.exportLoading = false
+            return
+          }
+
+          this.totalExportCount = total
+          this.totalExportPages = Math.ceil(total / BATCH_SIZE)
+          this.allExportRecords = [...firstRecords]
+          this.exportedCount = this.allExportRecords.length
+          this.exportProgress = Math.min((this.exportedCount / total) * 100, 95)
+          this.currentExportPage = 2
+        }
+
+        // Loop through remaining batches
+        while (this.currentExportPage <= this.totalExportPages) {
+          if (this.isExportCancelled) return
+
+          const page = this.currentExportPage
+          const totalPages = this.totalExportPages
+          this.exportStepText = (this.$t('alarm.exportStepFetching', { current: page, total: totalPages }))
+            || `正在拉取第 ${page}/${totalPages} 批数据...`
+
+          const pageArg = this.buildQueryParams(page, BATCH_SIZE)
+          const pageRes = await getDeviceAlarm(pageArg)
+
+          if (this.isExportCancelled) return
+
+          if (pageRes && pageRes.data && pageRes.data.records) {
+            this.allExportRecords = this.allExportRecords.concat(pageRes.data.records)
+          }
+
+          this.exportedCount = this.allExportRecords.length
+          this.exportProgress = Math.min((this.exportedCount / this.totalExportCount) * 100, 95)
+          this.currentExportPage++
+        }
+
+        if (this.isExportCancelled) return
+
+        if (this.allExportRecords.length === 0) {
+          this.showExportProgress = false
+          this.$message.warning(this.$t('alarm.exportNoData') || '暂无符合条件的告警数据可导出')
+          this.exportLoading = false
+          return
+        }
+
+        this.exportStepText = this.$t('alarm.exportStepParsing') || '数据拉取完毕，正在格式化并生成 Excel 文件...'
+        this.exportProgress = 98
+
+        // Small yield to let UI render progress update
+        await new Promise(resolve => setTimeout(resolve, 50))
+
+        // Trigger CSV download
+        this.downloadCsvFile(this.allExportRecords, false)
+
+        this.exportProgress = 100
+        this.exportStepText = (this.$t('alarm.exportStepCompleted', { total: this.allExportRecords.length }))
+          || `导出完成，已生成并下载文件 (共 ${this.allExportRecords.length} 条记录)`
+        this.$message.success(this.$t('alarm.exportSuccess') || '告警数据导出成功')
+      } catch (error) {
+        console.error('Export alarms error:', error)
+        const errorMsg = (error && error.response && error.response.data && error.response.data.msg)
+          || (error && error.message)
+          || '网络请求异常或超时'
+        this.exportError = errorMsg
+        const failedPage = this.currentExportPage
+        const totalPages = this.totalExportPages || 1
+        this.exportStepText = `第 ${failedPage}/${totalPages} 批数据请求失败 (${errorMsg})，您可以选择重试或终止导出`
+        this.$message.error(`第 ${failedPage} 批数据请求失败: ${errorMsg}`)
+      } finally {
+        this.exportLoading = false
+      }
+    },
+    downloadCsvFile (records, isPartial = false) {
+      const headers = [
+        this.$t('alarm.table.id'),
+        this.$t('alarm.table.deviceId'),
+        this.$t('alarm.table.type'),
+        this.$t('alarm.table.alarm'),
+        this.$t('alarm.table.time')
+      ]
+
+      const escapeCsv = (val) => {
+        if (val === null || val === undefined) return '""'
+        return `"${String(val).replace(/"/g, '""')}"`
+      }
+
+      const rows = records.map(record => {
+        const idStr = record.id !== undefined && record.id !== null ? String(record.id) : ''
+        const devIdStr = record.device_id ? `\t${record.device_id}` : ''
+        const typeStr = this.device_type_name(record.device_type)
+        const alarmStr = this.alarm_name(record.alarm)
+        const timeStr = record.timestamp ? this.localTime(record.timestamp) : ''
+        return [idStr, devIdStr, typeStr, alarmStr, timeStr]
+      })
+
+      const csvContent = '\uFEFF' + [
+        headers.map(escapeCsv).join(','),
+        ...rows.map(row => row.map(escapeCsv).join(','))
+      ].join('\r\n')
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      const downloadUrl = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.style.display = 'none'
+      link.href = downloadUrl
+      const timeStamp = moment().format('YYYYMMDD_HHmmss')
+      const prefix = isPartial ? 'alarm_records_partial_' : 'alarm_records_'
+      link.download = `${prefix}${timeStamp}.csv`
+      document.body.appendChild(link)
+      link.click()
+      setTimeout(() => {
+        window.URL.revokeObjectURL(downloadUrl)
+        document.body.removeChild(link)
+      }, 1000)
     },
     device_type_name (type) {
       const hexString = type.toString(16);
@@ -329,7 +638,7 @@ export default {
     get_alarm_name () {
       // 227 fm
       // 236 ls
-      getDeviceAlarmTypes(236)
+      return getDeviceAlarmTypes(236)
         .then(res => {
           console.log('alarm type', res)
           if (res.data) {

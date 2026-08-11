@@ -152,14 +152,14 @@ const vueConfig = {
     // }
     proxy: {
       '/admin': {
-        target: 'http://localhost:8015/',
-        // target: 'http://e.iov18.com/',
+        // target: 'http://localhost:8015/',
+        target: 'http://e.iov18.com/',
         ws: false,
         changeOrigin: true
       },
       '/api': {
-        target: 'http://localhost:8015/',
-        // target: 'http://e.iov18.com/',
+        // target: 'http://localhost:8015/',
+        target: 'http://e.iov18.com/',
         ws: false,
         changeOrigin: true
       }
