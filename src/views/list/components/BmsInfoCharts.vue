@@ -447,10 +447,20 @@ export default {
     }
   },
   mounted () {
-    this.refresh()
+    this.fetchData(false)
+    this.refreshTimer = setInterval(() => {
+      this.fetchData(false)
+    }, 15000)
+  },
+  beforeDestroy () {
+    if (this.refreshTimer) {
+      clearInterval(this.refreshTimer)
+      this.refreshTimer = null
+    }
   },
   data () {
     return {
+      refreshTimer: null,
       initHis: false,
       valueDate: [],
 
@@ -903,7 +913,12 @@ export default {
       return param_vec.join(',')
     },
     refresh () {
-      this.$message.info(this.$t('device.refreshing'))
+      this.fetchData(true)
+    },
+    fetchData (showToast = false) {
+      if (showToast) {
+        this.$message.info(this.$t('device.refreshing'))
+      }
       getBmsTypeInt(this.deviceId)
         .then(res => {
           console.log('bms type int', res)
@@ -917,7 +932,9 @@ export default {
         const bms_type = res.data.bms_type
         getBatteryInfoLatest(this.deviceId, res.data.bms_type, {})
           .then(res => {
-            this.$message.info(this.$t('device.refreshSuccess'))
+            if (showToast) {
+              this.$message.info(this.$t('device.refreshSuccess'))
+            }
             console.log('battery info latest', res)
             if (res.data && res.data.vehicle_detail_vo) {
               this.battery_capacity_config = res.data.battery_capacity
