@@ -151,6 +151,27 @@
         <a-button type='primary' @click='handleImport'>{{ $t('list.device.actions.import') }}</a-button>
         <a-button type='primary' @click='handleSendBtCode'>{{ $t('list.device.actions.sendBtCode') }}</a-button>
         <a-button type='primary' @click='handleRefreshOnlineStatusPage'>{{ $t('list.device.actions.refreshOnlineStatus') }}</a-button>
+        <span style="display: inline-flex; align-items: center; margin-left: 8px; margin-right: 8px;">
+          <span style="margin-right: 4px; font-weight: 500;">{{ $t('list.device.filters.offlineGreaterThan') }}</span>
+          <a-input-number
+            data-testid="device-offline-days-input"
+            v-model="queryData.offline_days"
+            :min="1"
+            :precision="0"
+            style="width: 70px;"
+            @change="handleOfflineDaysChange"
+            @pressEnter="handleOfflineDaysChange"
+          />
+          <span style="margin-left: 4px; margin-right: 4px;">{{ $t('list.device.filters.days') }}</span>
+          <a-button
+            v-if="queryData.offline_days != null && queryData.offline_days !== ''"
+            data-testid="device-offline-days-clear"
+            size="small"
+            icon="close"
+            shape="circle"
+            @click="clearOfflineDays"
+          />
+        </span>
         <a-dropdown v-action:edit v-if='selectedRowKeys.length > 0'>
           <a-menu slot='overlay'>
             <a-menu-item key='send-command' @click='handleSendCommandBatch'>
@@ -523,7 +544,8 @@ export default {
         soh: null,
         soc: null,
         alarm: null,
-        contains_search: false
+        contains_search: false,
+        offline_days: null
       },
       showMoreParam: false,
       showExporting: false,
@@ -868,6 +890,13 @@ export default {
             this.$message.error(err.msg)
           }
         })
+    },
+    handleOfflineDaysChange () {
+      this.refreshTable(true)
+    },
+    clearOfflineDays () {
+      this.queryData.offline_days = null
+      this.refreshTable(true)
     },
     handleRefreshOnlineStatusAll () {
       refreshDeviceOnlineStatusAll().then(res => {

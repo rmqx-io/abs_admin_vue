@@ -39,6 +39,8 @@ export default {
   'list.device.filters.collapseParams': 'Collapse Parameters',
   'list.device.filters.fuzzySearch': 'Fuzzy Search',
   'list.device.filters.orgPlaceholder': 'Please select organization',
+  'list.device.filters.offlineGreaterThan': 'Offline >',
+  'list.device.filters.days': 'days',
   'list.device.actions.addEdit': 'Add/Edit',
   'list.device.actions.commandManager': 'Command Manager',
   'list.device.actions.productionTest': 'Production Test',
