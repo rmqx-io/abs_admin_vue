@@ -42,6 +42,9 @@
         <a-tab-pane key="table">
           <template #tab><a-icon type="table" /><span>{{ $t('list.device.tabs.table') }}</span></template>
         </a-tab-pane>
+        <a-tab-pane key="map">
+          <template #tab><a-icon type="environment" /><span>{{ $t('list.device.tabs.map') }}</span></template>
+        </a-tab-pane>
         <a-tab-pane key="alarm">
           <template #tab><a-icon type="warning" /><span>{{ $t('list.device.tabs.alarm') }}</span></template>
         </a-tab-pane>
@@ -422,6 +425,14 @@
     </div>
     </div>
 
+    <div v-if="showMap" style="width: 100%; height: 70vh" class="map-container">
+      <device-map
+        v-if="showMap"
+        ref="deviceMapTab"
+        :device-status="deviceStatus"
+        :query-params="queryData"
+      />
+    </div>
     <div v-if="showAlarm" class="alarm-container">
       <device-alarm
         ref='alarm'
@@ -484,6 +495,7 @@ import PacketLog from '@/views/list/components/PacketLog'
 import LocationHistory from '@/views/list/components/LocationHistory'
 import LocationHistoryTable from './components/LocationHistoryTable'
 import DevicePlaybackPanel from '@/views/list/components/DevicePlaybackPanel'
+import DeviceMap from './components/DeviceMap'
 
 const apiBaseUrl = process.env.VUE_APP_API_BASE_URL || ''
 
@@ -505,7 +517,8 @@ export default {
     PacketLog,
     LocationHistory,
     LocationHistoryTable,
-    DevicePlaybackPanel
+    DevicePlaybackPanel,
+    DeviceMap
   },
   data() {
     return {
@@ -637,6 +650,9 @@ export default {
   computed: {
     showTableTab() {
       return this.activeTab === 'table'
+    },
+    showMap() {
+      return this.activeTab === 'map'
     },
     showAlarm() {
       return this.activeTab === 'alarm'
@@ -1220,6 +1236,12 @@ export default {
       console.log('tab change', tab)
       if (tab === 'table') {
         this.refreshTable(true)
+      } else if (tab === 'map') {
+        // Refresh device markers whenever the map tab is opened/selected
+        // so that the latest locations are always fetched.
+        if (this.$refs.deviceMapTab && this.$refs.deviceMapTab.refreshMap) {
+          this.$refs.deviceMapTab.refreshMap()
+        }
       } else if (tab === 'alarm') {
         if (this.$refs.alarm) {
           this.$refs.alarm.query()

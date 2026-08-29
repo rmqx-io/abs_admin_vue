@@ -73,6 +73,18 @@ export default {
   components: {
     LMap
   },
+  props: {
+    // Query filters from the device list page (device status / org / device id).
+    // The map shows markers for the currently filtered device set.
+    deviceStatus: {
+      type: String,
+      default: 'total'
+    },
+    queryParams: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data () {
     return {
       isDestroyed: false,
@@ -133,10 +145,21 @@ export default {
         return
       }
       this.isGettingDeviceLocation = true
+      // Reset markers so stale (old) locations never linger on the map
+      this.deviceMarkers = []
+      this.markersFound = 0
       const arg = {}
       arg.page_no = 1
       arg.page_size = 2000
-      arg.device_status = 'total'
+      arg.device_status = this.deviceStatus || 'total'
+      // Carry over useful filters from the device list page (org/device filters)
+      const qp = this.queryParams || {}
+      if (qp.organization_id) {
+        arg.organization_id = qp.organization_id
+      }
+      if (qp.device_id) {
+        arg.device_id = qp.device_id
+      }
       this.getDeviceLocation(arg, 1)
     },
     getDeviceLocation (arg, page_no) {
