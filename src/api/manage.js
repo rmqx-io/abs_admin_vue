@@ -107,6 +107,7 @@ export const api = {
   geo_fence_devices: `${prefix}/geo_fence/devices`,
   geo_fence_bind_devices: `${prefix}/geo_fence/bind_devices`,
   geo_fence_query_point: `${prefix}/geo_fence/query_point`,
+  geo_fence_check_position: `${prefix}/geo_fence/check_position`,
   alarm_rule_page: `${prefix}/alarm_rule/page`,
   alarm_rule_add: `${prefix}/alarm_rule/add`,
   alarm_rule_update: `${prefix}/alarm_rule/update`,
@@ -829,6 +830,10 @@ export function bindGeoFenceDevices(arg) {
 
 export function queryGeoFencePoint(arg) {
   return request({ url: api.geo_fence_query_point, method: 'post', data: arg })
+}
+
+export function checkGeoFencePosition(arg) {
+  return request({ url: api.geo_fence_check_position, method: 'post', data: arg })
 }
 
 export function getAlarmRulePage(arg) {

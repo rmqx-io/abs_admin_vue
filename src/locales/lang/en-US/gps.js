@@ -39,6 +39,8 @@ export default {
   "gps.fence.alerts": "Alerts",
   "gps.fence.deviceCount": "Devices",
   "gps.fence.bindDevices": "Bind Devices",
+  "gps.fence.forDevice": "Current device",
+  "gps.fence.forDeviceHint": "Opened from this device; new fences will bind it automatically",
   "gps.fence.circleRequired": "Center and radius required",
   "gps.fence.polygonRequired": "Polygon vertices required",
   "gps.rule.add": "New Rule",

@@ -1,5 +1,13 @@
 <template>
   <a-card :bordered="false">
+    <a-alert
+      v-if="prefillDeviceId"
+      type="info"
+      show-icon
+      style="margin-bottom: 12px"
+      :message="$t('gps.fence.forDevice') + ': ' + prefillDeviceId"
+      :description="$t('gps.fence.forDeviceHint')"
+    />
     <div class="table-operator" style="margin-bottom: 16px">
       <a-button type="primary" icon="plus" @click="openEdit()">{{ $t('gps.fence.add') }}</a-button>
       <a-button icon="reload" style="margin-left: 8px" @click="loadData()">{{ $t('gps.common.refresh') }}</a-button>
@@ -154,6 +162,7 @@ export default {
       allDevices: [],
       deviceLoading: false,
       boundDeviceKeys: [],
+      prefillDeviceId: '',
       deviceColumns: [
         { title: this.$t('gps.common.deviceId'), dataIndex: 'code' },
         { title: this.$t('gps.common.alias'), dataIndex: 'alias' }
@@ -172,9 +181,18 @@ export default {
     }
   },
   created () {
+    this.applyDeviceQuery()
     this.loadData()
   },
+  watch: {
+    '$route.query.device_id' (val) {
+      this.prefillDeviceId = val || ''
+    }
+  },
   methods: {
+    applyDeviceQuery () {
+      this.prefillDeviceId = (this.$route.query && this.$route.query.device_id) || ''
+    },
     emptyFence () {
       return {
         id: undefined,
@@ -254,6 +272,9 @@ export default {
         effective_start: e.effective_start_moment ? e.effective_start_moment.format('HH:mm:ss') : undefined,
         effective_end: e.effective_end_moment ? e.effective_end_moment.format('HH:mm:ss') : undefined,
         description: e.description || undefined
+      }
+      if (!e.id && this.prefillDeviceId) {
+        payload.device_ids = [this.prefillDeviceId]
       }
       try {
         if (e.id) {

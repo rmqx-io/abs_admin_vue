@@ -39,6 +39,8 @@ export default {
   "gps.fence.alerts": "告警",
   "gps.fence.deviceCount": "绑定数",
   "gps.fence.bindDevices": "绑定设备",
+  "gps.fence.forDevice": "当前设备",
+  "gps.fence.forDeviceHint": "从此设备进入围栏管理，新建围栏将自动绑定该设备",
   "gps.fence.circleRequired": "请填写圆心与半径",
   "gps.fence.polygonRequired": "请填写多边形顶点",
   "gps.rule.add": "新增规则",

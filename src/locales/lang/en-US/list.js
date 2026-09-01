@@ -77,6 +77,7 @@ export default {
   'list.device.menu.historyTrip': 'History Trip',
   'list.device.menu.historyRoute': 'History Route',
   'list.device.menu.historyMileage': 'History Mileage',
+  'list.device.menu.fence': 'Fence',
   'list.device.menu.sendCommand': 'Send Command',
   'list.device.menu.protocolLog': 'Protocol Log',
   'list.device.menu.refreshStatus': 'Refresh Online Status',

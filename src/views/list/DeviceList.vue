@@ -289,6 +289,8 @@
           <template>
             <a @click="handleBatteryInfo(record)">{{ $t('list.device.menu.batteryDetails') }}</a>
             <a-divider type="vertical" />
+            <a data-testid="device-fence-button" @click="handleFence(record)">{{ $t('list.device.menu.fence') }}</a>
+            <a-divider type="vertical" />
             <a-dropdown>
               <a class="ant-dropdown-link">{{ $t('common.more') }}<a-icon type="down"/>
               </a>
@@ -301,6 +303,9 @@
                 </a-menu-item>
                 <a-menu-item>
                   <a @click="handleLocationHistory(record)">{{ $t('list.device.menu.historyMileage') }}</a>
+                </a-menu-item>
+                <a-menu-item>
+                  <a data-testid="device-fence-button" @click="handleFence(record)">{{ $t('list.device.menu.fence') }}</a>
                 </a-menu-item>
                 <a-menu-item>
                   <a @click="handleSendCommand(record)">{{ $t('list.device.menu.sendCommand') }}</a>
@@ -1138,6 +1143,9 @@ export default {
     handleMap(record) {
       this.device_id = record.code
       this.map_visible = true
+    },
+    handleFence(record) {
+      this.$router.push({ path: '/gps/fence', query: { device_id: record.code } })
     },
     handleSendCommand(record) {
       this.device_id = record.code

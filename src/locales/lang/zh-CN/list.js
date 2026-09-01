@@ -77,6 +77,7 @@ export default {
   'list.device.menu.historyTrip': '历史行程',
   'list.device.menu.historyRoute': '历史行程',
   'list.device.menu.historyMileage': '历史里程',
+  'list.device.menu.fence': '围栏',
   'list.device.menu.sendCommand': '下发指令',
   'list.device.menu.protocolLog': '协议日志',
   'list.device.menu.refreshStatus': '刷新在线状态',
