@@ -56,5 +56,9 @@ export default {
     'menu.tools.bms-query-rate-limit': 'BMS查询频率限制',
     'menu.tools.device-tracing': '设备在线追踪',
     'menu.tools.scylla-reclaim': 'Scylla 磁盘回收',
-    'menu.test': '测试'
+    'menu.test': '测试',
+    'menu.gps': 'GPS平台',
+    'menu.gps.fence': '围栏管理',
+    'menu.gps.rule': '告警规则',
+    'menu.gps.alarm': '平台告警'
 }

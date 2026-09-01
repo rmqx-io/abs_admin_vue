@@ -98,6 +98,22 @@ export const api = {
   scylla_reclaim_history: `${prefix}/scylla_reclaim/history`,
   scylla_reclaim_history_logs: `${prefix}/scylla_reclaim/history`,
   device_tracing: `${prefix}/tracing/device`,
+
+  // ---- 通用 GPS 平台扩展：电子围栏 / 告警规则 / 平台告警 ----
+  geo_fence_page: `${prefix}/geo_fence/page`,
+  geo_fence_add: `${prefix}/geo_fence/add`,
+  geo_fence_update: `${prefix}/geo_fence/update`,
+  geo_fence_remove: `${prefix}/geo_fence/remove`,
+  geo_fence_devices: `${prefix}/geo_fence/devices`,
+  geo_fence_bind_devices: `${prefix}/geo_fence/bind_devices`,
+  geo_fence_query_point: `${prefix}/geo_fence/query_point`,
+  alarm_rule_page: `${prefix}/alarm_rule/page`,
+  alarm_rule_add: `${prefix}/alarm_rule/add`,
+  alarm_rule_update: `${prefix}/alarm_rule/update`,
+  alarm_rule_remove: `${prefix}/alarm_rule/remove`,
+  platform_alarm_page: `${prefix}/platform_alarm/page`,
+  platform_alarm_confirm: `${prefix}/platform_alarm/confirm`,
+  platform_alarm_clear: `${prefix}/platform_alarm/clear`,
 }
 
 export function getAction(url, parameter) {
@@ -785,6 +801,62 @@ export function clearDeviceTracingRecords(deviceId) {
     url: api.device_tracing + '/' + deviceId + '/records',
     method: 'delete'
   })
+}
+
+export function getGeoFencePage(arg) {
+  return request({ url: api.geo_fence_page, method: 'post', data: arg })
+}
+
+export function addGeoFence(arg) {
+  return request({ url: api.geo_fence_add, method: 'post', data: arg })
+}
+
+export function updateGeoFence(arg) {
+  return request({ url: api.geo_fence_update, method: 'post', data: arg })
+}
+
+export function removeGeoFence(arg) {
+  return request({ url: api.geo_fence_remove, method: 'post', data: arg })
+}
+
+export function getGeoFenceDevices(fenceId) {
+  return request({ url: api.geo_fence_devices + '/' + fenceId, method: 'get' })
+}
+
+export function bindGeoFenceDevices(arg) {
+  return request({ url: api.geo_fence_bind_devices, method: 'post', data: arg })
+}
+
+export function queryGeoFencePoint(arg) {
+  return request({ url: api.geo_fence_query_point, method: 'post', data: arg })
+}
+
+export function getAlarmRulePage(arg) {
+  return request({ url: api.alarm_rule_page, method: 'post', data: arg })
+}
+
+export function addAlarmRule(arg) {
+  return request({ url: api.alarm_rule_add, method: 'post', data: arg })
+}
+
+export function updateAlarmRule(arg) {
+  return request({ url: api.alarm_rule_update, method: 'post', data: arg })
+}
+
+export function removeAlarmRule(arg) {
+  return request({ url: api.alarm_rule_remove, method: 'post', data: arg })
+}
+
+export function getPlatformAlarmPage(arg) {
+  return request({ url: api.platform_alarm_page, method: 'post', data: arg })
+}
+
+export function confirmPlatformAlarm(arg) {
+  return request({ url: api.platform_alarm_confirm, method: 'post', data: arg })
+}
+
+export function clearPlatformAlarm(arg) {
+  return request({ url: api.platform_alarm_clear, method: 'post', data: arg })
 }
 
 /**

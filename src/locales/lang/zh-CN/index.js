@@ -14,6 +14,7 @@ import list from './list'
 import org from './org'
 import alarm from './alarm'
 import deviceTracing from './device-tracing'
+import gps from './gps'
 
 const components = {
   antLocale: antd,
@@ -56,5 +57,6 @@ export default {
   ...list,
   ...org,
   ...alarm,
-  ...deviceTracing
+  ...deviceTracing,
+  ...gps
 }

@@ -55,5 +55,9 @@ export default {
   'menu.tools.bms-query-rate-limit': 'BMS Query Rate Limit',
   'menu.tools.device-tracing': 'Device Tracing',
   'menu.tools.scylla-reclaim': 'Scylla Disk Reclaim',
-  'menu.test': 'Test'
+  'menu.test': 'Test',
+  'menu.gps': 'GPS Platform',
+    'menu.gps.fence': 'Geo-Fence',
+    'menu.gps.rule': 'Alarm Rules',
+    'menu.gps.alarm': 'Platform Alarms'
 }

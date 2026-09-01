@@ -71,6 +71,27 @@ export const asyncRouterMap = [
             name: 'Info',
             component: () => import('@/views/list/components/BatteryInfo'),
             meta: { title: 'menu.list.battery-detail', keepAlive: true, permission: ['table'] }
+          },
+          {
+            path: '/gps/fence',
+            name: 'GeoFenceList',
+            hideChildrenInMenu: true,
+            component: () => import('@/views/gps/FenceList'),
+            meta: { title: 'menu.gps.fence', keepAlive: true, permission: ['table'] }
+          },
+          {
+            path: '/gps/alarm-rule',
+            name: 'AlarmRuleList',
+            hideChildrenInMenu: true,
+            component: () => import('@/views/gps/AlarmRuleList'),
+            meta: { title: 'menu.gps.rule', keepAlive: true, permission: ['table'] }
+          },
+          {
+            path: '/gps/platform-alarm',
+            name: 'PlatformAlarmList',
+            hideChildrenInMenu: true,
+            component: () => import('@/views/gps/PlatformAlarmList'),
+            meta: { title: 'menu.gps.alarm', keepAlive: true, permission: ['table'] }
           }
         ]
       },
