@@ -82,8 +82,21 @@ style="width: 100%"
         <a-form-item :label="$t('gps.rule.enabled')">
           <a-switch :checked="editing.enabled === 1" @change="v => (editing.enabled = v ? 1 : 0)" />
         </a-form-item>
+        <a-form-item :label="$t('gps.rule.channel')">
+          <a-checkbox-group :value="channelList" @change="onChannelChange">
+            <a-checkbox :value="1">{{ $t('gps.rule.channelWebhook') }}</a-checkbox>
+            <a-checkbox :value="2">{{ $t('gps.rule.channelSms') }}</a-checkbox>
+            <a-checkbox :value="4">{{ $t('gps.rule.channelPush') }}</a-checkbox>
+          </a-checkbox-group>
+        </a-form-item>
         <a-form-item :label="$t('gps.rule.webhook')">
           <a-input v-model="editing.notify_webhook" :placeholder="'https://example.com/hook'" />
+        </a-form-item>
+        <a-form-item v-if="(editing.notify_channel & 2) === 2" :label="$t('gps.rule.smsPhone')">
+          <a-input v-model="editing.notify_sms" placeholder="13800138000" />
+        </a-form-item>
+        <a-form-item v-if="(editing.notify_channel & 4) === 4" :label="$t('gps.rule.pushToken')">
+          <a-input v-model="editing.notify_push" />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -109,6 +122,7 @@ export default {
         { title: this.$t('gps.rule.threshold'), scopedSlots: { customRender: 'threshold' } },
         { title: this.$t('gps.common.status'), dataIndex: 'enabled', scopedSlots: { customRender: 'enabled' } },
         { title: this.$t('gps.rule.webhook'), dataIndex: 'notify_webhook' },
+        { title: this.$t('gps.rule.channel'), dataIndex: 'notify_channel' },
         { title: this.$t('gps.common.action'), key: 'action', scopedSlots: { customRender: 'action' } }
       ],
       editVisible: false,
@@ -124,6 +138,14 @@ export default {
         showSizeChanger: true,
         showTotal: t => `${this.$t('gps.common.total')} ${t}`
       }
+    },
+    channelList () {
+      const mask = this.editing.notify_channel || 0
+      const vals = []
+      if (mask & 1) vals.push(1)
+      if (mask & 2) vals.push(2)
+      if (mask & 4) vals.push(4)
+      return vals
     }
   },
   created () {
@@ -131,7 +153,20 @@ export default {
   },
   methods: {
     emptyRule () {
-      return { id: undefined, device_id: '', rule_type: 1, threshold: 30, enabled: 1, notify_webhook: undefined }
+      return {
+        id: undefined,
+        device_id: '',
+        rule_type: 1,
+        threshold: 30,
+        enabled: 1,
+        notify_webhook: undefined,
+        notify_channel: 1,
+        notify_sms: undefined,
+        notify_push: undefined
+      }
+    },
+    onChannelChange (vals) {
+      this.editing.notify_channel = (vals || []).reduce((a, b) => a + b, 0)
     },
     ruleName (t) {
       const map = { 1: this.$t('gps.rule.speed'), 2: this.$t('gps.rule.powerOff'), 3: this.$t('gps.rule.lowBattery'), 4: this.$t('gps.rule.vibration') }
@@ -178,14 +213,25 @@ export default {
       }
       try {
         if (e.id) {
-          await updateAlarmRule({ id: e.id, threshold: e.threshold, enabled: e.enabled, notify_webhook: e.notify_webhook })
+          await updateAlarmRule({
+            id: e.id,
+            threshold: e.threshold,
+            enabled: e.enabled,
+            notify_webhook: e.notify_webhook,
+            notify_channel: e.notify_channel,
+            notify_sms: e.notify_sms,
+            notify_push: e.notify_push
+          })
         } else {
           await addAlarmRule({
             device_id: e.device_id,
             rule_type: e.rule_type,
             threshold: e.rule_type === 1 || e.rule_type === 3 ? e.threshold : undefined,
             enabled: e.enabled,
-            notify_webhook: e.notify_webhook || undefined
+            notify_webhook: e.notify_webhook || undefined,
+            notify_channel: e.notify_channel || 1,
+            notify_sms: e.notify_sms || undefined,
+            notify_push: e.notify_push || undefined
           })
         }
         this.$message.success(this.$t('gps.common.success'))

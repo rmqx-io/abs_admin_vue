@@ -59,5 +59,8 @@ export default {
   'menu.gps': 'GPS Platform',
     'menu.gps.fence': 'Geo-Fence',
     'menu.gps.rule': 'Alarm Rules',
-    'menu.gps.alarm': 'Platform Alarms'
+    'menu.gps.alarm': 'Platform Alarms',
+    'menu.gps.group': 'Device Groups',
+    'menu.gps.mileage': 'Mileage',
+    'menu.gps.trajectory': 'Trajectory Report'
 }

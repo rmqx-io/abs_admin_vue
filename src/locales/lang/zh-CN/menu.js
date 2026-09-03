@@ -60,5 +60,8 @@ export default {
     'menu.gps': 'GPS平台',
     'menu.gps.fence': '围栏管理',
     'menu.gps.rule': '告警规则',
-    'menu.gps.alarm': '平台告警'
+    'menu.gps.alarm': '平台告警',
+    'menu.gps.group': '设备分组',
+    'menu.gps.mileage': '里程统计',
+    'menu.gps.trajectory': '轨迹报表'
 }

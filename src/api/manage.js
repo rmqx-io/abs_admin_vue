@@ -115,6 +115,17 @@ export const api = {
   platform_alarm_page: `${prefix}/platform_alarm/page`,
   platform_alarm_confirm: `${prefix}/platform_alarm/confirm`,
   platform_alarm_clear: `${prefix}/platform_alarm/clear`,
+  device_group_page: `${prefix}/device_group/page`,
+  device_group_add: `${prefix}/device_group/add`,
+  device_group_update: `${prefix}/device_group/update`,
+  device_group_remove: `${prefix}/device_group/remove`,
+  device_group_devices: `${prefix}/device_group/devices`,
+  device_group_bind_devices: `${prefix}/device_group/bind_devices`,
+  mileage_report: `${prefix}/mileage/report`,
+  mileage_export_csv: `${prefix}/mileage/export_csv`,
+  trajectory_report: `${prefix}/trajectory/report`,
+  trajectory_export_csv: `${prefix}/trajectory/export_csv`,
+  trajectory_export_kml: `${prefix}/trajectory/export_kml`,
 }
 
 export function getAction(url, parameter) {
@@ -862,6 +873,50 @@ export function confirmPlatformAlarm(arg) {
 
 export function clearPlatformAlarm(arg) {
   return request({ url: api.platform_alarm_clear, method: 'post', data: arg })
+}
+
+export function getDeviceGroupPage(arg) {
+  return request({ url: api.device_group_page, method: 'post', data: arg })
+}
+
+export function addDeviceGroup(arg) {
+  return request({ url: api.device_group_add, method: 'post', data: arg })
+}
+
+export function updateDeviceGroup(arg) {
+  return request({ url: api.device_group_update, method: 'post', data: arg })
+}
+
+export function removeDeviceGroup(arg) {
+  return request({ url: api.device_group_remove, method: 'post', data: arg })
+}
+
+export function getDeviceGroupDevices(groupId) {
+  return request({ url: api.device_group_devices + '/' + groupId, method: 'get' })
+}
+
+export function bindDeviceGroupDevices(arg) {
+  return request({ url: api.device_group_bind_devices, method: 'post', data: arg })
+}
+
+export function getMileageReport(arg) {
+  return request({ url: api.mileage_report, method: 'post', data: arg })
+}
+
+export function exportMileageCsv(arg) {
+  return request({ url: api.mileage_export_csv, method: 'post', data: arg, responseType: 'blob' })
+}
+
+export function getTrajectoryReport(arg) {
+  return request({ url: api.trajectory_report, method: 'post', data: arg })
+}
+
+export function exportTrajectoryCsv(arg) {
+  return request({ url: api.trajectory_export_csv, method: 'post', data: arg, responseType: 'blob' })
+}
+
+export function exportTrajectoryKml(arg) {
+  return request({ url: api.trajectory_export_kml, method: 'post', data: arg, responseType: 'blob' })
 }
 
 /**

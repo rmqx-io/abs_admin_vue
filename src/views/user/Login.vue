@@ -189,7 +189,12 @@ export default {
           console.log('login form', values)
           const loginParams = { ...values }
           delete loginParams.account
-          loginParams[!state.loginType ? 'email' : 'account'] = values.account
+          // 账户密码登录(tab1)以 account 字段提交；手机验证码登录(tab2)以 mobile 字段提交
+          if (customActiveKey === 'tab1') {
+            loginParams.account = values.account
+          } else {
+            loginParams.mobile = values.mobile
+          }
           loginParams.password = md5(values.password)
           loginParams.vcode = ""
           Login(loginParams)

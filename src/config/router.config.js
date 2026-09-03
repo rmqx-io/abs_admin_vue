@@ -92,6 +92,27 @@ export const asyncRouterMap = [
             hideChildrenInMenu: true,
             component: () => import('@/views/gps/PlatformAlarmList'),
             meta: { title: 'menu.gps.alarm', keepAlive: true, permission: ['table'] }
+          },
+          {
+            path: '/gps/group',
+            name: 'DeviceGroupList',
+            hideChildrenInMenu: true,
+            component: () => import('@/views/gps/DeviceGroupList'),
+            meta: { title: 'menu.gps.group', keepAlive: true, permission: ['table'] }
+          },
+          {
+            path: '/gps/mileage',
+            name: 'MileageReport',
+            hideChildrenInMenu: true,
+            component: () => import('@/views/gps/MileageReport'),
+            meta: { title: 'menu.gps.mileage', keepAlive: true, permission: ['table'] }
+          },
+          {
+            path: '/gps/trajectory',
+            name: 'TrajectoryReport',
+            hideChildrenInMenu: true,
+            component: () => import('@/views/gps/TrajectoryReport'),
+            meta: { title: 'menu.gps.trajectory', keepAlive: true, permission: ['table'] }
           }
         ]
       },
