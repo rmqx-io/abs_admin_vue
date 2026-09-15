@@ -56,6 +56,7 @@ export const api = {
   battery_model: `${prefix}/battery/model/page`,
 
   battery_info: `${prefix}/device/bms/info`,
+  battery_info_export: `${prefix}/device/bms/info`,
   battery_info_latest: `${prefix}/device/bms/info/latest`,
   bms_config: `${prefix}/device/bms/config`,
   bms_config_data_types: `${prefix}/device/bms/config/data_types`,
@@ -917,6 +918,15 @@ export function exportTrajectoryCsv(arg) {
 
 export function exportTrajectoryKml(arg) {
   return request({ url: api.trajectory_export_kml, method: 'post', data: arg, responseType: 'blob' })
+}
+
+export function exportBmsHistoryExcel(deviceId, bmsType, arg) {
+  return request({
+    url: `${api.battery_info_export}/${deviceId}/${bmsType}/export`,
+    method: 'post',
+    data: arg,
+    responseType: 'blob'
+  })
 }
 
 /**

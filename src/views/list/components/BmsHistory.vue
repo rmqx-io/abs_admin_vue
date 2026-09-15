@@ -14,6 +14,18 @@
                             />
                         </a-form-item>
                     </a-col>
+                    <a-col :md="6" :sm="12">
+                        <a-form-item aria-label="导出">
+                            <a-button
+                                type="primary"
+                                ghost
+                                icon="file-excel"
+                                :loading="exporting"
+                                data-testid="bms-history-export-button"
+                                @click="exportExcel"
+                            >导出 Excel</a-button>
+                        </a-form-item>
+                    </a-col>
                 </a-row>
             </a-form>
         </div>
@@ -47,7 +59,7 @@
     </a-card>
 </template>
 <script>
-import { getBmsType, getBatteryInfo } from '@/api/manage'
+import { getBmsType, getBatteryInfo, exportBmsHistoryExcel } from '@/api/manage'
 import BmsChartComponent from '@/views/list/components/BmsChartComponent'
 import moment from 'moment/moment'
 
@@ -81,6 +93,7 @@ export default {
             singleBatteryVoltageYLabel: '电压 (V)',
             singleBatteryVoltageData: {},
             loading: false,
+            exporting: false,
             bms_type: "",
         }
     },
@@ -199,7 +212,65 @@ export default {
                         }, 1000)
                     }
                 })
+        },
+        /**
+         * 导出所选日期（00:00:00 ~ 23:59:59）的全部历史信息为 Excel。
+         * 页面是 ECharts 折线图，落盘由后端把同一套查询结果写成 .xlsx，
+         * 前端只负责带上当前 bms_type 和日期区间，再把 blob 交给浏览器下载。
+         */
+        async exportExcel () {
+            if (!this.bms_type) {
+                this.$message.error('BMS 类型加载未完成，请稍后重试')
+                return
+            }
+            const startDate = this.date.clone().startOf('day')
+            const endDate = this.date.clone().endOf('day')
+            this.exporting = true
+            try {
+                const blob = await exportBmsHistoryExcel(this.deviceId, this.bms_type, {
+                    device_id: this.deviceId,
+                    bms_type: this.bms_type,
+                    start_date: startDate.format('YYYY-MM-DD HH:mm:ss'),
+                    end_date: endDate.format('YYYY-MM-DD HH:mm:ss')
+                })
+                if (!blob || !blob.size) {
+                    this.$message.error('导出失败：响应为空')
+                    return
+                }
+                if (blob.type && blob.type.indexOf('json') !== -1) {
+                    this.$message.error(await readExportError(blob))
+                    return
+                }
+                const fileName = `BMS历史信息_${this.deviceId}_${startDate.format('YYYYMMDD')}.xlsx`
+                const url = window.URL.createObjectURL(new Blob([blob]))
+                const link = document.createElement('a')
+                link.href = url
+                link.download = fileName
+                link.click()
+                window.URL.revokeObjectURL(url)
+                this.$message.success(`已导出 ${fileName}`)
+            } catch (error) {
+                console.error('exportBmsHistoryExcel failed:', error)
+                this.$message.error('导出失败，请稍后重试')
+            } finally {
+                this.exporting = false
+            }
         }
+    }
+}
+
+/**
+ * responseType=blob 会把后端的 RespVO 错误也包成 Blob，下载前读回来提示给用户。
+ */
+async function readExportError (blob) {
+    if (!blob || !blob.text) {
+        return '导出失败'
+    }
+    try {
+        const body = JSON.parse(await blob.text())
+        return body.message || '导出失败'
+    } catch (ignore) {
+        return '导出失败'
     }
 }
 </script>
