@@ -10,10 +10,10 @@ jest.mock('@/api/manage', () => ({
 }))
 
 // Mock Echarts for BmsChartComponent testing
-const setOptionMock = jest.fn()
+const mockSetOption = jest.fn()
 jest.mock('echarts', () => ({
   init: jest.fn(() => ({
-    setOption: setOptionMock
+    setOption: mockSetOption
   })),
   getInstanceByDom: jest.fn(() => null)
 }))
@@ -87,8 +87,8 @@ describe('BmsHistory and BmsChartComponent temperature fix', () => {
     wrapper.vm.updateChart(chartData)
 
     // Assert that echarts was initialized and setOption was called with connectNulls: true
-    expect(setOptionMock).toHaveBeenCalled()
-    const lastCalledOptions = setOptionMock.mock.calls[setOptionMock.mock.calls.length - 1][0]
+    expect(mockSetOption).toHaveBeenCalled()
+    const lastCalledOptions = mockSetOption.mock.calls[mockSetOption.mock.calls.length - 1][0]
     expect(lastCalledOptions.series[0]).toEqual(
       expect.objectContaining({
         type: 'line',
