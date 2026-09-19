@@ -287,7 +287,7 @@
 
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleBatteryInfo(record)">{{ $t('list.device.menu.batteryDetails') }}</a>
+            <a data-testid="device-battery-details-button" @click="handleBatteryInfo(record)">{{ $t('list.device.menu.batteryDetails') }}</a>
             <a-divider type="vertical" />
             <a data-testid="device-fence-button" @click="handleFence(record)">{{ $t('list.device.menu.fence') }}</a>
             <a-divider type="vertical" />

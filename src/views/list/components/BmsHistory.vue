@@ -246,8 +246,13 @@ export default {
                 const link = document.createElement('a')
                 link.href = url
                 link.download = fileName
+                link.style.display = 'none'
+                document.body.appendChild(link)
                 link.click()
-                window.URL.revokeObjectURL(url)
+                document.body.removeChild(link)
+                setTimeout(() => {
+                    window.URL.revokeObjectURL(url)
+                }, 1000)
                 this.$message.success(`已导出 ${fileName}`)
             } catch (error) {
                 console.error('exportBmsHistoryExcel failed:', error)

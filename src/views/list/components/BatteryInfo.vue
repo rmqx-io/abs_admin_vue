@@ -2,9 +2,9 @@
   <a-card>
     <div width='100%'>
       <a @click="handleClose()"><< 返回</a>
-      <a-radio-group v-model:value="mode" :style="{ marginBottom: '8px', marginRight: '8px', float: 'right' }">
+      <a-radio-group v-model="mode" :style="{ marginBottom: '8px', marginRight: '8px', float: 'right' }">
         <a-radio-button value="basic">基础信息</a-radio-button>
-        <a-radio-button value="history">历史信息</a-radio-button>
+        <a-radio-button value="history" data-testid="bms-mode-history">历史信息</a-radio-button>
         <a-radio-button value="config">配置信息</a-radio-button>
       </a-radio-group>
     </div>
